@@ -1,25 +1,27 @@
+import Image from "next/image";
+import plate from "../brand/logo/dragonet-divers-logo-plate.png";
+import HomeFeatures from "@/components/HomeFeatures";
 import HomeHero from "@/components/HomeHero";
+import LearnToDive from "@/components/LearnToDive";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { FishIcon, SunsetIcon, UsersIcon, Wave } from "@/components/icons";
+import { ArrowIcon, Wave } from "@/components/icons";
+import { whatsappLink } from "@/lib/site";
 
-// Halaman sementara selama website lengkap dibangun. Isinya hanya janji brand
-// dan cerita logo (BRANDING.md §1); belum ada harga, jadwal, atau klaim lain.
-const promises = [
-  { icon: UsersIcon, title: "Small groups", text: "Fewer divers per guide, more time with the reef." },
-  { icon: FishIcon, title: "Local guides", text: "Guides who know the Dampier Strait reefs by name." },
-  { icon: SunsetIcon, title: "Dusk dives", text: "Watch mandarinfish pairs rise from the rubble at sunset." },
-];
-
+// Halaman sementara selama website lengkap dibangun. Isinya hanya janji brand,
+// layanan, dan cerita logo (BRANDING.md §1); belum ada harga, jadwal, atau klaim lain.
 export default function HomePage() {
+  const chat = whatsappLink("Hi Dragonet Divers, I'd like to plan some diving in Raja Ampat.");
   return (
     <>
       <SiteHeader />
       <main>
         <HomeHero />
+        <HomeFeatures />
+        <LearnToDive />
 
         <section id="story" className="scroll-mt-24 bg-foam">
-          <div className="gutter mx-auto grid max-w-[1200px] gap-10 py-16 md:grid-cols-[1fr_1fr] md:py-24">
+          <div className="gutter mx-auto grid max-w-[1200px] items-center gap-10 py-16 md:grid-cols-[1fr_auto] md:gap-16 md:py-24">
             <div className="grid content-start gap-3">
               <p className="eyebrow">Our name</p>
               <h2 className="text-[1.75rem] leading-[1.15] text-abyss sm:text-[2.125rem]">Named after the fish that dances at dusk</h2>
@@ -30,19 +32,32 @@ export default function HomePage() {
                 Raja Ampat.
               </p>
             </div>
-            <ul className="grid content-start gap-4">
-              {promises.map(({ icon: Icon, title, text }) => (
-                <li key={title} className="grid grid-cols-[44px_1fr] items-start gap-4 rounded-card border border-mist bg-white p-5">
-                  <span className="grid size-11 place-items-center rounded-full bg-teal-soft text-teal">
-                    <Icon className="size-[22px]" />
-                  </span>
-                  <span className="grid gap-1">
-                    <span className="text-lg font-bold">{title}</span>
-                    <span className="text-[15px] text-slate">{text}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {/* Versi plate: pita tulisan logo asli transparan, latar section Foam (BRANDING.md §2) */}
+            <Image src={plate} alt="Dragonet Divers badge: two mandarinfish under a sunset over Raja Ampat" className="mx-auto size-52 md:size-64" />
+          </div>
+        </section>
+
+        <section aria-labelledby="plan-title" className="bg-white">
+          <div className="gutter mx-auto grid max-w-[1200px] justify-items-center gap-4 py-16 text-center md:py-24">
+            <p className="eyebrow">Fun dives · Courses · Snorkeling</p>
+            <h2 id="plan-title" className="text-[1.75rem] leading-[1.15] text-abyss sm:text-[2.25rem]">
+              Plan your days in Raja Ampat
+            </h2>
+            <Wave />
+            <p className="max-w-[52ch] text-slate">Fun dives, dive courses and snorkeling trips around the Dampier Strait.</p>
+            {chat ? (
+              <a
+                href={chat}
+                className="mt-4 inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
+              >
+                Chat on WhatsApp
+                <ArrowIcon className="size-[18px]" />
+              </a>
+            ) : (
+              <span className="mt-4 inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] text-teal uppercase">
+                Bookings open soon
+              </span>
+            )}
           </div>
         </section>
       </main>
