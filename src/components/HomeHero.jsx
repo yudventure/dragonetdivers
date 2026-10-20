@@ -5,7 +5,7 @@ import { preload } from "react-dom";
 // poster = frame pertamanya. Cara membuat ulang: brand/hero/README.md.
 import poster from "../assets/hero-diver.webp";
 import { site, whatsappLink } from "@/lib/site";
-import HeroVideo from "./HeroVideo";
+import LoopVideo from "./LoopVideo";
 import { ArrowIcon, CapIcon, FishIcon, WavesIcon } from "./icons";
 
 // Layanan dari BRANDING.md §1 (yang dijual). Tanpa harga atau jadwal.
@@ -25,7 +25,14 @@ export default function HomeHero() {
       <div className="gutter relative mx-auto flex max-w-[1200px] flex-col lg:block lg:h-[clamp(712px,100svh,952px)]">
         {/* Penyelam: video loop persegi di tengah, menempel ke bawah */}
         <div className="order-2 mx-auto aspect-square w-[min(88vw,480px)] lg:absolute lg:top-0 lg:left-1/2 lg:h-full lg:w-auto lg:-translate-x-[42%]">
-          <HeroVideo poster={poster.src} className="size-full object-contain" />
+          <LoopVideo
+            sources={[
+              { src: "/media/hero-diver.webm", type: "video/webm" },
+              { src: "/media/hero-diver.mp4", type: "video/mp4" },
+            ]}
+            poster={poster.src}
+            className="size-full object-contain"
+          />
         </div>
 
         {/* Judul */}

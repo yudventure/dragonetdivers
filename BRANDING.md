@@ -261,6 +261,8 @@ Input tinggi 48 px, radius 10 px, border 1 px Garis Tegas, label di atas (14 px 
 ### 9.7 Kotak info & kondisi laut
 Latar Laguna Tipis, ikon Teal, teks Abyss, radius 16 px. Peringatan cuaca: Fajar Tipis + teks Bara.
 
+Pengecualian (permintaan pemilik, Oktober 2026): panel **kondisi laut live** di beranda dan halaman layanan memakai latar video laut dalam dengan manta yang lewat (`public/media/ocean-manta.*`, cara membuat di `brand/ocean/README.md`). Teks putih, ikon putih, panah arah Kuning Fajar, lapisan gradasi Abyss 40–70% dan bayangan teks di atas video agar teks tetap terbaca.
+
 ### 9.8 Judul section
 Eyebrow (Bara) → H2 (Abyss) → garis ombak (Teal, 96 px) → paragraf Slate maks. 60 karakter. Rata kiri di desktop.
 
@@ -268,7 +270,7 @@ Eyebrow (Bara) → H2 (Abyss) → garis ombak (Teal, 96 px) → paragraf Slate m
 Header Abyss 14 px 700 di atas Foam, baris dipisah garis Mist, angka rata kanan tabular. Mobile: tabel bergulir di wadahnya sendiri.
 
 ### 9.10 Footer
-Satu-satunya area gelap: latar Abyss, didahului pita garis mandarin 8 px. Logo versi *plate*, kolom menu, kontak (WhatsApp, email, alamat), ikon sosial putih, teks sekunder `--dd-on-dark-muted` `#9DB9BF`.
+Area gelap utama (selain panel kondisi laut, §9.7): latar Abyss, didahului pita garis mandarin 8 px. Logo versi *plate*, kolom menu, kontak (WhatsApp, email, alamat), ikon sosial putih, teks sekunder `--dd-on-dark-muted` `#9DB9BF`.
 
 ### 9.11 Tombol WhatsApp mengambang
 Lingkaran 56 px, latar Teal, ikon putih, bayangan `--dd-shadow-md`, di pojok kanan bawah dengan jarak 20 px + safe area. Jangan menutupi CTA lain di mobile.

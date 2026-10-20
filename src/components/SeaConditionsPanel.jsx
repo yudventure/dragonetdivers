@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+// Latar laut dalam + manta yang lewat (Higgsfield: GPT Image 2.5 + Kling 3.0), cara membuat: brand/ocean/README.md.
+import oceanPoster from "../assets/ocean-manta.webp";
+import LoopVideo from "./LoopVideo";
 import {
   ArrowNorthIcon,
   CloudFogIcon,
@@ -22,16 +25,16 @@ const WEATHER_ICONS = { partly: CloudSunIcon, cloud: CloudIcon, rain: CloudRainI
 function Tile({ icon: Icon, label, value, unit, detail, arrow }) {
   return (
     <div className="grid content-start gap-1">
-      <dt className="flex items-center gap-2 text-[11px] font-bold tracking-[0.12em] text-slate uppercase">
-        <Icon className="size-[18px] text-teal" />
+      <dt className="flex items-center gap-2 text-[11px] font-bold tracking-[0.12em] text-white/75 uppercase">
+        <Icon className="size-[18px] text-white" />
         {label}
       </dt>
-      <dd className="font-display text-2xl leading-tight font-semibold text-abyss tabular-nums">
+      <dd className="font-display text-2xl leading-tight font-semibold text-white tabular-nums">
         {value ?? "–"}
         {value != null && unit && <span className="ml-1 text-base">{unit}</span>}
       </dd>
-      <dd className="flex min-h-5 items-center gap-1.5 text-[13px] text-slate">
-        {arrow != null && <ArrowNorthIcon className="size-3.5 shrink-0 text-teal" style={{ transform: `rotate(${arrow}deg)` }} />}
+      <dd className="flex min-h-5 items-center gap-1.5 text-[13px] text-white/80">
+        {arrow != null && <ArrowNorthIcon className="size-3.5 shrink-0 text-sunrise" style={{ transform: `rotate(${arrow}deg)` }} />}
         {detail}
       </dd>
     </div>
@@ -41,7 +44,8 @@ function Tile({ icon: Icon, label, value, unit, detail, arrow }) {
 const join = (...parts) => parts.filter(Boolean).join(", ") || null;
 const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 
-// Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak Laguna Tipis, ikon Teal.
+// Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak gelap dengan video laut dalam
+// (sinar matahari, partikel, manta lewat) di belakang teks putih; lapisan Abyss menjaga keterbacaan.
 // Data awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka.
 export default function SeaConditionsPanel({ initial }) {
   const [data, setData] = useState(initial);
@@ -78,12 +82,21 @@ export default function SeaConditionsPanel({ initial }) {
   return (
     <section aria-labelledby="sea-title" className="bg-white">
       <div className="gutter mx-auto max-w-[1200px] pt-10 md:pt-14">
-        <div className="rounded-card bg-lagoon-wash p-5 sm:p-7">
+        <div className="relative isolate overflow-hidden rounded-card bg-abyss p-6 sm:p-8 lg:py-10 [text-shadow:0_1px_2px_rgb(10_50_59/0.65),0_0_18px_rgb(10_50_59/0.6)]">
+          <LoopVideo
+            sources={[
+              { src: "/media/ocean-manta.webm", type: "video/webm" },
+              { src: "/media/ocean-manta.mp4", type: "video/mp4" },
+            ]}
+            poster={oceanPoster.src}
+            className="absolute inset-0 -z-10 size-full object-cover"
+          />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.6)_0%,rgb(10_50_59/0.4)_45%,rgb(10_50_59/0.7)_100%)]" />
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h2 id="sea-title" className="flex items-center gap-2.5 text-xl text-abyss">
+            <h2 id="sea-title" className="flex items-center gap-2.5 text-xl text-white">
               <span className="relative flex size-2.5" aria-hidden="true">
-                <span className="absolute inline-flex size-full rounded-full bg-teal opacity-60 motion-safe:animate-ping" />
-                <span className="relative inline-flex size-2.5 rounded-full bg-teal" />
+                <span className="absolute inline-flex size-full rounded-full bg-sunrise opacity-70 motion-safe:animate-ping" />
+                <span className="relative inline-flex size-2.5 rounded-full bg-sunrise" />
               </span>
               <span>
                 Live sea conditions
@@ -91,7 +104,7 @@ export default function SeaConditionsPanel({ initial }) {
                 <span className="block sm:inline">{data?.place ?? "Dampier Strait"}</span>
               </span>
             </h2>
-            <p className="text-sm text-slate" aria-live="polite">
+            <p className="text-sm text-white/80" aria-live="polite">
               {updated ? `Updated ${updated} WIT` : failed ? "Live data unavailable right now" : "Loading live data…"}
             </p>
           </div>
@@ -126,9 +139,9 @@ export default function SeaConditionsPanel({ initial }) {
             <Tile icon={SunsetIcon} label="Sunset" value={data?.sunset} detail="WIT · mandarin hour" />
           </dl>
 
-          <p className="mt-6 text-xs text-slate">
+          <p className="mt-6 text-xs text-white/75">
             Forecast model data from{" "}
-            <a href="https://open-meteo.com/" className="font-semibold text-teal underline-offset-2 hover:underline" rel="noopener" target="_blank">
+            <a href="https://open-meteo.com/" className="font-semibold text-white underline underline-offset-2" rel="noopener" target="_blank">
               Open-Meteo
             </a>
             , refreshed every 15 minutes. Conditions at each dive site can differ.

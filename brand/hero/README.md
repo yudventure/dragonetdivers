@@ -1,6 +1,6 @@
 # Hero beranda: penyelam menghembuskan gelembung
 
-Video loop 10 detik di atas latar putih (`src/components/HomeHero.jsx`, `HeroVideo.jsx`). Ilustrasi AI, bukan dokumentasi lokasi (BRANDING.md §7). Dibuat 20 Oktober 2026 di akun Higgsfield pemilik.
+Video loop 10 detik di atas latar putih (`src/components/HomeHero.jsx`, `LoopVideo.jsx`). Ilustrasi AI, bukan dokumentasi lokasi (BRANDING.md §7). Dibuat 20 Oktober 2026 di akun Higgsfield pemilik.
 
 | File | Isi |
 | --- | --- |
@@ -23,7 +23,7 @@ Video loop 10 detik di atas latar putih (`src/components/HomeHero.jsx`, `HeroVid
    - Frame awal = frame akhir membuat loop mulus tanpa crossfade. Video tanpa frame akhir bergeser beberapa piksel sehingga sambungannya terlihat.
    - Prompt "head almost completely still" menghasilkan penyelam yang terlalu kaku. Pemilik ingin penyelam berkedip dan mulutnya ikut bergerak saat menghembuskan napas, jadi prompt di atas yang dipakai.
 
-4. **Olah** — `python3 brand/hero/make-loop.py hasil-kling.mp4`: skala 1080 px, latar keabuan Kling (±250) dijadikan putih 255, frame terakhir dibuang, lalu tulis mp4, webm, dan poster.
+4. **Olah** — `python3 brand/video/make-loop.py hasil-kling.mp4 --name hero-diver --size 1080x1080 --whiten`: skala 1080 px, latar keabuan Kling (±250) dijadikan putih 255, frame terakhir dibuang, lalu tulis mp4, webm, dan poster.
 
 ## Foto seksi kursus
 
