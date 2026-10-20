@@ -122,6 +122,108 @@ export function GaugeIcon(props) {
   );
 }
 
+export function SunIcon(props) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2" />
+      <path d="M12 20v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="m17.66 17.66 1.41 1.41" />
+      <path d="M2 12h2" />
+      <path d="M20 12h2" />
+      <path d="m6.34 17.66-1.41 1.41" />
+      <path d="m19.07 4.93-1.41 1.41" />
+    </Icon>
+  );
+}
+
+export function MoonIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+    </Icon>
+  );
+}
+
+export function CloudIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+    </Icon>
+  );
+}
+
+export function CloudSunIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="M20 12h2" />
+      <path d="m19.07 4.93-1.41 1.41" />
+      <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" />
+      <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />
+    </Icon>
+  );
+}
+
+export function CloudRainIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+      <path d="M16 14v6" />
+      <path d="M8 14v6" />
+      <path d="M12 16v6" />
+    </Icon>
+  );
+}
+
+export function CloudLightningIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" />
+      <path d="m13 12-3 5h4l-3 5" />
+    </Icon>
+  );
+}
+
+export function CloudFogIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+      <path d="M16 17H7" />
+      <path d="M17 21H9" />
+    </Icon>
+  );
+}
+
+export function WindIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12.8 19.6A2 2 0 1 0 14 16H2" />
+      <path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" />
+      <path d="M9.8 4.4A2 2 0 1 1 11 8H2" />
+    </Icon>
+  );
+}
+
+export function ThermometerIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
+    </Icon>
+  );
+}
+
+// Panah arah (Lucide navigation-2), menunjuk ke atas = utara; diputar sesuai derajat.
+export function ArrowNorthIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2 19 21 12 17 5 21Z" />
+    </Icon>
+  );
+}
+
 // Motif garis ombak dari logo (brand/patterns/wave-divider.svg).
 export function Wave({ className = "h-4 w-24" }) {
   return (

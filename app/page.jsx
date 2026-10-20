@@ -3,10 +3,14 @@ import plate from "../brand/logo/dragonet-divers-logo-plate.png";
 import HomeFeatures from "@/components/HomeFeatures";
 import HomeHero from "@/components/HomeHero";
 import LearnToDive from "@/components/LearnToDive";
+import SeaConditions from "@/components/SeaConditions";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { ArrowIcon, Wave } from "@/components/icons";
 import { whatsappLink } from "@/lib/site";
+
+// Dibangun ulang paling lama tiap 15 menit agar kondisi laut di HTML tetap segar.
+export const revalidate = 900;
 
 // Halaman sementara selama website lengkap dibangun. Isinya hanya janji brand,
 // layanan, dan cerita logo (BRANDING.md §1); belum ada harga, jadwal, atau klaim lain.
@@ -17,6 +21,7 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <HomeHero />
+        <SeaConditions />
         <HomeFeatures />
         <LearnToDive />
 
