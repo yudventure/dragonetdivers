@@ -3,10 +3,10 @@
 Proyek ini Next.js 16 (App Router) + React 19 + Tailwind CSS 4 + MySQL (`mysql2`), dijalankan sebagai server Node.js dengan `npm start`. Alurnya:
 
 ```
-branch kerja ──push──► CI: test + build ──lulus──► merge otomatis ke main ──► Hostinger build & deploy ──► dragonetdiversrajaampat.com
+branch kerja ──push──► CI: test + build ──lulus──► merge otomatis ke main ──► deploy: build di Hostinger + cek /api/health ──► website tayang
 ```
 
-## 1. GitHub: merge otomatis
+## 1. GitHub: merge & deploy otomatis
 
 Workflow `.github/workflows/ci.yml` berjalan di setiap push:
 
@@ -14,12 +14,24 @@ Workflow `.github/workflows/ci.yml` berjalan di setiap push:
 | --- | --- |
 | **build** | `npm ci`, `npm test`, `npm run build` |
 | **merge** | Hanya untuk branch selain `main`, setelah **build** lulus. Membuka PR ke `main` (bila diizinkan), lalu menggabungkannya. Bila Actions belum diizinkan membuat PR, branch digabung langsung ke `main`. |
+| **deploy / hostinger** | Setelah ada yang masuk `main`. Lewat API Hostinger (`scripts/hostinger-deploy.mjs`, `.github/workflows/deploy.yml`): memastikan auto-deploy website menunjuk branch `main`, membangun website dari `main` (atau memakai build yang sudah dipicu Hostinger), menunggu sampai selesai, lalu membuka `/api/health`. |
 
-Jadi setiap push yang lulus test + build **langsung tayang** (setelah Hostinger membangun ulang). Bila build gagal, tidak ada yang digabung. Bila branch bentrok dengan `main`, cek **merge** merah dan menjelaskan konfliknya.
+Jadi setiap push yang lulus test + build **langsung tayang**. Bila build gagal, tidak ada yang digabung. Bila branch bentrok dengan `main`, cek **merge** merah dan menjelaskan konfliknya. Bila build di Hostinger gagal, cek **deploy** merah dan menampilkan log build Hostinger (juga di ringkasan run di tab Actions).
 
 Pengecualian:
 - Branch berawalan `wip/` (mis. `wip/coba-galeri`) tidak digabung otomatis; pakai untuk percobaan.
 - Matikan merge otomatis untuk semua branch: Settings → Secrets and variables → Actions → Variables → `AUTO_MERGE` = `false`.
+
+### Token API Hostinger (wajib untuk deploy otomatis, sekali saja)
+
+Tanpa token, cek **deploy** tetap hijau tetapi hanya memberi peringatan "Deploy Hostinger dilewati".
+
+1. hPanel akun hosting → ikon profil kanan atas → **Profile** → **API** ([hpanel.hostinger.com/profile/api](https://hpanel.hostinger.com/profile/api)) → buat token baru, mis. nama `github-dragonetdivers`. Salin token (hanya tampil sekali).
+2. github.com/yudventure/dragonetdivers → Settings → Secrets and variables → Actions → **New repository secret**: nama `HOSTINGER_API_TOKEN`, isi token tadi. Jangan tempel token di chat, issue, atau file di repo.
+3. Opsional, tab **Variables** → `HOSTINGER_DOMAIN` = domain website di Hostinger (sekarang domain sementara `….hostingersite.com`, nanti `dragonetdiversrajaampat.com`). Bila kosong, website dicari otomatis: website Node.js yang auto-deploy-nya terhubung ke repo ini, atau satu-satunya website Node.js di akun. Bila diisi, perbarui setelah domain asli disambungkan.
+4. Tab **Actions** → **Deploy** → **Run workflow** untuk deploy pertama. Setelah itu deploy berjalan sendiri setiap merge ke `main`.
+
+Token berlaku untuk seluruh akun Hostinger. Bila bocor, hapus di halaman API hPanel dan buat yang baru.
 
 Pengaturan GitHub yang disarankan (sekali saja, di github.com/yudventure/dragonetdivers):
 
@@ -47,7 +59,7 @@ Di akun Hostinger yang memegang paket **Business** (yang berisi thedampier.com, 
 
    `npm run build` sudah memakai `next build --webpack`. Turbopack bawaan Next.js 16 bisa gagal di server Hostinger karena versi GLIBC (pengalaman di Zanclus), jadi jangan ganti menjadi `next build` polos.
 4. Isi **environment variables** (bagian 4) sebelum deploy pertama.
-5. Nyalakan **auto-deploy** dari GitHub bila opsinya ada. Bila tidak ada, tekan **Redeploy** setelah setiap merge ke `main`.
+5. Branch harus **`main`**. Bila terlanjur memilih branch lain (mis. `claude/…`), merge ke `main` tidak akan tayang; cek **deploy** memindahkannya ke `main` otomatis begitu token API terpasang (bagian 1). Tanpa token: ubah branch di pengaturan Git website, lalu tekan **Redeploy**.
 6. Pilih domain: klik **Gunakan domain sementara**. `dragonetdiversrajaampat.com` belum bisa dipilih di sini karena masih tercatat di akun Hostinger lain (muncul tercoret, "Sudah terdaftar di Hostinger"). Domain asli disambungkan belakangan (bagian 3).
 
 ## 3. Sambungkan domain dragonetdiversrajaampat.com
@@ -113,4 +125,4 @@ Buat file `database/migrations/NNN_nama.sql` (nomor berikutnya, 3 digit) berisi 
 
 - **Build gagal**: pastikan Node 22.x, direktori proyek `.`, dan `package-lock.json` ikut. Baca error pertama di log build.
 - **Website 503 / tidak jalan**: pastikan start command `npm start` dan build selesai. `PORT` diberikan Hostinger, tidak perlu diisi.
-- **Perubahan tidak muncul**: pastikan PR sudah di-merge ke `main` dan deployment terbaru sukses.
+- **Perubahan tidak muncul**: buka tab Actions → run terakhir → cek **deploy**. "Dilewati" = token API belum dipasang (bagian 1). Merah = baca log build Hostinger di ringkasan run. Deploy ulang kapan saja: Actions → **Deploy** → **Run workflow**.

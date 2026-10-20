@@ -23,5 +23,5 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdiversrajaampat.com). Pe
 
 ## Git & deploy
 - `main` = produksi; Hostinger membangun dari `main`. Kerjakan di branch lain.
-- **Setiap push ke branch selain `main` yang lulus test + build otomatis digabung ke `main` dan tayang** (job `merge` di `.github/workflows/ci.yml`). Push hanya pekerjaan yang sudah selesai dan teruji; percobaan pakai branch `wip/…`.
+- **Setiap push ke branch selain `main` yang lulus test + build otomatis digabung ke `main` dan tayang** (job `merge` di `.github/workflows/ci.yml`, lalu job `deploy` → `.github/workflows/deploy.yml` → `scripts/hostinger-deploy.mjs` lewat API Hostinger, secret `HOSTINGER_API_TOKEN`). Push hanya pekerjaan yang sudah selesai dan teruji; percobaan pakai branch `wip/…`.
 - Panduan Hostinger, DNS, dan MySQL: `HOSTINGER-DEPLOY.md`.

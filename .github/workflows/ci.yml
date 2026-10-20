@@ -2,7 +2,7 @@ name: CI
 
 # Setiap push: test + build (cek "build").
 # Push ke branch selain main yang lulus build otomatis digabung ke main (cek "merge"),
-# lalu Hostinger membangun ulang website dari main.
+# lalu website dibangun ulang dan dicek di Hostinger dari main (cek "deploy", deploy.yml).
 # Lewati merge otomatis: pakai branch berawalan wip/, atau variabel repo AUTO_MERGE=false.
 on:
   push:
@@ -48,11 +48,14 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    outputs:
+      merged: ${{ steps.merge.outputs.merged }}
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Gabungkan ke main
+        id: merge
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -84,6 +87,7 @@ jobs:
           if [ -n "$pr" ]; then
             gh pr ready "$pr" >/dev/null 2>&1 || true
             if gh pr merge "$pr" --merge --match-head-commit "$SHA"; then
+              echo "merged=true" >> "$GITHUB_OUTPUT"
               echo "PR #$pr digabung ke main."
               exit 0
             fi
@@ -99,4 +103,15 @@ jobs:
             exit 1
           fi
           git push origin main
+          echo "merged=true" >> "$GITHUB_OUTPUT"
           echo "Branch $BRANCH digabung langsung ke main."
+
+  # Push oleh Actions tidak memicu workflow baru, jadi deploy dipanggil dari run ini.
+  deploy:
+    name: deploy
+    needs: [build, merge]
+    if: >-
+      !cancelled() && needs.build.result == 'success' &&
+      (needs.merge.outputs.merged == 'true' || (github.event_name == 'push' && github.ref_name == 'main'))
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
