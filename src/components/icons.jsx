@@ -224,6 +224,14 @@ export function ArrowNorthIcon(props) {
   );
 }
 
+export function CheckIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M20 6 9 17l-5-5" />
+    </Icon>
+  );
+}
+
 // Motif garis ombak dari logo (brand/patterns/wave-divider.svg).
 export function Wave({ className = "h-4 w-24" }) {
   return (

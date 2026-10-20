@@ -9,7 +9,7 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik ber
 
 ## Struktur
 - `app/` halaman & route API; `app/api/health` untuk cek deploy + database; `app/api/conditions` kondisi laut live Selat Dampier (Open-Meteo, logika di `src/lib/sea-conditions.js`, cache 15 menit).
-- `src/components/` komponen UI; `src/lib/site.js` data situs & WhatsApp.
+- `src/components/` komponen UI; `src/lib/site.js` data situs & WhatsApp; `src/lib/services.js` daftar layanan (grid beranda + halaman `app/services/[slug]`, ilustrasi di `src/assets/services/<slug>.webp`).
 - `src/server/db.js` → pakai `query(sql, params)` untuk semua akses database (server saja).
 - `database/migrations/NNN_nama.sql`: skema, idempoten (`CREATE TABLE IF NOT EXISTS`), dijalankan otomatis. Jangan ubah file migrasi yang sudah di-merge; buat nomor baru.
 - `brand/`: identitas visual. Pedoman di `BRANDING.md`.
