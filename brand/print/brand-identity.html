@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dragonet Divers Brand Identity</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  /* Buku pedoman A4 landscape (297 × 210 mm). Satu .page = satu halaman PDF. Render: node brand/social/export.mjs */
+  @page { size: 297mm 210mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--dd-white); }
+  body { counter-reset: pg; font-size: 12.5px; line-height: 1.55; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @media screen {
+    body { background: #dfe7e9; padding: 24px 0; }
+    .page { margin: 0 auto 24px; box-shadow: 0 6px 24px rgba(10, 50, 59, .12); }
+  }
+  .page {
+    counter-increment: pg;
+    width: 297mm; height: 210mm; position: relative; overflow: hidden;
+    break-after: page; background: var(--dd-white);
+    padding: 62px 64px 58px; display: flex; flex-direction: column; gap: 20px;
+  }
+  .page:last-child { break-after: auto; }
+  .run { position: absolute; top: 26px; left: 64px; right: 64px; display: flex; justify-content: space-between; font: 700 8.5px/1 var(--dd-font-body); letter-spacing: .18em; text-transform: uppercase; color: var(--dd-slate); }
+  .folio { position: absolute; bottom: 22px; left: 64px; right: 64px; display: flex; justify-content: space-between; align-items: center; font: 600 10px/1 var(--dd-font-body); color: var(--dd-slate); font-variant-numeric: tabular-nums; }
+  .folio .n::before { content: counter(pg, decimal-leading-zero); }
+  .folio .dd-wave { width: 56px; height: 10px; }
+  .head { display: grid; gap: 8px; }
+  .head h2 { margin: 0; font: 600 30px/1.1 var(--dd-font-display); color: var(--dd-abyss); text-wrap: balance; }
+  .head p { margin: 0; color: var(--dd-slate); font-size: 13px; max-width: 86ch; }
+  .body { flex: 1; min-height: 0; display: grid; gap: 18px; align-content: start; }
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .panel { border: 1px solid var(--dd-mist); border-radius: 14px; padding: 18px; min-width: 0; }
+  .lbl { margin: 0 0 10px; font: 700 9.5px/1.3 var(--dd-font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--dd-slate); }
+  .note { font-size: 11px; color: var(--dd-slate); margin: 6px 0 0; }
+  h3 { margin: 0 0 6px; font: 600 17px/1.25 var(--dd-font-display); color: var(--dd-abyss); }
+  ul.list { margin: 0; padding-left: 16px; display: grid; gap: 5px; }
+  ul.list li::marker { color: var(--dd-teal); }
+  code { font: 600 11px/1.4 ui-monospace, Menlo, monospace; color: var(--dd-abyss); }
+  .ok { color: var(--dd-success); font-weight: 800; }
+  .no { color: var(--dd-danger); font-weight: 800; }
+  table.spec { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.spec th { text-align: left; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dd-slate); padding: 7px 10px; background: var(--dd-foam); }
+  table.spec td { padding: 8px 10px; border-top: 1px solid var(--dd-mist); vertical-align: top; }
+  table.spec .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* Sampul */
+  .cover { padding: 0; display: grid; grid-template-columns: 46% 54%; gap: 0; }
+  .cover .left { display: grid; place-items: center; background: var(--dd-foam); }
+  .cover .left img { width: 330px; }
+  .cover .right { padding: 0 72px; display: grid; align-content: center; gap: 18px; }
+  .cover h1 { margin: 0; font: 600 58px/1.02 var(--dd-font-display); color: var(--dd-abyss); }
+  .cover .tag { font: 600 28px/1.1 var(--dd-font-display); color: var(--dd-teal); margin: 0; }
+  .cover .meta { font-size: 12px; color: var(--dd-slate); margin: 22px 0 0; display: grid; gap: 4px; }
+  .cover .stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: url("../patterns/mandarin-stripe.svg") repeat-x left center / auto 100%; }
+
+  /* Isi */
+  .toc { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+  .toc > div > div { display: flex; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--dd-mist); font-size: 13.5px; }
+  .toc b { font: 600 13px/1 var(--dd-font-body); color: var(--dd-ember); width: 22px; font-variant-numeric: tabular-nums; }
+  .toc span { flex: 1; }
+  .toc i { font-style: normal; color: var(--dd-slate); font-variant-numeric: tabular-nums; }
+  .toc > div > .grp { font: 700 9.5px/1 var(--dd-font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--dd-teal); border-bottom: 0; padding: 18px 0 4px; }
+
+  /* Inti brand */
+  dl.core { margin: 0; display: grid; grid-template-columns: 130px 1fr; }
+  dl.core dt, dl.core dd { padding: 10px 0; border-top: 1px solid var(--dd-mist); margin: 0; }
+  dl.core dt { font: 700 10px/1.5 var(--dd-font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--dd-teal); }
+  .traits { display: grid; gap: 8px; }
+  .traits div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: baseline; }
+  .traits b { font: 600 17px/1.2 var(--dd-font-display); color: var(--dd-teal); }
+  .taglines { display: grid; gap: 8px; }
+  .taglines div { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--dd-mist); }
+  .taglines div.rec { border: 2px solid var(--dd-teal); }
+  .taglines b { font: 600 17px/1.2 var(--dd-font-display); color: var(--dd-abyss); display: block; }
+
+  /* Logo */
+  .anat { display: grid; grid-template-columns: 300px 1fr; gap: 36px; align-items: center; }
+  .anat img { width: 300px; }
+  .el { display: grid; gap: 8px; }
+  .el div { display: grid; grid-template-columns: 26px 1fr 80px; gap: 12px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--dd-mist); }
+  .dot { width: 22px; height: 22px; border-radius: 50%; }
+  .files { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .files figure { margin: 0; display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; border: 1px solid var(--dd-mist); border-radius: 12px; padding: 10px; }
+  .files .th { width: 64px; height: 64px; border-radius: 10px; display: grid; place-items: center; }
+  .files .th img { width: 52px; }
+  .files figcaption { font-size: 11px; color: var(--dd-slate); min-width: 0; }
+  .files figcaption code { display: block; font-size: 10px; word-break: break-all; margin-bottom: 3px; }
+
+  .clear { position: relative; display: grid; place-items: center; height: 240px; background: var(--dd-foam); border-radius: 12px; }
+  .clear .box { position: relative; width: 186px; height: 186px; padding: 31px; outline: 1.5px dashed var(--dd-mandarin-fin); }
+  .clear .box img { width: 100%; display: block; }
+  .clear .box i { position: absolute; font: 700 10px/1 var(--dd-font-body); color: var(--dd-ember); font-style: normal; }
+  .clear .box i:nth-of-type(1) { top: 10px; left: 50%; transform: translateX(-50%); }
+  .clear .box i:nth-of-type(2) { left: 9px; top: 50%; transform: translateY(-50%); }
+  .sizes { display: flex; align-items: flex-end; gap: 22px; }
+  .sizes figure { margin: 0; display: grid; justify-items: center; gap: 6px; font-size: 10.5px; color: var(--dd-slate); }
+  .bgs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .bgs div { height: 92px; border-radius: 10px; display: grid; place-items: center; }
+  .bgs img { width: 64px; }
+  .dont { display: grid; gap: 8px; }
+  .dont .st { height: 196px; border-radius: 12px; background: var(--dd-foam); display: grid; place-items: center; overflow: hidden; }
+  .dont .st img { width: 120px; }
+  .dont p { margin: 0; font-size: 12.5px; }
+  .busy { background: repeating-linear-gradient(45deg, var(--dd-mandarin) 0 12px, var(--dd-lagoon) 12px 24px, var(--dd-sunrise) 24px 36px) !important; }
+
+  /* Warna */
+  .sw { border: 1px solid var(--dd-mist); border-radius: 14px; overflow: hidden; display: grid; grid-template-rows: 300px auto; }
+  .sw .c { padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; font: 700 11px/1.2 var(--dd-font-body); }
+  .sw .c b { font: 600 24px/1.1 var(--dd-font-display); }
+  .sw .d { padding: 12px 16px 14px; display: grid; gap: 3px; font-size: 11.5px; color: var(--dd-slate); }
+  .sw .d code { font-size: 12.5px; }
+  .mini { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .mini div { border: 1px solid var(--dd-mist); border-radius: 10px; overflow: hidden; font-size: 10.5px; }
+  .mini i { display: block; height: 56px; }
+  .mini span { display: grid; padding: 7px 9px 8px; gap: 1px; color: var(--dd-slate); }
+  .mini span b { color: var(--dd-abyss); font-size: 11.5px; }
+  .ratio { display: flex; height: 54px; border-radius: 12px; overflow: hidden; border: 1px solid var(--dd-mist); }
+  .ratio div { display: flex; align-items: flex-end; padding: 7px 9px; font: 700 10.5px/1 var(--dd-font-body); min-width: 0; }
+  .pairs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .pair { border-radius: 12px; padding: 14px; display: grid; gap: 4px; height: 96px; align-content: space-between; border: 1px solid var(--dd-mist); }
+  .pair b { font: 600 26px/1 var(--dd-font-display); }
+  .pair span { font-size: 11px; font-weight: 600; }
+
+  /* Tipografi */
+  .spec-aa { font-size: 120px; line-height: .9; }
+  .alpha { font-size: 17px; line-height: 1.5; }
+  .scale > div { display: grid; grid-template-columns: 190px 1fr; gap: 18px; padding: 9px 0; border-top: 1px solid var(--dd-mist); align-items: baseline; }
+  .scale code { font-size: 10px; color: var(--dd-slate); line-height: 1.45; }
+
+  /* Ikon & motif */
+  .motif .st { height: 112px; border-radius: 12px; background: var(--dd-foam); display: grid; place-items: center; margin-bottom: 10px; }
+  .icons { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
+  .icons figure { margin: 0; border: 1px solid var(--dd-mist); border-radius: 10px; padding: 12px 4px 8px; display: grid; justify-items: center; gap: 6px; font-size: 9.5px; color: var(--dd-slate); }
+  .icons .dd-icon { color: var(--dd-teal); width: 24px; height: 24px; }
+
+  /* Fotografi */
+  .shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .shots figure { margin: 0; display: grid; gap: 8px; }
+  .shots .dd-photo-ph { height: 150px; border-radius: 16px; }
+  .shots figcaption { font-size: 11.5px; color: var(--dd-slate); }
+  .shots figcaption b { display: block; color: var(--dd-abyss); font-size: 12.5px; }
+  .overlay { position: relative; height: 200px; border-radius: 22px; overflow: hidden; }
+  .overlay::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,50,59,0) 35%, rgba(10,50,59,.7) 100%); }
+  .overlay p { position: absolute; left: 22px; bottom: 18px; margin: 0; color: #fff; font: 600 24px/1.1 var(--dd-font-display); z-index: 1; }
+
+  /* Website */
+  .zoom-85 { zoom: .85; }
+  .stage { border: 1px solid var(--dd-mist); border-radius: 14px; overflow: hidden; }
+  .stage-lbl { display: flex; justify-content: space-between; padding: 8px 14px; background: var(--dd-foam); border-bottom: 1px solid var(--dd-mist); font: 700 10px/1.3 var(--dd-font-body); letter-spacing: .1em; text-transform: uppercase; color: var(--dd-slate); }
+  .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 36px 32px 24px; align-items: center; }
+  .hero .txt { display: grid; gap: 14px; }
+  .hero .dd-photo-ph { aspect-ratio: 5 / 4; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .states { display: grid; grid-template-columns: 90px repeat(4, 1fr); gap: 12px 14px; align-items: center; }
+  .states > span { font-size: 10px; font-weight: 700; color: var(--dd-slate); letter-spacing: .08em; text-transform: uppercase; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: start; }
+  .team { display: grid; justify-items: center; text-align: center; gap: 10px; padding: 22px 16px; }
+  .team .dd-photo-ph { width: 92px; height: 92px; }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px; }
+  .form .span2 { grid-column: 1 / -1; }
+  .foot-demo { padding: 28px 32px 20px; display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 24px; font-size: 13px; }
+  .foot-demo h4 { margin: 0 0 10px; font: 700 10.5px/1 var(--dd-font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--dd-on-dark-muted); }
+  .foot-demo ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .foot-demo img { width: 64px; }
+  .foot-bottom { border-top: 1px solid rgba(255,255,255,.12); padding: 12px 32px; font-size: 11.5px; display: flex; justify-content: space-between; }
+  .bars { display: grid; gap: 6px; }
+  .bars div { display: grid; grid-template-columns: 70px 1fr; gap: 10px; align-items: center; font-size: 11px; color: var(--dd-slate); font-variant-numeric: tabular-nums; }
+  .bars i { display: block; height: 10px; background: var(--dd-lagoon); border-radius: 3px; }
+  .radii { display: flex; gap: 14px; align-items: flex-end; }
+  .radii figure { margin: 0; display: grid; gap: 6px; justify-items: center; font-size: 10.5px; color: var(--dd-slate); }
+  .radii i { display: block; width: 72px; height: 56px; background: var(--dd-teal-soft); border: 1.5px solid var(--dd-teal); }
+  .grid12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; height: 70px; }
+  .grid12 i { background: var(--dd-lagoon-wash); border: 1px dashed var(--dd-lagoon); border-radius: 4px; }
+  .sitemap { display: grid; gap: 6px; }
+  .sitemap div { display: grid; grid-template-columns: 110px 1fr; gap: 10px; padding: 6px 0; border-top: 1px solid var(--dd-mist); font-size: 11.5px; }
+  .sitemap b { color: var(--dd-teal); }
+
+  /* Sosial */
+  .ig { border: 1px solid var(--dd-mist); border-radius: 18px; padding: 18px; display: grid; gap: 14px; }
+  .ig-top { display: grid; grid-template-columns: 84px 1fr; gap: 16px; align-items: center; }
+  .ig-top img { width: 84px; height: 84px; border-radius: 50%; border: 1px solid var(--dd-mist); }
+  .ig-top b { font-size: 14px; }
+  .ig-top p { margin: 4px 0 0; font-size: 11.5px; line-height: 1.45; }
+  .ig-hl { display: flex; gap: 12px; }
+  .ig-hl figure { margin: 0; display: grid; justify-items: center; gap: 4px; font-size: 9.5px; }
+  .ig-hl img { width: 46px; height: 46px; border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--dd-mist); }
+  .ig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .ig-grid img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
+  .feeds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .feeds figure, .stories figure { margin: 0; display: grid; gap: 8px; align-content: start; }
+  .feeds img, .stories img { width: 100%; border-radius: 10px; border: 1px solid var(--dd-mist); display: block; }
+  .feeds figcaption, .stories figcaption { font-size: 11px; color: var(--dd-slate); }
+  .feeds figcaption b, .stories figcaption b { display: block; color: var(--dd-abyss); font-size: 12.5px; }
+  .stories { display: grid; grid-template-columns: 200px 200px 1fr; gap: 22px; align-items: start; }
+  .safe { position: relative; }
+  .safe::before, .safe::after { content: ""; position: absolute; left: 1px; right: 1px; background: repeating-linear-gradient(135deg, rgba(192,57,43,.16) 0 6px, rgba(192,57,43,.04) 6px 12px); border: 1px dashed var(--dd-danger); }
+  .safe::before { top: 1px; height: 13%; border-radius: 10px 10px 0 0; }
+  .safe::after { bottom: 1px; height: 17.7%; border-radius: 0 0 10px 10px; }
+  .caption-card { border: 1px solid var(--dd-mist); border-radius: 16px; padding: 18px; font-size: 12.5px; line-height: 1.6; display: grid; gap: 10px; }
+  .caption-card p { margin: 0; }
+  .steps { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: st; }
+  .steps li { counter-increment: st; position: relative; padding: 3px 0 3px 40px; min-height: 26px; }
+  .steps li::before { content: counter(st); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--dd-teal-soft); color: var(--dd-teal); font: 700 12px/26px var(--dd-font-body); text-align: center; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { padding: 5px 10px; border-radius: 999px; background: var(--dd-lagoon-wash); color: var(--dd-teal); font-weight: 600; font-size: 11.5px; }
+  .tags.rot span { background: var(--dd-foam); color: var(--dd-slate); }
+
+  .check { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+  .check li { position: relative; padding-left: 24px; }
+  .check li::before { content: ""; position: absolute; left: 0; top: 3px; width: 13px; height: 13px; border: 1.5px solid var(--dd-line-strong); border-radius: 4px; }
+  .check.done li::before { background: var(--dd-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 10px no-repeat; border-color: var(--dd-teal); }
+
+  /* Sampul belakang */
+  .back { background: var(--dd-abyss); color: #fff; display: grid; place-items: center; text-align: center; padding: 0; }
+  .back .stripe { position: absolute; left: 0; right: 0; top: 0; height: 14px; background: url("../patterns/mandarin-stripe.svg") repeat-x left center / auto 100%; }
+  .back img { width: 190px; }
+  .back p { margin: 0; }
+</style>
+</head>
+<body class="dd-base">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-fish" viewBox="0 0 24 24"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z"/><path d="M18 12v.5"/><path d="M16 17.93a9.77 9.77 0 0 1 0-11.86"/><path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33"/></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+    <symbol id="i-sunset" viewBox="0 0 24 24"><path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m16 6-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-thermo" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
+    <symbol id="i-depth" viewBox="0 0 24 24"><path d="M12 3v14"/><path d="m6 11 6 6 6-6"/><path d="M4 21h16"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8.5 10.5c.5 2 2.5 4 4.5 4.5l1.3-1.3 2 .9v1.6c0 .4-.4.8-.8.8C10.6 17 7 13.4 7 8.8c0-.4.4-.8.8-.8h1.6l.9 2Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></symbol>
+    <symbol id="i-anchor" viewBox="0 0 24 24"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/></symbol>
+    <symbol id="i-ship" viewBox="0 0 24 24"><path d="M12 10.189V14"/><path d="M12 2v3"/><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-8.188-3.639a2 2 0 0 0-1.624 0L3 14a11.6 11.6 0 0 0 2.81 7.76"/><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1s1.2 1 2.5 1c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+    <symbol id="i-buoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/></symbol>
+    <symbol id="i-insta" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  </defs>
+</svg>
+
+<!-- 01 Sampul -->
+<section class="page cover">
+  <div class="left"><img src="../logo/dragonet-divers-logo.png" alt="Logo Dragonet Divers Raja Ampat"></div>
+  <div class="right">
+    <p class="dd-eyebrow">Brand identity guidelines · v1.0</p>
+    <h1>Dragonet Divers Raja Ampat</h1>
+    <p class="tag">Dive into colour.</p>
+    <span class="dd-wave" aria-hidden="true"></span>
+    <div class="meta"><span>Pedoman identitas visual untuk website dan media sosial</span><span>Oktober 2026</span></div>
+  </div>
+  <div class="stripe"></div>
+</section>
+
+<!-- 02 Isi -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>Isi</span></div>
+  <div class="head"><p class="dd-eyebrow">Daftar isi</p><h2>Isi pedoman</h2></div>
+  <div class="body">
+    <div class="toc">
+      <div>
+        <div class="grp">Fondasi</div>
+        <div><b>01</b><span>Inti brand &amp; tagline</span><i>03</i></div>
+        <div><b>02</b><span>Logo: anatomi &amp; file</span><i>04</i></div>
+        <div><b>03</b><span>Logo: area aman, ukuran, latar</span><i>05</i></div>
+        <div><b>04</b><span>Logo: larangan</span><i>06</i></div>
+        <div><b>05</b><span>Warna utama</span><i>07</i></div>
+        <div><b>06</b><span>Warna turunan, netral &amp; proporsi</span><i>08</i></div>
+        <div><b>07</b><span>Kontras &amp; aturan warna</span><i>09</i></div>
+        <div><b>08</b><span>Tipografi: font</span><i>10</i></div>
+        <div><b>09</b><span>Tipografi: skala</span><i>11</i></div>
+        <div><b>10</b><span>Elemen grafis &amp; ikon</span><i>12</i></div>
+        <div><b>11</b><span>Fotografi</span><i>13</i></div>
+      </div>
+      <div>
+        <div class="grp">Penerapan</div>
+        <div><b>12</b><span>Suara &amp; bahasa</span><i>14</i></div>
+        <div><b>13</b><span>Website: tata letak &amp; token</span><i>15</i></div>
+        <div><b>14</b><span>Website: header, hero, kondisi laut</span><i>16</i></div>
+        <div><b>15</b><span>Website: tombol, chip, judul section</span><i>17</i></div>
+        <div><b>16</b><span>Website: kartu</span><i>18</i></div>
+        <div><b>17</b><span>Website: form, info, tabel, footer</span><i>19</i></div>
+        <div><b>18</b><span>Media sosial: profil &amp; ukuran</span><i>20</i></div>
+        <div><b>19</b><span>Media sosial: template feed</span><i>21</i></div>
+        <div><b>20</b><span>Media sosial: story &amp; highlight</span><i>22</i></div>
+        <div><b>21</b><span>Media sosial: caption &amp; hashtag</span><i>23</i></div>
+        <div><b>22</b><span>Aksesibilitas, file &amp; kebutuhan</span><i>24</i></div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 03 Inti brand -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>01 Inti brand</span></div>
+  <div class="head"><p class="dd-eyebrow">01 · Inti brand</p><h2>Grup kecil, pemandu lokal, laut penuh warna</h2></div>
+  <div class="body cols-2">
+    <dl class="core">
+      <dt>Nama</dt><dd><b>Dragonet Divers Raja Ampat</b>. Boleh disingkat <i>Dragonet Divers</i>. Jangan "DD" di materi publik.</dd>
+      <dt>Yang dijual</dt><dd>Fun dive, kursus selam, snorkeling, dan trip di Raja Ampat, terutama Selat Dampier.</dd>
+      <dt>Audiens</dt><dd>Penyelam internasional dan domestik, pasangan dan keluarga yang ingin snorkeling, pemula yang ingin kursus.</dd>
+      <dt>Janji brand</dt><dd>Grup kecil, pemandu lokal yang mengenal setiap karang, dan rasa takjub pada makhluk sekecil ikan mandarin.</dd>
+      <dt>Bahasa</dt><dd>Website: English (default) + Bahasa Indonesia. Media sosial: English dulu, satu baris Bahasa Indonesia.</dd>
+    </dl>
+    <div style="display:grid;gap:22px;align-content:start">
+      <div>
+        <p class="lbl">Kepribadian</p>
+        <div class="traits">
+          <div><b>Ramah</b><span>Seperti dive guide yang sudah lama kenal.</span></div>
+          <div><b>Tenang</b><span>Meyakinkan soal keselamatan, tidak heboh.</span></div>
+          <div><b>Teliti</b><span>Spesifik: nama site, kedalaman, biota.</span></div>
+          <div><b>Penuh warna</b><span>Seperti ikan mandarin, tapi dipakai hemat.</span></div>
+          <div><b>Hormat laut</b><span>Biota bukan atraksi; karang tidak disentuh.</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="lbl">Tagline (usulan)</p>
+        <div class="taglines">
+          <div class="rec"><span class="dd-chip dd-chip--solid" style="float:right">Rekomendasi</span><b>Dive into colour.</b>Menyelam ke dalam warna. Bio Instagram &amp; hero website.</div>
+          <div><b>Small groups. Big colour. Raja Ampat.</b>Menonjolkan grup kecil.</div>
+          <div><b>Where the reef dances at dusk.</b>Khusus paket Sunset Mandarin Dive.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 04 Logo anatomi -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>02 Logo</span></div>
+  <div class="head"><p class="dd-eyebrow">02 · Logo</p><h2>Badge mandarin</h2><p>Dragonet adalah keluarga ikan <i>Callionymidae</i>; anggotanya yang paling terkenal adalah ikan mandarin (<i>Synchiropus splendidus</i>). Saat senja, pasangan ikan mandarin naik dari celah karang untuk menari. Badge ini merekam momen itu: dua ikan berhadapan, matahari di atas pulau karst, dan laut Raja Ampat.</p></div>
+  <div class="body" style="gap:22px">
+    <div class="anat">
+      <img src="../logo/dragonet-divers-logo.png" alt="">
+      <div class="el">
+        <div><i class="dot" style="background:var(--dd-teal)"></i><span><b>Cincin &amp; tulisan</b> → Teal Dragonet, warna utama</span><code>#146E7F</code></div>
+        <div><i class="dot" style="background:var(--dd-lagoon)"></i><span><b>Laut</b> → Biru Laguna, warna pendukung</span><code>#1592AB</code></div>
+        <div><i class="dot" style="background:var(--dd-mandarin)"></i><span><b>Tubuh ikan mandarin</b> → Oranye Mandarin, aksen CTA</span><code>#EB7817</code></div>
+        <div><i class="dot" style="background:var(--dd-sunrise)"></i><span><b>Langit</b> → Kuning Fajar, sorotan kecil</span><code>#F9D13E</code></div>
+        <div><i class="dot" style="background:var(--dd-mandarin-fin)"></i><span><b>Sirip ekor</b> → Koral Sirip, ilustrasi &amp; pola</span><code>#D9651F</code></div>
+        <div><i class="dot" style="background:#fff;border:1px solid var(--dd-mist)"></i><span><b>Bagian dalam badge</b> → Putih, dasar website</span><code>#FFFFFF</code></div>
+      </div>
+    </div>
+    <div>
+      <p class="lbl">Tiga versi file</p>
+      <div class="files">
+        <figure><div class="th" style="background:#fff;border:1px solid var(--dd-mist)"><img src="../logo/dragonet-divers-logo.png" alt=""></div><figcaption><code>dragonet-divers-logo.png</code>Asli, transparan. <b>Hanya di atas putih.</b></figcaption></figure>
+        <figure><div class="th" style="background:var(--dd-abyss)"><img src="../logo/dragonet-divers-logo-plate.png" alt=""></div><figcaption><code>dragonet-divers-logo-plate.png</code>Dalam cincin diisi putih. Untuk foto, Foam, footer gelap.</figcaption></figure>
+        <figure><div class="th" style="background:var(--dd-foam)"><img src="../logo/dragonet-divers-logo-white-bg.png" alt=""></div><figcaption><code>dragonet-divers-logo-white-bg.png</code>Persegi putih. Foto profil media sosial.</figcaption></figure>
+      </div>
+      <div class="dd-notice" style="margin-top:12px;font-size:12px"><svg class="dd-icon"><use href="#i-info"/></svg><div><strong>Pita bertulisan di file asli transparan.</strong> Di latar gelap atau foto, tulisan DRAGONET DIVERS / RAJA AMPAT hilang. Di luar latar putih, selalu pakai versi <i>plate</i>.</div></div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 05 Logo pemakaian -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>03 Logo</span></div>
+  <div class="head"><p class="dd-eyebrow">03 · Pemakaian logo</p><h2>Area aman, ukuran, lockup, latar</h2></div>
+  <div class="body cols-2">
+    <div class="panel">
+      <p class="lbl">Area aman = ¼ diameter badge</p>
+      <div class="clear"><div class="box"><img src="../logo/dragonet-divers-logo.png" alt=""><i>¼</i><i>¼</i></div></div>
+      <p class="note">Badge 64 px → ruang kosong minimal 16 px di semua sisi. Tidak ada teks, foto, atau tepi kartu di area ini.</p>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <p class="lbl">Ukuran minimum</p>
+        <div class="sizes">
+          <figure><img src="../logo/dragonet-divers-logo.png" alt="" width="88" height="88">88 px</figure>
+          <figure><img src="../logo/dragonet-divers-logo.png" alt="" width="56" height="56">56 px · layar min.</figure>
+          <figure><img src="../logo/favicon-32.png" alt="" width="32" height="32">favicon</figure>
+          <span class="note" style="margin:0 0 6px">Cetak: min. 20 mm. Di bawah ukuran ini pakai lockup atau favicon.</span>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="lbl">Lockup horizontal (header website)</p>
+        <div class="row" style="gap:28px">
+          <span class="dd-lockup"><img src="../logo/dragonet-divers-logo.png" alt=""><span class="dd-lockup__name"><b>Dragonet Divers</b><small>RAJA AMPAT</small></span></span>
+          <span class="dd-lockup" style="background:var(--dd-abyss);padding:8px 14px;border-radius:10px"><img src="../logo/dragonet-divers-logo-plate.png" alt=""><span class="dd-lockup__name"><b style="color:#fff">Dragonet Divers</b><small style="color:var(--dd-on-dark-muted)">RAJA AMPAT</small></span></span>
+        </div>
+        <p class="note">Badge 46 px · jarak 12 px · Fredoka 600 20 px · Plus Jakarta Sans 700 10 px, spasi 0.2em. Di layar &lt; 360 px tampilkan badge saja.</p>
+      </div>
+      <div class="panel">
+        <p class="lbl">Latar yang boleh</p>
+        <div class="bgs">
+          <div style="background:#fff;border:1px solid var(--dd-mist)"><img src="../logo/dragonet-divers-logo.png" alt=""></div>
+          <div style="background:var(--dd-foam)"><img src="../logo/dragonet-divers-logo-plate.png" alt=""></div>
+          <div style="background:var(--dd-abyss)"><img src="../logo/dragonet-divers-logo-plate.png" alt=""></div>
+        </div>
+        <p class="note">Putih: file asli · Foam: plate · Abyss (footer saja): plate</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 06 Larangan -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>04 Logo</span></div>
+  <div class="head"><p class="dd-eyebrow">04 · Larangan</p><h2>Yang tidak boleh dilakukan pada logo</h2></div>
+  <div class="body cols-3" style="gap:16px 18px">
+    <div class="dont"><div class="st"><img src="../logo/dragonet-divers-logo.png" alt="" style="transform:scaleX(1.35)"></div><p><span class="no">✕</span> Meregangkan atau memampatkan</p></div>
+    <div class="dont"><div class="st"><img src="../logo/dragonet-divers-logo.png" alt="" style="filter:hue-rotate(150deg) saturate(1.4)"></div><p><span class="no">✕</span> Mengganti warna</p></div>
+    <div class="dont"><div class="st"><img src="../logo/dragonet-divers-logo.png" alt="" style="filter:drop-shadow(0 10px 12px rgba(0,0,0,.45))"></div><p><span class="no">✕</span> Memberi bayangan, glow, atau outline</p></div>
+    <div class="dont"><div class="st busy"><img src="../logo/dragonet-divers-logo.png" alt="" style="transform:rotate(-14deg)"></div><p><span class="no">✕</span> Memutar atau menaruh di latar ramai</p></div>
+    <div class="dont"><div class="st" style="background:var(--dd-abyss)"><img src="../logo/dragonet-divers-logo.png" alt=""></div><p><span class="no">✕</span> File transparan di latar gelap: tulisan hilang</p></div>
+    <div class="dont"><div class="st"><img src="../logo/dragonet-divers-logo.png" alt="" style="width:260px;transform:translate(22%,18%)"></div><p><span class="no">✕</span> Memotong cincin luar</p></div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 07 Warna utama -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>05 Warna</span></div>
+  <div class="head"><p class="dd-eyebrow">05 · Warna utama</p><h2>Empat warna, diambil langsung dari logo</h2><p>Website berdasar putih. Keempat warna ini aksen, masing-masing dengan satu peran.</p></div>
+  <div class="body cols-4">
+    <div class="sw"><div class="c" style="background:var(--dd-teal);color:#fff"><span>UTAMA</span><b>Teal Dragonet</b></div><div class="d"><code>#146E7F</code><span>RGB 20 110 127</span><span>Dari cincin &amp; tulisan logo.</span><span style="color:var(--dd-abyss)">Tombol utama, link, ikon, judul aksen.</span><span>Putih di atasnya 5.9 : 1</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--dd-lagoon);color:#fff"><span>PENDUKUNG</span><b>Biru Laguna</b></div><div class="d"><code>#1592AB</code><span>RGB 21 146 171</span><span>Dari air laut di logo.</span><span style="color:var(--dd-abyss)">Ikon, ilustrasi, focus ring, kotak info.</span><span>Teks hanya ≥ 24 px (3.7 : 1)</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--dd-mandarin);color:var(--dd-abyss)"><span>AKSEN</span><b>Oranye Mandarin</b></div><div class="d"><code>#EB7817</code><span>RGB 235 120 23</span><span>Dari tubuh ikan mandarin.</span><span style="color:var(--dd-abyss)">Tombol CTA (Book / WhatsApp), satu per layar.</span><span>Teks Abyss di atasnya 4.7 : 1</span></div></div>
+    <div class="sw"><div class="c" style="background:var(--dd-sunrise);color:var(--dd-abyss)"><span>SOROTAN</span><b>Kuning Fajar</b></div><div class="d"><code>#F9D13E</code><span>RGB 249 209 62</span><span>Dari langit di logo.</span><span style="color:var(--dd-abyss)">Bintang rating, stabilo, titik aktif.</span><span>Bukan untuk teks</span></div></div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 08 Turunan & netral -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>06 Warna</span></div>
+  <div class="head"><p class="dd-eyebrow">06 · Turunan, netral &amp; proporsi</p><h2>Putih memimpin, warna logo menyusul</h2></div>
+  <div class="body" style="gap:22px">
+    <div>
+      <p class="lbl">Turunan untuk UI</p>
+      <div class="mini">
+        <div><i style="background:var(--dd-teal-dark)"></i><span><b>Teal Gelap</b><code>#0F5866</code>Hover tombol teal</span></div>
+        <div><i style="background:var(--dd-teal-soft)"></i><span><b>Teal Lembut</b><code>#D9E8EB</code>Chip, tab aktif</span></div>
+        <div><i style="background:var(--dd-lagoon-wash)"></i><span><b>Laguna Tipis</b><code>#ECF6F8</code>Kotak info</span></div>
+        <div><i style="background:var(--dd-mandarin-hover)"></i><span><b>Mandarin Hover</b><code>#F28A33</code>Hover tombol CTA</span></div>
+        <div><i style="background:var(--dd-ember)"></i><span><b>Bara</b><code>#B4560F</code>Teks oranye (4.9 : 1)</span></div>
+        <div><i style="background:var(--dd-mandarin-fin)"></i><span><b>Koral Sirip</b><code>#D9651F</code>Ilustrasi &amp; pola</span></div>
+        <div><i style="background:var(--dd-sunrise-wash)"></i><span><b>Fajar Tipis</b><code>#FEF8E0</code>Peringatan, chip</span></div>
+      </div>
+    </div>
+    <div>
+      <p class="lbl">Netral</p>
+      <div class="mini">
+        <div><i style="background:#fff;border-bottom:1px solid var(--dd-mist)"></i><span><b>Putih</b><code>#FFFFFF</code>Dasar</span></div>
+        <div><i style="background:var(--dd-foam)"></i><span><b>Foam</b><code>#F4F9FA</code>Section selang-seling</span></div>
+        <div><i style="background:var(--dd-mist)"></i><span><b>Mist</b><code>#DCE8EB</code>Garis, border</span></div>
+        <div><i style="background:var(--dd-line-strong)"></i><span><b>Garis Tegas</b><code>#78939A</code>Border input</span></div>
+        <div><i style="background:var(--dd-slate)"></i><span><b>Slate</b><code>#557079</code>Teks sekunder</span></div>
+        <div><i style="background:var(--dd-abyss)"></i><span><b>Abyss</b><code>#0A323B</code>Teks utama, footer</span></div>
+        <div><i style="background:var(--dd-on-dark-muted)"></i><span><b>Kabut Malam</b><code>#9DB9BF</code>Teks sekunder footer</span></div>
+      </div>
+    </div>
+    <div>
+      <p class="lbl">Proporsi dalam satu halaman</p>
+      <div class="ratio">
+        <div style="flex:80;background:linear-gradient(90deg,#fff 60%,var(--dd-foam) 60%);color:var(--dd-slate)">Putih + Foam ±80%</div>
+        <div style="flex:12;background:linear-gradient(90deg,var(--dd-abyss) 50%,var(--dd-teal) 50%);color:#fff">±12%</div>
+        <div style="flex:5;background:var(--dd-lagoon);color:#fff">±5%</div>
+        <div style="flex:3;background:linear-gradient(180deg,var(--dd-mandarin) 60%,var(--dd-sunrise) 60%)"></div>
+      </div>
+      <p class="note">Abyss + Teal ±12% (teks, tombol utama, footer) · Biru Laguna ±5% (ikon, info) · Oranye + Kuning ±3% (satu CTA per layar, rating). Oranye kecil di layar, karena itu mata langsung menemukan tombol booking.</p>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 09 Kontras -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>07 Warna</span></div>
+  <div class="head"><p class="dd-eyebrow">07 · Kontras &amp; aturan</p><h2>Kombinasi teks yang lulus WCAG AA</h2><p>Batas: 4.5 : 1 untuk teks biasa, 3 : 1 untuk teks ≥ 24 px, ikon, border kontrol, dan focus ring.</p></div>
+  <div class="body" style="gap:22px">
+    <div class="pairs">
+      <div class="pair" style="background:#fff;color:var(--dd-abyss)"><b>Aa</b><span>Abyss / Putih · 13.7</span></div>
+      <div class="pair" style="background:var(--dd-teal);color:#fff;border-color:transparent"><b>Aa</b><span>Putih / Teal · 5.9</span></div>
+      <div class="pair" style="background:var(--dd-mandarin);color:var(--dd-abyss);border-color:transparent"><b>Aa</b><span>Abyss / Mandarin · 4.7</span></div>
+      <div class="pair" style="background:#fff;color:var(--dd-ember)"><b>Aa</b><span>Bara / Putih · 4.9</span></div>
+      <div class="pair" style="background:#fff;color:var(--dd-slate)"><b>Aa</b><span>Slate / Putih · 5.3</span></div>
+      <div class="pair" style="background:var(--dd-sunrise);color:var(--dd-abyss);border-color:transparent"><b>Aa</b><span>Abyss / Kuning · 9.3</span></div>
+      <div class="pair" style="background:var(--dd-abyss);color:#fff;border-color:transparent"><b>Aa</b><span>Putih / Abyss · 13.7</span></div>
+      <div class="pair" style="background:var(--dd-mandarin);color:#fff;border-color:transparent"><b>Aa</b><span>✕ Putih / Mandarin · 2.9</span></div>
+    </div>
+    <div class="cols-2">
+      <div class="panel"><p class="lbl">Boleh</p><ul class="list">
+        <li>Teks utama Abyss di atas Putih atau Foam.</li>
+        <li>Tombol utama: latar Teal, teks Putih.</li>
+        <li>Tombol CTA: latar Oranye Mandarin, teks Abyss.</li>
+        <li>Teks oranye (eyebrow, harga): pakai Bara, bukan Oranye Mandarin.</li>
+        <li>Biru Laguna untuk ikon, ilustrasi, focus ring, dan judul ≥ 24 px.</li>
+      </ul></div>
+      <div class="panel"><p class="lbl">Dilarang</p><ul class="list">
+        <li>Teks putih di atas oranye (2.9 : 1).</li>
+        <li>Teks kuning atau oranye terang di atas putih.</li>
+        <li>Lebih dari satu tombol oranye dalam satu layar.</li>
+        <li>Gradasi ungu-biru atau warna di luar palet.</li>
+        <li>Latar gelap untuk section selain footer.</li>
+      </ul></div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 10 Tipografi font -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>08 Tipografi</span></div>
+  <div class="head"><p class="dd-eyebrow">08 · Tipografi</p><h2>Bulat untuk judul, rapi untuk teks</h2></div>
+  <div class="body cols-2">
+    <div class="panel" style="display:grid;gap:10px;align-content:start">
+      <p class="lbl" style="margin:0">Display · Fredoka 600</p>
+      <div class="spec-aa" style="font-family:var(--dd-font-display);font-weight:600;color:var(--dd-teal)">Aa</div>
+      <div class="alpha" style="font-family:var(--dd-font-display);font-weight:600">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789</div>
+      <p style="margin:6px 0 0">Huruf tebal yang membulat, senada dengan tulisan di badge. Ramah tanpa kekanak-kanakan selama dipakai hemat: judul H1–H3 dan judul template sosial.</p>
+      <p class="note">Tidak untuk paragraf, form, atau tabel. Lisensi SIL OFL 1.1.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:10px;align-content:start">
+      <p class="lbl" style="margin:0">Body · Plus Jakarta Sans 400 · 600 · 700 · 800</p>
+      <div class="spec-aa" style="font-weight:700;color:var(--dd-abyss)">Aa</div>
+      <div class="alpha">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br><span class="dd-num">0123456789</span></div>
+      <p style="margin:6px 0 0">Rapi dan mudah dibaca di ukuran kecil. Dibuat oleh Tokotype, foundry Indonesia. Dipakai untuk paragraf, menu, tombol, form, tabel, dan harga.</p>
+      <p class="note">File font disimpan lokal di <code>brand/fonts/</code>, tanpa CDN. Lisensi SIL OFL 1.1.</p>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 11 Skala -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>09 Tipografi</span></div>
+  <div class="head"><p class="dd-eyebrow">09 · Skala tipografi</p><h2>Ukuran desktop / mobile</h2></div>
+  <div class="body" style="grid-template-columns:1fr 250px;gap:32px">
+    <div class="scale">
+      <div><code>Display · Fredoka 600<br>60 / 40 px · 1.05</code><span class="dd-display" style="font-size:46px">Dive into colour.</span></div>
+      <div><code>H1 · Fredoka 600<br>44 / 34 px · 1.1</code><span class="dd-h1" style="font-size:36px">Diving the Dampier Strait</span></div>
+      <div><code>H2 · Fredoka 600<br>34 / 28 px · 1.15</code><span class="dd-h2" style="font-size:28px">Dive sites we love</span></div>
+      <div><code>H3 · Fredoka 600<br>24 px · 1.25</code><span class="dd-h3" style="font-size:22px">Sunset Mandarin Dive</span></div>
+      <div><code>H4 · Jakarta 700<br>20 px · 1.3</code><span class="dd-h4" style="font-size:18px">What's included</span></div>
+      <div><code>Lead · Jakarta 400<br>18 px · 1.65</code><span style="font-size:16px;color:var(--dd-slate)">Small groups, local guides, and some of the richest reefs in the Coral Triangle.</span></div>
+      <div><code>Body · Jakarta 400<br>16 px · 1.65</code><span style="font-size:14px">Briefing jelas sebelum turun, dan jarak aman dari biota di setiap penyelaman.</span></div>
+      <div><code>Small · Jakarta 500<br>14 px · 1.55</code><span class="dd-small" style="font-size:12.5px">Max depth 18 m · Water 28 °C · Visibility 15–25 m</span></div>
+      <div><code>Eyebrow · Jakarta 700<br>12 px · 0.14em · CAPS</code><span class="dd-eyebrow">Raja Ampat · Dampier Strait</span></div>
+    </div>
+    <div class="panel" style="align-self:start">
+      <p class="lbl">Aturan</p>
+      <ul class="list">
+        <li>Satu H1 per halaman.</li>
+        <li>Judul <i>sentence case</i>; HURUF BESAR hanya untuk eyebrow dan label.</li>
+        <li>Paragraf maks. ±65 karakter per baris.</li>
+        <li>Angka data selam dan harga pakai <code>tabular-nums</code>.</li>
+        <li>Satuan diberi spasi: <code>18 m</code>, <code>28 °C</code>, <code>IDR 1.500.000</code>.</li>
+        <li>Satu kata kunci di judul boleh berwarna Teal.</li>
+      </ul>
+      <p class="note">Contoh di halaman ini diperkecil agar muat; ukuran sebenarnya ada di kolom kiri.</p>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 12 Motif & ikon -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>10 Elemen grafis</span></div>
+  <div class="head"><p class="dd-eyebrow">10 · Elemen grafis &amp; ikon</p><h2>Tiga motif dari dalam badge</h2><p>Paling banyak satu motif per section. Motif adalah bumbu, bukan latar.</p></div>
+  <div class="body" style="gap:22px">
+    <div class="cols-3 motif">
+      <div><div class="st"><span class="dd-wave" style="width:180px;height:30px"></span></div><h3>Garis ombak</h3><span class="dd-small">Dari goresan air di logo. Di bawah judul section, penanda menu aktif, pembatas. File: <code>wave-divider.svg</code></span></div>
+      <div><div class="st"><div class="dd-stripe" style="width:78%;height:12px;border-radius:6px"></div></div><h3>Garis mandarin</h3><span class="dd-small">Dari belang ikan mandarin. Pita 6–12 px di atas footer dan tepi template sosial. Jangan sebagai latar luas. File: <code>mandarin-stripe.svg</code></span></div>
+      <div><div class="st"><div class="dd-photo-ph dd-ring" style="width:78px;height:78px"></div></div><h3>Lingkaran badge</h3><span class="dd-small">Dari bentuk badge. Foto tim, foto biota, highlight Instagram: lingkaran dengan cincin Teal 3 px.</span></div>
+    </div>
+    <div>
+      <p class="lbl">Ikon garis · stroke 1.75 px · ujung membulat · grid 24 px · set Lucide (ISC) · warna Teal</p>
+      <div class="icons">
+        <figure><svg class="dd-icon"><use href="#i-fish"/></svg>fish</figure>
+        <figure><svg class="dd-icon"><use href="#i-waves"/></svg>waves</figure>
+        <figure><svg class="dd-icon"><use href="#i-sunset"/></svg>sunset</figure>
+        <figure><svg class="dd-icon"><use href="#i-depth"/></svg>kedalaman</figure>
+        <figure><svg class="dd-icon"><use href="#i-thermo"/></svg>suhu</figure>
+        <figure><svg class="dd-icon"><use href="#i-eye"/></svg>visibilitas</figure>
+        <figure><svg class="dd-icon"><use href="#i-gauge"/></svg>arus</figure>
+        <figure><svg class="dd-icon"><use href="#i-ship"/></svg>trip</figure>
+        <figure><svg class="dd-icon"><use href="#i-cap"/></svg>kursus</figure>
+        <figure><svg class="dd-icon"><use href="#i-pin"/></svg>lokasi</figure>
+        <figure><svg class="dd-icon"><use href="#i-calendar"/></svg>jadwal</figure>
+        <figure><svg class="dd-icon"><use href="#i-chat"/></svg>WhatsApp</figure>
+      </div>
+      <p class="note">Di atas Abyss ikon berwarna Putih. Oranye hanya untuk ikon di dalam tombol CTA. Jangan pakai emoji sebagai ikon di website.</p>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 13 Fotografi -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>11 Fotografi</span></div>
+  <div class="head"><p class="dd-eyebrow">11 · Fotografi &amp; video</p><h2>Asli, natural, dan menghormati laut</h2></div>
+  <div class="body" style="gap:22px">
+    <div class="shots">
+      <figure><div class="dd-photo-ph" data-label="Makro"></div><figcaption><b>Makro</b>Ikan mandarin, nudibranch, kuda laut pygmy.</figcaption></figure>
+      <figure><div class="dd-photo-ph" data-label="Luas"></div><figcaption><b>Luas</b>Manta, hamparan karang, pulau karst, Selat Dampier.</figcaption></figure>
+      <figure><div class="dd-photo-ph" data-label="Manusia"></div><figcaption><b>Manusia</b>Penyelam dengan buoyancy baik, tim, briefing di kapal.</figcaption></figure>
+      <figure><div class="dd-photo-ph" data-label="Senja"></div><figcaption><b>Senja</b>Sesuai cerita logo. Hero &amp; paket Sunset Mandarin.</figcaption></figure>
+    </div>
+    <div class="cols-2">
+      <ul class="list">
+        <li><b>Asli dan jujur.</b> Foto milik sendiri atau berlisensi jelas. Gambar AI tidak boleh tampil sebagai dokumentasi lokasi.</li>
+        <li><b>Warna natural.</b> Koreksi warna bawah laut secukupnya; jangan saturasi berlebihan atau filter kuning/ungu.</li>
+        <li><b>Etika.</b> Tidak menyentuh karang, jarak aman dari biota. Ini bagian dari pesan brand.</li>
+        <li><b>Bingkai.</b> Radius 28 px untuk foto besar, 16 px untuk kartu, lingkaran untuk potret.</li>
+        <li><b>Teks di atas foto.</b> Gradasi Abyss 0 → 70% di bagian bawah, teks putih, hanya di area foto yang tenang.</li>
+      </ul>
+      <div class="overlay dd-photo-ph" data-label=""><p>Sunset Mandarin Dive</p></div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 14 Suara -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>12 Suara &amp; bahasa</span></div>
+  <div class="head"><p class="dd-eyebrow">12 · Suara &amp; bahasa</p><h2>Seperti dive guide yang sudah lama kenal</h2></div>
+  <div class="body" style="gap:20px">
+    <table class="spec">
+      <thead><tr><th style="width:50%">Kami</th><th>Bukan</th></tr></thead>
+      <tbody>
+        <tr><td>Ramah, seperti dive guide yang sudah lama kenal</td><td>Formal kaku atau terlalu heboh</td></tr>
+        <tr><td>Spesifik: nama site, kedalaman, biota</td><td>Klaim umum ("terbaik di dunia!!!")</td></tr>
+        <tr><td>Tenang dan meyakinkan soal keselamatan</td><td>Menakut-nakuti atau meremehkan risiko</td></tr>
+        <tr><td>Menghormati laut dan warga lokal</td><td>Memperlakukan biota sebagai atraksi</td></tr>
+      </tbody>
+    </table>
+    <div class="cols-2">
+      <div class="panel"><p class="lbl">Begini</p>
+        <p style="margin:0 0 8px"><span class="ok">✓</span> Small groups, local guides, and the colours of the Dampier Strait.</p>
+        <p style="margin:0 0 8px"><span class="ok">✓</span> Two mandarinfish pairs tonight at our house reef. Join the 17:30 sunset dive.</p>
+        <p style="margin:0"><span class="ok">✓</span> Menyelam santai bersama pemandu lokal di Selat Dampier.</p>
+      </div>
+      <div class="panel"><p class="lbl">Bukan begini</p>
+        <p style="margin:0 0 8px"><span class="no">✕</span> BEST DIVING EVER!!! BOOK NOW</p>
+        <p style="margin:0 0 8px"><span class="no">✕</span> Touch a turtle on our tour!</p>
+        <p style="margin:0"><span class="no">✕</span> Paket termurah se-Raja Ampat, dijamin!</p>
+      </div>
+    </div>
+    <div class="panel"><p class="lbl">Penulisan</p>
+      <ul class="list" style="grid-template-columns:1fr 1fr;column-gap:32px">
+        <li>"Raja Ampat", bukan "Rajaampat"; "Selat Dampier / Dampier Strait".</li>
+        <li>Nama biota: English di konten EN, Indonesia di konten ID (mandarinfish / ikan mandarin).</li>
+        <li>Tombol pakai kata kerja: <b>Book a dive</b>, <b>Chat on WhatsApp</b>, <b>See packages</b>.</li>
+        <li>Klaim angka (jumlah tamu per pemandu, harga) harus sesuai kebijakan asli.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 15 Website tata letak -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>13 Website</span></div>
+  <div class="head"><p class="dd-eyebrow">13 · Website: tata letak &amp; token</p><h2>Ruang lega di atas putih</h2><p>Semua nilai tersedia sebagai variabel CSS di <code>brand/tokens.css</code> dan sebagai JSON di <code>brand/tokens.json</code>.</p></div>
+  <div class="body cols-2" style="gap:24px">
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <p class="lbl">Grid · kontainer 1200 px · 12 kolom · gutter 16–32 px</p>
+        <div class="grid12"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="note">Jarak antar-section 64 px (mobile) sampai 112 px (desktop). Layout rata kiri; teks tidak di tengah kecuali CTA penutup.</p>
+      </div>
+      <div class="panel">
+        <p class="lbl">Jarak · basis 4 px</p>
+        <div class="bars">
+          <div><span>space-1 · 4</span><i style="width:4px"></i></div>
+          <div><span>space-2 · 8</span><i style="width:8px"></i></div>
+          <div><span>space-3 · 12</span><i style="width:12px"></i></div>
+          <div><span>space-4 · 16</span><i style="width:16px"></i></div>
+          <div><span>space-5 · 24</span><i style="width:24px"></i></div>
+          <div><span>space-6 · 32</span><i style="width:32px"></i></div>
+          <div><span>space-7 · 48</span><i style="width:48px"></i></div>
+          <div><span>space-8 · 64</span><i style="width:64px"></i></div>
+          <div><span>space-9 · 96</span><i style="width:96px"></i></div>
+          <div><span>space-10 · 128</span><i style="width:128px"></i></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <p class="lbl">Radius · dari bentuk badge bulat</p>
+        <div class="radii">
+          <figure><i style="border-radius:10px"></i>10 px · input</figure>
+          <figure><i style="border-radius:16px"></i>16 px · kartu</figure>
+          <figure><i style="border-radius:28px"></i>28 px · foto besar</figure>
+          <figure><i style="border-radius:999px;width:96px;height:40px"></i>pil · tombol, chip</figure>
+        </div>
+        <p class="note">Bayangan hanya untuk elemen mengambang (tombol WhatsApp, dropdown): <code>0 10px 30px rgba(10,50,59,.10)</code>. Kartu memakai border Mist, tanpa bayangan.</p>
+      </div>
+      <div class="panel">
+        <p class="lbl">Struktur halaman (usulan)</p>
+        <div class="sitemap">
+          <div><b>Home</b><span>Hero, kondisi laut, paket unggulan, dive site, testimoni, CTA</span></div>
+          <div><b>Diving</b><span>Fun dive, daftar dive site, Sunset Mandarin Dive</span></div>
+          <div><b>Courses</b><span>Kursus selam per level</span></div>
+          <div><b>Snorkeling &amp; Trips</b><span>Trip harian, snorkeling keluarga</span></div>
+          <div><b>About</b><span>Cerita dragonet, tim, konservasi</span></div>
+          <div><b>Contact / Book</b><span>Form booking ke WhatsApp, peta, kontak</span></div>
+        </div>
+        <p class="note">Setiap halaman punya versi Bahasa Indonesia di <code>/id</code>.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 16 Header & hero -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>14 Website</span></div>
+  <div class="head"><p class="dd-eyebrow">14 · Website: header, hero, kondisi laut</p><h2>Layar pertama</h2></div>
+  <div class="body">
+    <div class="stage" style="zoom:.76">
+      <div class="dd-header">
+        <span class="dd-lockup"><img src="../logo/dragonet-divers-logo.png" alt=""><span class="dd-lockup__name"><b>Dragonet Divers</b><small>RAJA AMPAT</small></span></span>
+        <nav class="dd-nav"><a aria-current="page">Diving</a><a>Courses</a><a>Snorkeling</a><a>Trips</a><a>About</a></nav>
+        <span class="dd-lang"><span aria-current="true">EN</span><span>ID</span></span>
+        <span class="dd-btn dd-btn--accent dd-btn--sm">Book a dive</span>
+      </div>
+      <div class="hero">
+        <div class="txt">
+          <p class="dd-eyebrow">Raja Ampat · Dampier Strait</p>
+          <h3 class="dd-display" style="font-size:56px">Dive into <span class="dd-accent-word">colour.</span></h3>
+          <p class="dd-lead">Small-group fun dives, courses and snorkeling trips with local guides who know every reef by name.</p>
+          <div class="row"><span class="dd-btn dd-btn--accent"><svg class="dd-icon"><use href="#i-chat"/></svg>Book via WhatsApp</span><span class="dd-btn dd-btn--outline">See packages</span></div>
+        </div>
+        <div class="dd-photo-ph dd-frame" data-label="Foto · pasangan ikan mandarin saat senja"></div>
+      </div>
+      <div style="padding:0 32px 28px">
+        <dl class="dd-conditions" style="margin:0">
+          <div><dt><svg class="dd-icon"><use href="#i-thermo"/></svg>Water</dt><dd>28 °C</dd></div>
+          <div><dt><svg class="dd-icon"><use href="#i-eye"/></svg>Visibility</dt><dd>15–25 m</dd></div>
+          <div><dt><svg class="dd-icon"><use href="#i-gauge"/></svg>Current</dt><dd>Mild</dd></div>
+          <div><dt><svg class="dd-icon"><use href="#i-sunset"/></svg>Sunset</dt><dd>18:12 WIT</dd></div>
+        </dl>
+      </div>
+    </div>
+    <p class="note" style="margin:0">Header putih 72 px, menempel saat scroll dengan garis bawah Mist; menu aktif Teal + garis ombak. Hero tidak setinggi layar penuh. Angka kondisi laut contoh; di website diisi dari data cuaca/laporan harian.</p>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 17 Tombol -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>15 Website</span></div>
+  <div class="head"><p class="dd-eyebrow">15 · Website: tombol, chip, judul section</p><h2>Satu tombol oranye per layar</h2></div>
+  <div class="body" style="gap:18px">
+    <div class="panel">
+      <div class="states">
+        <span></span><span>Default</span><span>Hover</span><span>Fokus keyboard</span><span>Nonaktif</span>
+        <span>Aksen</span><div><span class="dd-btn dd-btn--accent">Book a dive</span></div><div><span class="dd-btn dd-btn--accent is-hover">Book a dive</span></div><div><span class="dd-btn dd-btn--accent is-focus">Book a dive</span></div><div><span class="dd-btn is-disabled">Book a dive</span></div>
+        <span>Utama</span><div><span class="dd-btn">See packages</span></div><div><span class="dd-btn is-hover">See packages</span></div><div><span class="dd-btn is-focus">See packages</span></div><div><span class="dd-btn is-disabled">See packages</span></div>
+        <span>Garis</span><div><span class="dd-btn dd-btn--outline">Our courses</span></div><div><span class="dd-btn dd-btn--outline is-hover">Our courses</span></div><div><span class="dd-btn dd-btn--outline is-focus">Our courses</span></div><div><span class="dd-btn is-disabled">Our courses</span></div>
+        <span>Teks</span><div><span class="dd-link">Read more <svg class="dd-icon"><use href="#i-arrow"/></svg></span></div><div><span class="dd-link is-hover">Read more <svg class="dd-icon"><use href="#i-arrow"/></svg></span></div><div></div><div></div>
+      </div>
+      <p class="note">Pil, tinggi 48 px (kecil 40 px), padding 24 px, Plus Jakarta Sans 700 15 px. Fokus: cincin Biru Laguna 3 px berjarak 2 px. Tombol WhatsApp mengambang: lingkaran Teal 56 px <span class="dd-fab" style="display:inline-grid;width:30px;height:30px;vertical-align:middle;margin-left:4px"><svg class="dd-icon" style="width:16px;height:16px"><use href="#i-chat"/></svg></span></p>
+    </div>
+    <div class="cols-2" style="gap:18px">
+      <div class="panel">
+        <p class="lbl">Chip level &amp; jenis</p>
+        <div class="row">
+          <span class="dd-chip">Beginner</span>
+          <span class="dd-chip dd-chip--advanced">Advanced</span>
+          <span class="dd-chip dd-chip--sunset"><svg class="dd-icon" style="width:14px;height:14px"><use href="#i-sunset"/></svg>Sunset dive</span>
+          <span class="dd-chip dd-chip--snorkel">Snorkel</span>
+          <span class="dd-chip dd-chip--solid">Most popular</span>
+        </div>
+        <p class="note">Pil 26 px, 11 px huruf besar, Plus Jakarta Sans 700. Warna mengikuti arti: Teal = umum, Bara = advanced, Kuning = senja, Laguna = snorkel.</p>
+      </div>
+      <div class="panel" style="display:grid;gap:8px">
+        <p class="lbl" style="margin:0">Judul section</p>
+        <p class="dd-eyebrow">Dive sites</p>
+        <h3 class="dd-h2" style="font-size:28px">Reefs of the Dampier Strait</h3>
+        <span class="dd-wave" aria-hidden="true"></span>
+        <p class="note" style="margin:0">Eyebrow Bara → H2 Abyss → garis ombak → paragraf Slate maks. 60 karakter, rata kiri.</p>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 18 Kartu -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>16 Website</span></div>
+  <div class="head"><p class="dd-eyebrow">16 · Website: kartu</p><h2>Border tipis, tanpa bayangan</h2></div>
+  <div class="body">
+    <div class="cards zoom-85">
+      <article class="dd-card">
+        <div class="dd-card__media dd-photo-ph" data-label="Foto · Cape Kri"></div>
+        <div class="dd-card__body">
+          <div class="row" style="gap:8px"><span class="dd-chip">Beginner</span><span class="dd-chip dd-chip--snorkel">Snorkel ok</span></div>
+          <h4 class="dd-card__title">Cape Kri</h4>
+          <div class="dd-meta"><span><svg class="dd-icon"><use href="#i-depth"/></svg>5–30 m</span><span><svg class="dd-icon"><use href="#i-gauge"/></svg>Mild–strong</span><span><svg class="dd-icon"><use href="#i-fish"/></svg>Schooling fish</span></div>
+          <span class="dd-link">View dive site <svg class="dd-icon"><use href="#i-arrow"/></svg></span>
+        </div>
+      </article>
+      <article class="dd-card dd-card--featured">
+        <div class="dd-card__body" style="padding:24px">
+          <div class="row" style="justify-content:space-between"><p class="dd-eyebrow">Fun dive</p><span class="dd-chip dd-chip--solid">Most popular</span></div>
+          <h4 class="dd-h3">Sunset Mandarin Dive</h4>
+          <div class="dd-price">IDR 1.250.000 <small>/ dive</small></div>
+          <ul class="dd-checklist">
+            <li><svg class="dd-icon"><use href="#i-check"/></svg>Dusk dive at a mandarinfish site</li>
+            <li><svg class="dd-icon"><use href="#i-check"/></svg>Guide, tank, weights, torch</li>
+            <li><svg class="dd-icon"><use href="#i-check"/></svg>Max 4 divers per guide</li>
+          </ul>
+          <span class="dd-btn dd-btn--outline" style="margin-top:6px">Ask on WhatsApp</span>
+        </div>
+      </article>
+      <div style="display:grid;gap:18px">
+        <figure class="dd-quote" style="margin:0">
+          <div class="dd-stars"><svg class="dd-icon"><use href="#i-star"/></svg><svg class="dd-icon"><use href="#i-star"/></svg><svg class="dd-icon"><use href="#i-star"/></svg><svg class="dd-icon"><use href="#i-star"/></svg><svg class="dd-icon"><use href="#i-star"/></svg></div>
+          <blockquote>“The guides found two mandarinfish pairs at dusk. Calm, patient, and so careful with the reef.”</blockquote>
+          <figcaption class="dd-small"><b style="color:var(--dd-abyss)">Contoh tamu</b> · Germany</figcaption>
+        </figure>
+        <article class="dd-card team">
+          <div class="dd-photo-ph dd-ring" data-label=""></div>
+          <h4 class="dd-h4">Nama Pemandu</h4>
+          <span class="dd-small">PADI Divemaster · Waisai</span>
+        </article>
+      </div>
+    </div>
+    <p class="note" style="margin:0">Dive site: foto 4:3, judul Fredoka 22 px, meta berikon, hover border Teal · Paket: border Mist, unggulan border 2 px Teal, harga Jakarta 800 · Testimoni: latar Foam, bintang Kuning · Tim: foto lingkaran bercincin Teal. Isi kartu contoh.</p>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 19 Form, info, tabel, footer -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>17 Website</span></div>
+  <div class="head"><p class="dd-eyebrow">17 · Website: form, info, tabel, footer</p><h2>Booking berakhir di WhatsApp</h2></div>
+  <div class="body zoom-85" style="gap:18px">
+    <div class="cols-2" style="gap:20px;align-items:start">
+      <div class="stage">
+        <div class="stage-lbl"><span>Form booking</span><span>Input 48 px · radius 10</span></div>
+        <div class="form">
+          <div class="dd-field"><label class="dd-label">Full name</label><input class="dd-input" placeholder="Your name"></div>
+          <div class="dd-field"><label class="dd-label">Dive date</label><input class="dd-input is-focus" value="12 Nov 2026"></div>
+          <div class="dd-field"><label class="dd-label">Certification</label><select class="dd-input"><option>Open Water</option></select></div>
+          <div class="dd-field is-error"><label class="dd-label">Divers</label><input class="dd-input" value="0"><span class="dd-help"><svg class="dd-icon"><use href="#i-alert"/></svg>Enter at least 1 diver.</span></div>
+          <span class="dd-btn dd-btn--accent span2"><svg class="dd-icon"><use href="#i-chat"/></svg>Send to WhatsApp</span>
+        </div>
+      </div>
+      <div style="display:grid;gap:14px">
+        <div class="dd-notice"><svg class="dd-icon"><use href="#i-info"/></svg><div><strong>Dive conditions.</strong> Updated every morning from the boat before the first dive.</div></div>
+        <div class="dd-notice dd-notice--warn"><svg class="dd-icon"><use href="#i-alert"/></svg><div><strong>Strong current today.</strong> Cape Kri is for advanced divers only.</div></div>
+        <div class="dd-table-wrap">
+          <table class="dd-table">
+            <thead><tr><th>Package</th><th>Dives</th><th class="num">Price (IDR)</th></tr></thead>
+            <tbody>
+              <tr><td>Fun dive</td><td>1</td><td class="num">1.000.000</td></tr>
+              <tr><td>Sunset Mandarin Dive</td><td>1</td><td class="num">1.250.000</td></tr>
+              <tr><td>3-day dive package</td><td>6</td><td class="num">5.400.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="stage" style="border:0">
+      <div class="dd-stripe"></div>
+      <footer class="dd-footer">
+        <div class="foot-demo">
+          <div><img src="../logo/dragonet-divers-logo-plate.png" alt=""><p class="dd-footer__muted" style="margin:10px 0 0;max-width:30ch">Small-group diving and snorkeling in Raja Ampat.</p></div>
+          <div><h4>Dive</h4><ul><li>Fun dives</li><li>Dive sites</li><li>Sunset Mandarin</li></ul></div>
+          <div><h4>Learn</h4><ul><li>Courses</li><li>Snorkeling</li><li>Trips</li></ul></div>
+          <div><h4>Contact</h4><ul><li>WhatsApp</li><li class="dd-footer__muted">Waisai, Raja Ampat</li><li class="dd-footer__muted">Papua Barat Daya</li></ul></div>
+        </div>
+        <div class="foot-bottom dd-footer__muted"><span>© 2026 Dragonet Divers Raja Ampat</span><span>EN · ID</span></div>
+      </footer>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 20 Sosial profil -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>18 Media sosial</span></div>
+  <div class="head"><p class="dd-eyebrow">18 · Media sosial: profil &amp; ukuran</p><h2>Grid yang tetap putih</h2></div>
+  <div class="body" style="grid-template-columns:330px 1fr;gap:30px">
+    <div class="ig">
+      <div class="ig-top"><img src="../logo/dragonet-divers-logo-white-bg.png" alt=""><div><b>dragonetdivers</b><p><b style="font-size:11.5px">Dragonet Divers Raja Ampat</b><br>Dive into colour · Small-group diving &amp; snorkeling in Raja Ampat · Dampier Strait · Book via WhatsApp ↓</p></div></div>
+      <div class="ig-hl">
+        <figure><img src="../social/highlights/dive.png" alt="">Dive</figure>
+        <figure><img src="../social/highlights/snorkel.png" alt="">Snorkel</figure>
+        <figure><img src="../social/highlights/trips.png" alt="">Trips</figure>
+        <figure><img src="../social/highlights/courses.png" alt="">Courses</figure>
+        <figure><img src="../social/highlights/reviews.png" alt="">Reviews</figure>
+      </div>
+      <div class="ig-grid">
+        <img src="../social/preview/f1-dive-site.png" alt=""><img src="../social/preview/f3-package.png" alt=""><img src="../social/preview/f2-marine-fact.png" alt="">
+        <img src="../social/preview/f4-review.png" alt=""><img src="../social/preview/f1-dive-site.png" alt=""><img src="../social/preview/f3-package.png" alt="">
+      </div>
+      <p class="note" style="margin:0">Handle <code>@dragonetdivers</code> usulan; cek ketersediaan.</p>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <table class="spec">
+        <thead><tr><th>Format</th><th>Ukuran</th><th>Zona aman</th></tr></thead>
+        <tbody>
+          <tr><td>Feed portrait (utama)</td><td class="num">1080 × 1350</td><td>Margin 80 px; grid profil memotong ke 3:4, jauhkan teks dari 40 px tepi kiri-kanan</td></tr>
+          <tr><td>Feed persegi</td><td class="num">1080 × 1080</td><td>Margin 80 px</td></tr>
+          <tr><td>Story / Reels / TikTok</td><td class="num">1080 × 1920</td><td>Kosongkan 250 px atas, 340 px bawah; TikTok juga 140 px kanan</td></tr>
+          <tr><td>Sampul Reels</td><td class="num">1080 × 1920</td><td>Judul di area tengah 1080 × 1440</td></tr>
+          <tr><td>Highlight</td><td class="num">1080 × 1080</td><td>Ikon ±40% lebar lingkaran, di tengah</td></tr>
+          <tr><td>Foto profil</td><td class="num">min. 320 × 320</td><td>Badge sudah bulat, pas dengan potongan lingkaran</td></tr>
+        </tbody>
+      </table>
+      <div class="panel">
+        <p class="lbl">Ritme grid</p>
+        <ul class="list">
+          <li>Selang-seling <b>foto – putih – foto</b> agar profil tetap terasa minimalis dan putih.</li>
+          <li>Foto bawah laut (F1, F2) diselingi template putih (F3, F4).</li>
+          <li>Maksimal dua posting dominan oranye berturut-turut.</li>
+          <li>Logo selalu versi <i>plate</i> di template; ukuran 110–130 px di kanvas 1080.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 21 Feed -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>19 Media sosial</span></div>
+  <div class="head"><p class="dd-eyebrow">19 · Media sosial: template feed</p><h2>Empat template feed 1080 × 1350</h2><p>File siap ubah: <code>brand/social/templates.html</code>. Kotak bergaris biru adalah tempat foto asli; harga, site, dan kutipan masih contoh.</p></div>
+  <div class="body feeds">
+    <figure><img src="../social/preview/f1-dive-site.png" alt=""><figcaption><b>F1 · Dive Site Spotlight</b>Foto penuh + kartu putih: nama site, kedalaman, arus, level.</figcaption></figure>
+    <figure><img src="../social/preview/f2-marine-fact.png" alt=""><figcaption><b>F2 · Marine Life Fact</b>Latar putih, foto biota dalam lingkaran badge, satu fakta, pita garis mandarin.</figcaption></figure>
+    <figure><img src="../social/preview/f3-package.png" alt=""><figcaption><b>F3 · Paket / Promo</b>Nama paket, harga di chip oranye, 3–4 poin, jadwal, CTA WhatsApp.</figcaption></figure>
+    <figure><img src="../social/preview/f4-review.png" alt=""><figcaption><b>F4 · Testimoni</b>Latar Foam, bintang kuning, kutipan besar, nama &amp; negara.</figcaption></figure>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 22 Story -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>20 Media sosial</span></div>
+  <div class="head"><p class="dd-eyebrow">20 · Media sosial: story &amp; highlight</p><h2>Story 1080 × 1920 dan sampul highlight</h2></div>
+  <div class="body stories">
+    <figure><div class="safe"><img src="../social/preview/s1-dive-report.png" alt=""></div><figcaption><b>S1 · Dive Report</b>Suhu, visibilitas, arus, biota hari ini, jadwal besok. Area merah = zona UI Instagram, kosongkan.</figcaption></figure>
+    <figure><img src="../social/preview/s2-booking.png" alt=""><figcaption><b>S2 · Booking CTA</b>Foto + judul + tombol WhatsApp. Stiker link ditambahkan di aplikasi.</figcaption></figure>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="panel">
+        <p class="lbl">Highlight covers · lingkaran Teal, ikon garis putih</p>
+        <img src="../social/preview/h-highlights.png" alt="" style="width:100%;display:block">
+        <p class="note">File 1080 × 1080 siap unggah: <code>brand/social/highlights/</code> (dive, snorkel, trips, courses, reviews, info).</p>
+      </div>
+      <div class="panel">
+        <p class="lbl">Aturan story</p>
+        <ul class="list">
+          <li>Latar putih atau foto; teks gelap di area putih.</li>
+          <li>Logo <i>plate</i> di kiri atas, di bawah zona 250 px.</li>
+          <li>Satu tombol oranye per story.</li>
+          <li>Dive report diposting setiap pagi dengan data asli.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 23 Caption -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>21 Media sosial</span></div>
+  <div class="head"><p class="dd-eyebrow">21 · Media sosial: caption &amp; hashtag</p><h2>English dulu, satu baris Indonesia</h2></div>
+  <div class="body cols-2" style="gap:30px">
+    <div style="display:grid;gap:18px;align-content:start">
+      <div><p class="lbl">Susunan caption</p>
+        <ol class="steps">
+          <li>Baris pembuka EN, satu kalimat, spesifik.</li>
+          <li>2–3 kalimat detail EN.</li>
+          <li>Satu baris ringkas Bahasa Indonesia.</li>
+          <li>CTA: "Book via WhatsApp — link in bio."</li>
+          <li>5–10 hashtag di akhir.</li>
+        </ol>
+      </div>
+      <div><p class="lbl">Hashtag inti</p><div class="tags"><span>#DragonetDivers</span><span>#RajaAmpat</span><span>#RajaAmpatDiving</span><span>#DampierStrait</span><span>#MandarinFish</span><span>#DiveIndonesia</span><span>#WonderfulIndonesia</span></div></div>
+      <div><p class="lbl">Hashtag rotasi</p><div class="tags rot"><span>#ScubaDiving</span><span>#UnderwaterPhotography</span><span>#MacroDiving</span><span>#Snorkeling</span><span>#WestPapua</span><span>#CoralTriangle</span></div></div>
+      <p class="note" style="margin:0">Emoji maksimal 2 per caption, bertema laut (ikan, matahari terbenam, masker selam).</p>
+    </div>
+    <div class="caption-card">
+      <p class="lbl" style="margin:0">Contoh caption · F2 Marine Life Fact</p>
+      <p><b>Two mandarinfish, one sunset, zero rush.</b></p>
+      <p>Every evening at our dusk site, mandarinfish pairs rise from the rubble to spawn. We wait at a distance, torches low, and let them dance. It's the moment our logo is drawn from.</p>
+      <p style="color:var(--dd-teal)"><i>Ikan mandarin menari berpasangan setiap senja. Kami menonton dari jarak aman.</i></p>
+      <p>Join the Sunset Mandarin Dive. Book via WhatsApp — link in bio.</p>
+      <p style="color:var(--dd-teal)">#DragonetDivers #RajaAmpat #MandarinFish #DampierStrait #MacroDiving #DiveIndonesia</p>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 24 Aksesibilitas & file -->
+<section class="page">
+  <div class="run"><span>Dragonet Divers · Brand identity</span><span>22 Penutup</span></div>
+  <div class="head"><p class="dd-eyebrow">22 · Aksesibilitas, file &amp; kebutuhan</p><h2>Sebelum website dibangun</h2></div>
+  <div class="body cols-3" style="gap:20px">
+    <div class="panel"><p class="lbl">Aksesibilitas</p>
+      <ul class="check done">
+        <li>Teks memenuhi rasio kontras halaman 09.</li>
+        <li>Biru Laguna, Oranye, Kuning tidak dipakai untuk teks kecil.</li>
+        <li>Semua tombol &amp; link punya fokus terlihat (cincin Laguna).</li>
+        <li>Foto punya <code>alt</code> yang menyebut biota/lokasi.</li>
+        <li>Animasi menghormati <code>prefers-reduced-motion</code>.</li>
+        <li>Target sentuh minimal 44 × 44 px.</li>
+      </ul>
+    </div>
+    <div class="panel"><p class="lbl">File brand</p>
+      <ul class="list" style="font-size:11.5px">
+        <li><b>Logo kit (ZIP):</b> badge 3 versi, lockup, favicon, ikon aplikasi, highlight, palet warna.</li>
+        <li><code>BRANDING.md</code> pedoman tertulis.</li>
+        <li><code>brand/tokens.css</code> · <code>tokens.json</code> token desain.</li>
+        <li><code>brand/components.css</code> komponen website.</li>
+        <li><code>brand/brand-guide.html</code> brand book interaktif.</li>
+        <li><code>brand/social/</code> template &amp; PNG.</li>
+        <li><code>brand/fonts/</code> Fredoka, Plus Jakarta Sans (OFL).</li>
+      </ul>
+    </div>
+    <div class="panel"><p class="lbl">Masih dibutuhkan dari pemilik</p>
+      <ul class="check">
+        <li>Logo resolusi tinggi (≥ 2000 px) atau vektor SVG/AI/PDF, plus versi satu warna dari desainer. File sekarang hanya 301 px.</li>
+        <li>Pilihan tagline.</li>
+        <li>Handle media sosial &amp; domain.</li>
+        <li>Nomor WhatsApp, email, alamat.</li>
+        <li>Foto &amp; video asli.</li>
+        <li>Data dive site, harga paket, jumlah tamu per pemandu, sertifikasi tim.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="folio"><span class="dd-wave"></span><span class="n"></span></div>
+</section>
+
+<!-- 25 Sampul belakang -->
+<section class="page back">
+  <div class="stripe"></div>
+  <div style="display:grid;gap:18px;justify-items:center">
+    <img src="../logo/dragonet-divers-logo-plate.png" alt="Dragonet Divers Raja Ampat">
+    <p style="font:600 30px/1.1 var(--dd-font-display)">Dive into colour.</p>
+    <p style="color:var(--dd-on-dark-muted);font-size:12px">Dragonet Divers Raja Ampat · Brand identity guidelines v1.0 · Oktober 2026</p>
+  </div>
+</section>
+
+</body>
+</html>

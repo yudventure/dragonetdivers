@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dragonet Divers Lockup</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  /* Lockup horizontal untuk logo kit. Dirender transparan oleh export.mjs (omitBackground). */
+  html, body { margin: 0; background: transparent; }
+  .lockup { display: inline-flex; align-items: center; gap: 40px; padding: 24px; }
+  .lockup img { width: 260px; height: 260px; display: block; }
+  .name { display: grid; line-height: 1; }
+  .name b { font: 600 112px/1 var(--dd-font-display); color: var(--dd-teal); }
+  .name small { font: 700 30px/1 var(--dd-font-body); letter-spacing: .2em; color: var(--dd-slate); margin-top: 22px; }
+  .on-dark .name b { color: var(--dd-white); }
+  .on-dark .name small { color: var(--dd-on-dark-muted); }
+</style>
+</head>
+<body>
+  <div class="lockup" id="lockup-teal"><img src="../logo/dragonet-divers-logo.png" alt=""><span class="name"><b>Dragonet Divers</b><small>RAJA AMPAT</small></span></div>
+  <br>
+  <div class="lockup on-dark" id="lockup-white"><img src="../logo/dragonet-divers-logo-plate.png" alt=""><span class="name"><b>Dragonet Divers</b><small>RAJA AMPAT</small></span></div>
+</body>
+</html>

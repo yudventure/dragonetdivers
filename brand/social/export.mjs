@@ -1,6 +1,7 @@
 // Ekspor template media sosial dan tangkapan brand guide ke PNG.
 // Pakai: node brand/social/export.mjs   (butuh paket `playwright` + Chromium)
-// Hasil: brand/social/preview/*.png, brand/social/highlights/*.png, brand/preview/*.png
+// Hasil: brand/social/preview, brand/social/highlights, brand/preview, brand/logo/*lockup*.png,
+//        brand/export/Dragonet-Divers-Brand-Identity.pdf
 import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import { extname, join, normalize, dirname } from "node:path";
@@ -48,8 +49,25 @@ try {
     await guide.screenshot({ path: join(brandDir, `preview/${name}.png`), fullPage: true });
     await guide.close();
   }
+
+  // Lockup horizontal (latar transparan) untuk logo kit.
+  const lockup = await browser.newPage({ viewport: { width: 1400, height: 800 } });
+  await lockup.goto(`${base}/print/lockup.html`);
+  await lockup.evaluate(() => document.fonts.ready);
+  for (const id of ["lockup-teal", "lockup-white"]) {
+    await lockup.locator(`#${id}`).screenshot({ path: join(brandDir, `logo/dragonet-divers-${id}.png`), omitBackground: true });
+  }
+  await lockup.close();
+
+  // Buku pedoman PDF (A4 landscape).
+  await mkdir(join(brandDir, "export"), { recursive: true });
+  const book = await browser.newPage();
+  await book.goto(`${base}/print/brand-identity.html`, { waitUntil: "networkidle" });
+  await book.evaluate(() => document.fonts.ready);
+  await book.pdf({ path: join(brandDir, "export/Dragonet-Divers-Brand-Identity.pdf"), width: "297mm", height: "210mm", printBackground: true, preferCSSPageSize: true });
+  await book.close();
 } finally {
   await browser.close();
   server.close();
 }
-console.log("Selesai: brand/social/preview, brand/social/highlights, brand/preview");
+console.log("Selesai: PNG template, highlight, lockup, dan brand/export/Dragonet-Divers-Brand-Identity.pdf");

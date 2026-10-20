@@ -6,7 +6,9 @@ Lihat versi visualnya di [`brand/brand-guide.html`](brand/brand-guide.html) (buk
 
 | Isi | Lokasi |
 | --- | --- |
-| Logo asli + favicon | `brand/logo/` |
+| **Buku pedoman PDF** (A4 landscape, 25 halaman) | `brand/export/Dragonet-Divers-Brand-Identity.pdf` |
+| **Logo kit ZIP** (badge, lockup, favicon, highlight, palet) | `brand/export/Dragonet-Divers-Logo-Kit.zip` |
+| Logo asli, versi plate, lockup horizontal, favicon | `brand/logo/` |
 | Token warna, font, jarak, radius (CSS) | `brand/tokens.css` |
 | Token yang sama (JSON, untuk Tailwind/alat lain) | `brand/tokens.json` |
 | Font (self-host, lisensi SIL OFL) | `brand/fonts/` |
