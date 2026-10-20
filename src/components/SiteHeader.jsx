@@ -12,14 +12,14 @@ export default function SiteHeader() {
       <div className="gutter mx-auto flex h-16 max-w-[1200px] items-center gap-4 sm:h-[72px]">
         <Link href="/" className="flex items-center gap-3" aria-label={`${site.name}, home`}>
           <Image src={logo} alt="" width={44} height={44} priority className="size-11" />
-          <span className="hidden leading-none min-[360px]:grid">
-            <span className="font-display text-xl font-semibold text-teal">{site.shortName}</span>
+          <span className="hidden leading-none whitespace-nowrap min-[360px]:grid">
+            <span className="font-display text-lg font-semibold text-teal sm:text-xl">{site.shortName}</span>
             <span className="mt-1.5 text-[10px] font-bold tracking-[0.2em] text-slate">RAJA AMPAT</span>
           </span>
         </Link>
         <div className="ml-auto">
           {booking ? (
-            <a href={booking} className="inline-flex h-10 items-center gap-2 rounded-full bg-mandarin px-[18px] text-sm font-bold text-abyss transition-colors duration-200 ease-brand hover:bg-mandarin-hover">
+            <a href={booking} className="inline-flex h-10 items-center gap-2 rounded-full bg-mandarin px-4 text-sm font-bold whitespace-nowrap text-abyss sm:px-[18px] transition-colors duration-200 ease-brand hover:bg-mandarin-hover">
               <ChatIcon className="size-[18px]" />
               <span>Book a dive</span>
             </a>
