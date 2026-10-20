@@ -19,8 +19,10 @@ npm run build && npm start
 ## Alur kerja
 
 1. Kerjakan perubahan di branch selain `main`, lalu push.
-2. GitHub Actions otomatis menjalankan test + build (**CI**) dan membuka PR ke `main` (**Auto PR**).
-3. Merge PR → Hostinger membangun dan menayangkan versi baru.
+2. GitHub Actions menjalankan test + build. Bila lulus, branch **otomatis digabung ke `main`** (lewat PR bila diizinkan).
+3. Hostinger membangun dan menayangkan versi baru dari `main`.
+
+Branch berawalan `wip/` tidak digabung otomatis; variabel repo `AUTO_MERGE=false` mematikannya untuk semua branch.
 
 Pengaturan GitHub, Hostinger, domain, dan MySQL: **[HOSTINGER-DEPLOY.md](./HOSTINGER-DEPLOY.md)**.
 

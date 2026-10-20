@@ -3,23 +3,30 @@
 Proyek ini Next.js 16 (App Router) + React 19 + Tailwind CSS 4 + MySQL (`mysql2`), dijalankan sebagai server Node.js dengan `npm start`. Alurnya:
 
 ```
-branch kerja ──push──► PR otomatis ke main ──merge──► Hostinger build & deploy ──► dragonetdiversrajaampat.com
+branch kerja ──push──► CI: test + build ──lulus──► merge otomatis ke main ──► Hostinger build & deploy ──► dragonetdiversrajaampat.com
 ```
 
-## 1. Pengaturan GitHub (sekali saja, di github.com/yudventure/dragonetdivers)
+## 1. GitHub: merge otomatis
+
+Workflow `.github/workflows/ci.yml` berjalan di setiap push:
+
+| Cek | Isi |
+| --- | --- |
+| **build** | `npm ci`, `npm test`, `npm run build` |
+| **merge** | Hanya untuk branch selain `main`, setelah **build** lulus. Membuka PR ke `main` (bila diizinkan), lalu menggabungkannya. Bila Actions belum diizinkan membuat PR, branch digabung langsung ke `main`. |
+
+Jadi setiap push yang lulus test + build **langsung tayang** (setelah Hostinger membangun ulang). Bila build gagal, tidak ada yang digabung. Bila branch bentrok dengan `main`, cek **merge** merah dan menjelaskan konfliknya.
+
+Pengecualian:
+- Branch berawalan `wip/` (mis. `wip/coba-galeri`) tidak digabung otomatis; pakai untuk percobaan.
+- Matikan merge otomatis untuk semua branch: Settings → Secrets and variables → Actions → Variables → `AUTO_MERGE` = `false`.
+
+Pengaturan GitHub yang disarankan (sekali saja, di github.com/yudventure/dragonetdivers):
 
 | Pengaturan | Letak | Nilai |
 | --- | --- | --- |
 | Default branch | Settings → General → Default branch | `main` |
-| PR otomatis | Settings → Actions → General → Workflow permissions | Centang **Allow GitHub Actions to create and approve pull requests** |
-| Auto-merge (opsional) | Settings → General → Pull Requests | Centang **Allow auto-merge** |
-| Lindungi main (opsional, wajib untuk auto-merge) | Settings → Branches → Add rule `main` | Require status checks: **build** |
-| Nyalakan auto-merge (opsional) | Settings → Secrets and variables → Actions → Variables | `AUTO_MERGE` = `true` |
-
-Cara kerjanya:
-- **CI** (`.github/workflows/ci.yml`): setiap push menjalankan `npm ci`, `npm test`, `npm run build`. Cek bernama **build**.
-- **Auto PR** (`.github/workflows/auto-pr.yml`): setiap push ke branch selain `main` dibuatkan PR ke `main` bila belum ada. Judul PR = judul commit terakhir.
-- Dengan `AUTO_MERGE=true`, PR otomatis di-merge (squash) begitu cek **build** hijau. Tanpa variabel itu, Anda cukup menekan **Merge** di GitHub.
+| Catatan PR untuk setiap merge (opsional) | Settings → Actions → General → Workflow permissions | Centang **Allow GitHub Actions to create and approve pull requests** |
 
 ## 2. Buat Node.js Web App di hPanel
 

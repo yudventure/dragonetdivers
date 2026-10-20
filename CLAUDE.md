@@ -22,5 +22,6 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdiversrajaampat.com). Pe
 - Jangan menulis harga, jadwal, atau klaim bisnis yang belum diberikan pemilik.
 
 ## Git & deploy
-- `main` = produksi; Hostinger membangun dari `main`. Kerjakan di branch lain; workflow Auto PR membuka PR ke `main` otomatis.
+- `main` = produksi; Hostinger membangun dari `main`. Kerjakan di branch lain.
+- **Setiap push ke branch selain `main` yang lulus test + build otomatis digabung ke `main` dan tayang** (job `merge` di `.github/workflows/ci.yml`). Push hanya pekerjaan yang sudah selesai dan teruji; percobaan pakai branch `wip/…`.
 - Panduan Hostinger, DNS, dan MySQL: `HOSTINGER-DEPLOY.md`.
