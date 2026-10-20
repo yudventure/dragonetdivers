@@ -1,0 +1,102 @@
+name: CI
+
+# Setiap push: test + build (cek "build").
+# Push ke branch selain main yang lulus build otomatis digabung ke main (cek "merge"),
+# lalu Hostinger membangun ulang website dari main.
+# Lewati merge otomatis: pakai branch berawalan wip/, atau variabel repo AUTO_MERGE=false.
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  merge:
+    name: merge
+    needs: build
+    if: >-
+      github.event_name == 'push' && !github.event.deleted &&
+      github.ref_name != 'main' && !startsWith(github.ref_name, 'wip/') &&
+      vars.AUTO_MERGE != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Satu merge ke main pada satu waktu.
+    concurrency:
+      group: merge-to-main
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Gabungkan ke main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin +refs/heads/main:refs/remotes/origin/main
+
+          if git merge-base --is-ancestor "$SHA" origin/main; then
+            echo "Commit ini sudah ada di main."
+            exit 0
+          fi
+          # Hanya commit yang lulus build ini yang digabung; push yang lebih baru ditangani run-nya sendiri.
+          if [ "$(git ls-remote origin "refs/heads/$BRANCH" | cut -f1)" != "$SHA" ]; then
+            echo "Branch sudah punya commit lebih baru; merge diserahkan ke run berikutnya."
+            exit 0
+          fi
+
+          # Lewat PR bila memungkinkan, agar ada catatan perubahan di GitHub.
+          pr=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then
+            title=$(git log -1 --format=%s "$SHA")
+            if url=$(gh pr create --base main --head "$BRANCH" --title "$title" \
+                --body "PR otomatis dari \`$BRANCH\`, digabung ke \`main\` setelah test + build lulus." 2>/dev/null); then
+              pr=${url##*/}
+            fi
+          fi
+          if [ -n "$pr" ]; then
+            gh pr ready "$pr" >/dev/null 2>&1 || true
+            if gh pr merge "$pr" --merge --match-head-commit "$SHA"; then
+              echo "PR #$pr digabung ke main."
+              exit 0
+            fi
+            echo "::warning::Merge lewat PR #$pr gagal; mencoba merge langsung."
+          fi
+
+          # Cadangan: merge langsung (dipakai bila Actions belum diizinkan membuat PR).
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B main origin/main
+          if ! git merge --no-ff "$SHA" -m "Merge branch '$BRANCH' (otomatis setelah CI lulus)"; then
+            echo "::error title=Konflik dengan main::Branch $BRANCH bentrok dengan main. Gabungkan main ke branch ini, selesaikan konflik, lalu push lagi."
+            exit 1
+          fi
+          git push origin main
+          echo "Branch $BRANCH digabung langsung ke main."
