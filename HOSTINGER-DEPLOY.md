@@ -41,11 +41,18 @@ Di akun Hostinger yang memegang paket **Business** (yang berisi thedampier.com, 
    `npm run build` sudah memakai `next build --webpack`. Turbopack bawaan Next.js 16 bisa gagal di server Hostinger karena versi GLIBC (pengalaman di Zanclus), jadi jangan ganti menjadi `next build` polos.
 4. Isi **environment variables** (bagian 4) sebelum deploy pertama.
 5. Nyalakan **auto-deploy** dari GitHub bila opsinya ada. Bila tidak ada, tekan **Redeploy** setelah setiap merge ke `main`.
-6. Pilih domain: **dragonetdiversrajaampat.com** (lihat bagian 3). Bila domain belum bisa dipakai, buat dulu dengan domain sementara dari Hostinger, uji, lalu sambungkan domain belakangan.
+6. Pilih domain: **Gunakan domain yang sudah ada** → ketik `dragonetdiversrajaampat.com` (lihat bagian 3). Peringatan "domain belum mengarah ke Hostinger / akun ini" boleh dilanjutkan; record-nya diatur di akun domain.
 
-## 3. Sambungkan domain dragonetdiversrajaampat.com
+## 3. Sambungkan domain dragonetdiversrajaampat.com (domain & hosting beda akun)
 
-DNS domain ini saat ini dikelola di akun Hostinger lain (akses collaborator `backupdata@dewarangga.com`). Isinya per 20 Oktober 2026:
+Domain dan hosting ada di **dua akun Hostinger berbeda**, dan itu tidak masalah:
+
+| Akun | Isi | Yang dilakukan di sini |
+| --- | --- | --- |
+| **Akun domain** (akses collaborator `backupdata@dewarangga.com`) | Domain + zona DNS (halaman **DNS / Nameservers**) | Mengubah record DNS |
+| **Akun hosting** (paket Business) | Node.js Web App | Membuat website, melihat target DNS, memasang SSL |
+
+Domain tidak perlu dipindah akun. Zona DNS tetap dikelola di akun domain. Isinya per 20 Oktober 2026:
 
 | Tipe | Nama | Isi | TTL |
 | --- | --- | --- | --- |
@@ -53,22 +60,27 @@ DNS domain ini saat ini dikelola di akun Hostinger lain (akses collaborator `bac
 | CNAME | `www` | `www.dragonetdiversrajaampat.com.cdn.hstgr.net` | 300 |
 | A | `ftp` | `46.202.138.217` | 1800 |
 
-Record `@` dan `www` mengarah ke CDN Hostinger untuk website yang memakai domain ini. Langkah:
+Langkah:
 
-1. Saat menambahkan domain di langkah 2, bila hPanel menolak karena **domain sudah dipakai website/akun lain**, hapus dulu website lama untuk domain ini di akun tersebut (hanya bila memang boleh dihapus), lalu ulangi. Website lama akan offline sampai aplikasi baru aktif, jadi siapkan aplikasi baru dengan domain sementara lebih dulu.
-2. Setelah domain terpasang, buka dashboard website baru → bagian domain/DNS. Hostinger menampilkan record yang dibutuhkan:
-   - **Bila diminta ALIAS/CNAME ke `dragonetdiversrajaampat.com.cdn.hstgr.net`** (CDN aktif): record di atas sudah benar, tidak perlu diubah.
-   - **Bila diminta record A berisi IP server**: di halaman DNS / Nameservers, hapus `ALIAS @` dan `CNAME www`, lalu tambahkan:
+1. **Akun hosting:** setelah Node.js Web App dibuat dengan domain `dragonetdiversrajaampat.com` (bagian 2), buka dashboard website tersebut. Catat target DNS yang diminta Hostinger. Bentuknya salah satu dari:
+   - **CDN**: ALIAS/CNAME ke `dragonetdiversrajaampat.com.cdn.hstgr.net`, atau
+   - **IP**: record A berisi IP website. IP juga tertera di dashboard website, bagian detail/informasi hosting.
+2. **Akun domain → DNS / Nameservers:** samakan record dengan target tersebut.
+   - **Target CDN:** `ALIAS @` dan `CNAME www` di atas sudah sesuai, tidak perlu diubah.
+   - **Target IP:** hapus `ALIAS @` dan `CNAME www`, lalu tambahkan:
 
      | Tipe | Nama | Isi | TTL |
      | --- | --- | --- | --- |
-     | A | `@` | IP dari hPanel | 300 |
+     | A | `@` | IP website dari akun hosting | 300 |
      | CNAME | `www` | `dragonetdiversrajaampat.com` | 300 |
 
      `ALIAS @` dan `A @` tidak bisa berdampingan, jadi ALIAS harus dihapus dulu.
-   - Record `ftp` mengarah ke server lama. Ganti dengan IP FTP dari hPanel bila dipakai, atau hapus.
-3. Tunggu propagasi (biasanya beberapa menit dengan TTL 300, paling lama 24 jam), lalu pasang/cek **SSL** di hPanel (Security → SSL).
-4. Uji: `https://dragonetdiversrajaampat.com/api/health` harus menampilkan `"app":"dragonet-divers"`.
+   - `A ftp` mengarah ke server lain. Ganti dengan IP website dari akun hosting bila FTP dipakai, atau hapus.
+   - Record lain (MX/TXT email, verifikasi Google) biarkan.
+3. **Akun domain → Websites:** pastikan tidak ada website lain di akun ini yang masih memakai `dragonetdiversrajaampat.com`. Bila ada, CDN Hostinger bisa tetap mengarahkan domain ke website lama itu. Lepaskan domain dari website tersebut atau ganti domainnya.
+4. Tunggu propagasi: biasanya beberapa menit dengan TTL 300, paling lama 24 jam.
+5. **Akun hosting:** pasang/cek **SSL** untuk domain (Security → SSL). SSL baru bisa terbit setelah DNS mengarah ke hosting ini.
+6. Uji: `https://dragonetdiversrajaampat.com/api/health` harus menampilkan `"app":"dragonet-divers"`. Bila yang tampil website lain, DNS belum mengarah ke akun hosting (cek langkah 2–3).
 
 ## 4. Environment variables (hPanel → website → Environment variables)
 
