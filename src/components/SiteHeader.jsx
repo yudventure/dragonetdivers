@@ -2,13 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import { site, whatsappLink } from "@/lib/site";
+import HeaderShell from "./HeaderShell";
 import { ChatIcon } from "./icons";
 
-// Header putih 72 px dengan lockup horizontal (BRANDING.md §2.1, §9.1).
+// Header 72 px dengan lockup horizontal (BRANDING.md §2.1, §9.1). Latarnya diatur HeaderShell:
+// transparan di paling atas, putih transparan saat di-scroll.
 export default function SiteHeader() {
   const booking = whatsappLink("Hi Dragonet Divers, I'd like to ask about diving in Raja Ampat.");
   return (
-    <header className="sticky top-0 z-20 border-b border-mist bg-white/95 backdrop-blur">
+    <HeaderShell>
       <div className="gutter mx-auto flex h-16 max-w-[1200px] items-center gap-4 sm:h-[72px]">
         <Link href="/" className="flex items-center gap-3" aria-label={`${site.name}, home`}>
           <Image src={logo} alt="" width={44} height={44} priority className="size-11" />
@@ -30,6 +32,6 @@ export default function SiteHeader() {
           )}
         </div>
       </div>
-    </header>
+    </HeaderShell>
   );
 }

@@ -17,18 +17,19 @@ const services = [
 
 // Hero beranda: judul besar huruf kecil di kiri menimpa sebagian gambar,
 // penyelam di tengah di atas putih, daftar layanan bernomor di kanan.
+// Desktop: hero ditarik 72 px ke belakang header yang transparan, jadi gelembung naik di belakangnya.
 export default function HomeHero() {
   preload(poster.src, { as: "image", fetchPriority: "high" });
   return (
-    <section className="relative isolate overflow-hidden bg-white" aria-labelledby="hero-title">
-      <div className="gutter relative mx-auto flex max-w-[1200px] flex-col lg:block lg:h-[clamp(640px,calc(100svh-72px),880px)]">
+    <section className="relative isolate overflow-hidden bg-white lg:-mt-[72px]" aria-labelledby="hero-title">
+      <div className="gutter relative mx-auto flex max-w-[1200px] flex-col lg:block lg:h-[clamp(712px,100svh,952px)]">
         {/* Penyelam: video loop persegi di tengah, menempel ke bawah */}
         <div className="order-2 mx-auto aspect-square w-[min(88vw,480px)] lg:absolute lg:top-0 lg:left-1/2 lg:h-full lg:w-auto lg:-translate-x-[42%]">
           <HeroVideo poster={poster.src} className="size-full object-contain" />
         </div>
 
         {/* Judul */}
-        <div className="relative z-10 order-1 pt-10 pb-6 lg:absolute lg:top-1/2 lg:left-[max(32px,env(safe-area-inset-left,0px))] lg:-translate-y-[58%] lg:p-0">
+        <div className="relative z-10 order-1 pt-10 pb-6 lg:absolute lg:top-[calc(50%+36px)] lg:left-[max(32px,env(safe-area-inset-left,0px))] lg:-translate-y-[58%] lg:p-0">
           <h1
             id="hero-title"
             className="font-display text-[clamp(3.25rem,8.2vw,7.75rem)] leading-[0.88] font-semibold tracking-[-0.02em] text-abyss lowercase [text-shadow:0_0_28px_rgb(255_255_255/0.9)]"
@@ -41,7 +42,7 @@ export default function HomeHero() {
         </div>
 
         {/* Daftar layanan bernomor */}
-        <ol className="relative z-10 order-3 grid gap-2 py-8 lg:absolute lg:top-1/2 lg:right-[max(32px,env(safe-area-inset-right,0px))] lg:w-[300px] lg:-translate-y-1/2 lg:py-0">
+        <ol className="relative z-10 order-3 grid gap-2 py-8 lg:absolute lg:top-[calc(50%+36px)] lg:right-[max(32px,env(safe-area-inset-right,0px))] lg:w-[300px] lg:-translate-y-1/2 lg:py-0">
           {services.map(({ icon: Icon, title, text, ask }, index) => {
             const link = whatsappLink(`Hi Dragonet Divers, I'd like to ask about ${ask}.`);
             return (
