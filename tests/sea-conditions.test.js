@@ -80,5 +80,14 @@ test("keduanya gagal atau kosong: null (panel menampilkan 'unavailable')", async
     throw new Error("getaddrinfo ENOTFOUND");
   };
   assert.equal(await loadSeaConditions({ fetchImpl: offline, warn: () => {} }), null);
-  assert.equal(await loadSeaConditions({ fetchImpl: async () => Response.json({ current: {} }), warn: () => {} }), null);
+  const warnings = [];
+  assert.equal(await loadSeaConditions({ fetchImpl: async () => Response.json({ current: {} }), warn: (m) => warnings.push(m) }), null);
+  assert.deepEqual(warnings, ["[sea-conditions] Open-Meteo cuaca kosong", "[sea-conditions] Open-Meteo laut kosong"]);
+});
+
+test("data lengkap: tanpa peringatan", async () => {
+  const warnings = [];
+  const fetchImpl = async (url) => Response.json(url.includes("marine-api") ? marine : weather);
+  assert.ok(await loadSeaConditions({ fetchImpl, warn: (m) => warnings.push(m) }));
+  assert.deepEqual(warnings, []);
 });
