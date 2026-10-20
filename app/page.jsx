@@ -2,6 +2,7 @@ import Image from "next/image";
 import plate from "../brand/logo/dragonet-divers-logo-plate.png";
 import HomeFeatures from "@/components/HomeFeatures";
 import HomeHero from "@/components/HomeHero";
+import HomeServices from "@/components/HomeServices";
 import LearnToDive from "@/components/LearnToDive";
 import SeaConditions from "@/components/SeaConditions";
 import SiteHeader from "@/components/SiteHeader";
@@ -22,6 +23,7 @@ export default function HomePage() {
       <main>
         <HomeHero />
         <SeaConditions />
+        <HomeServices />
         <HomeFeatures />
         <LearnToDive />
 
