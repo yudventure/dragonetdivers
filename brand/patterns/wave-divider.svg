@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="16" viewBox="0 0 96 16" fill="none" role="img" aria-label="Garis ombak Dragonet Divers">
+  <!-- Motif "garis ombak": diambil dari goresan air di dalam logo. Warna default teal; ganti stroke sesuai latar. -->
+  <path d="M3 9c5-5 10-5 15 0s10 5 15 0" stroke="#146E7F" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 9c5-5 10-5 15 0s10 5 15 0" stroke="#1592AB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M77 9c3-3.4 6.5-3.4 9.5 0s6 3.4 7.5 1.2" stroke="#146E7F" stroke-width="3" stroke-linecap="round"/>
+</svg>

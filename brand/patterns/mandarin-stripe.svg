@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="12" viewBox="0 0 40 12" role="img" aria-label="Pola garis mandarin">
+  <!-- Pola "garis mandarin": belang bergelombang ikan mandarin di logo.
+       Ubin 40×12 px, diulang horizontal (background-repeat: repeat-x) sebagai pita setinggi 6–12 px. -->
+  <rect width="40" height="12" fill="#1592AB"/>
+  <path d="M8 -1c5 3 -5 4 0 7s-5 4 0 7" fill="none" stroke="#EB7817" stroke-width="5" stroke-linecap="round"/>
+  <path d="M28 -1c5 3 -5 4 0 7s-5 4 0 7" fill="none" stroke="#D9651F" stroke-width="5" stroke-linecap="round"/>
+</svg>

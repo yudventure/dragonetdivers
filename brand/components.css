@@ -1,0 +1,275 @@
+/*
+ * Dragonet Divers — komponen referensi
+ * Butuh tokens.css. Semua kelas berawalan .dd- agar tidak bentrok saat dipakai
+ * bersama Tailwind atau CSS lain. Spesifikasi: BRANDING.md §9.
+ */
+
+/* ── Dasar ───────────────────────────────────────────────── */
+.dd-base {
+  font-family: var(--dd-font-body);
+  font-size: var(--dd-text-body);
+  line-height: var(--dd-leading-body);
+  color: var(--dd-fg);
+  background: var(--dd-bg);
+  -webkit-font-smoothing: antialiased;
+}
+.dd-display, .dd-h1, .dd-h2, .dd-h3 {
+  font-family: var(--dd-font-display);
+  font-weight: 600;
+  color: var(--dd-abyss);
+  text-wrap: balance;
+  margin: 0;
+}
+.dd-display { font-size: var(--dd-text-display); line-height: 1.05; letter-spacing: -0.01em; }
+.dd-h1 { font-size: var(--dd-text-h1); line-height: var(--dd-leading-tight); }
+.dd-h2 { font-size: var(--dd-text-h2); line-height: 1.15; }
+.dd-h3 { font-size: var(--dd-text-h3); line-height: 1.25; }
+.dd-h4 { font-family: var(--dd-font-body); font-size: var(--dd-text-h4); font-weight: 700; line-height: var(--dd-leading-snug); margin: 0; }
+.dd-lead { font-size: var(--dd-text-lead); color: var(--dd-fg-muted); max-width: 60ch; margin: 0; }
+.dd-small { font-size: var(--dd-text-small); color: var(--dd-fg-muted); }
+.dd-eyebrow {
+  font-family: var(--dd-font-body);
+  font-size: var(--dd-text-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--dd-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--dd-ember);
+  margin: 0;
+}
+.dd-accent-word { color: var(--dd-teal); }
+.dd-num { font-variant-numeric: tabular-nums; }
+
+/* ── Motif ───────────────────────────────────────────────── */
+.dd-wave {
+  display: block;
+  width: 96px;
+  height: 16px;
+  background: url("./patterns/wave-divider.svg") no-repeat left center / contain;
+}
+.dd-stripe {
+  height: 8px;
+  background: url("./patterns/mandarin-stripe.svg") repeat-x left center / auto 100%;
+}
+.dd-ring { border-radius: 50%; box-shadow: 0 0 0 3px var(--dd-white), 0 0 0 6px var(--dd-teal); }
+
+/* ── Tombol ──────────────────────────────────────────────── */
+.dd-btn {
+  --_bg: var(--dd-teal);
+  --_fg: var(--dd-white);
+  --_bd: var(--dd-teal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1.5px solid var(--_bd);
+  border-radius: var(--dd-radius-full);
+  background: var(--_bg);
+  color: var(--_fg);
+  font: 700 15px/1 var(--dd-font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--dd-duration) var(--dd-ease), border-color var(--dd-duration) var(--dd-ease), color var(--dd-duration) var(--dd-ease);
+}
+.dd-btn svg { width: 18px; height: 18px; flex: none; }
+.dd-btn:hover, .dd-btn.is-hover { --_bg: var(--dd-teal-dark); --_bd: var(--dd-teal-dark); }
+.dd-btn:focus-visible, .dd-btn.is-focus { outline: 3px solid var(--dd-focus); outline-offset: 2px; }
+.dd-btn:disabled, .dd-btn.is-disabled { --_bg: var(--dd-mist); --_bd: var(--dd-mist); --_fg: var(--dd-slate); cursor: not-allowed; }
+
+.dd-btn--accent { --_bg: var(--dd-mandarin); --_bd: var(--dd-mandarin); --_fg: var(--dd-abyss); }
+.dd-btn--accent:hover, .dd-btn--accent.is-hover { --_bg: var(--dd-mandarin-hover); --_bd: var(--dd-mandarin-hover); }
+
+.dd-btn--outline { --_bg: transparent; --_bd: var(--dd-teal); --_fg: var(--dd-teal); }
+.dd-btn--outline:hover, .dd-btn--outline.is-hover { --_bg: var(--dd-teal-soft); --_bd: var(--dd-teal); }
+
+.dd-btn--sm { min-height: 40px; padding: 0 18px; font-size: 14px; }
+
+.dd-link {
+  color: var(--dd-link);
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dd-link:hover, .dd-link.is-hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.dd-link svg { width: 16px; height: 16px; }
+
+/* ── Chip ────────────────────────────────────────────────── */
+.dd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: var(--dd-radius-full);
+  font: 700 11px/1 var(--dd-font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--dd-teal-soft);
+  color: var(--dd-teal);
+  white-space: nowrap;
+}
+.dd-chip--advanced { background: var(--dd-mandarin-wash); color: var(--dd-ember); }
+.dd-chip--sunset { background: var(--dd-sunrise-wash); color: var(--dd-abyss); }
+.dd-chip--snorkel { background: var(--dd-lagoon-wash); color: var(--dd-teal); }
+.dd-chip--solid { background: var(--dd-teal); color: var(--dd-white); }
+
+/* ── Kartu ───────────────────────────────────────────────── */
+.dd-card {
+  background: var(--dd-white);
+  border: 1px solid var(--dd-border);
+  border-radius: var(--dd-radius-md);
+  overflow: hidden;
+  transition: border-color var(--dd-duration) var(--dd-ease);
+}
+.dd-card:hover, .dd-card.is-hover { border-color: var(--dd-teal); }
+.dd-card__media { aspect-ratio: 4 / 3; max-width: 100%; }
+.dd-card__body { padding: 20px 22px 22px; display: grid; gap: 10px; }
+.dd-card__title { font-family: var(--dd-font-display); font-weight: 600; font-size: 22px; line-height: 1.2; margin: 0; color: var(--dd-abyss); }
+.dd-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--dd-slate); font-variant-numeric: tabular-nums; }
+.dd-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.dd-meta svg { width: 16px; height: 16px; color: var(--dd-teal); }
+
+.dd-card--featured { border: 2px solid var(--dd-teal); }
+.dd-price { font: 800 32px/1 var(--dd-font-body); color: var(--dd-abyss); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.dd-price small { font-size: 14px; font-weight: 500; color: var(--dd-slate); letter-spacing: 0; }
+.dd-checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: 15px; }
+.dd-checklist li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; }
+.dd-checklist svg { width: 18px; height: 18px; color: var(--dd-teal); margin-top: 3px; }
+
+.dd-quote { background: var(--dd-foam); border-radius: var(--dd-radius-md); padding: 24px; display: grid; gap: 14px; }
+.dd-quote blockquote { margin: 0; font-size: 18px; line-height: 1.55; color: var(--dd-abyss); }
+.dd-stars { display: flex; gap: 2px; color: var(--dd-sunrise); }
+.dd-stars svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
+
+/* ── Form ────────────────────────────────────────────────── */
+.dd-field { display: grid; gap: 6px; }
+.dd-label { font-size: 14px; font-weight: 600; color: var(--dd-abyss); }
+.dd-help { font-size: 13px; color: var(--dd-slate); }
+.dd-input {
+  height: 48px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid var(--dd-line-strong);
+  border-radius: var(--dd-radius-sm);
+  background: var(--dd-white);
+  font: 400 16px/1 var(--dd-font-body);
+  color: var(--dd-abyss);
+  box-sizing: border-box;
+}
+.dd-input::placeholder { color: var(--dd-slate); opacity: 0.8; }
+.dd-input:focus, .dd-input.is-focus { outline: none; border-color: var(--dd-teal); box-shadow: 0 0 0 3px rgba(21, 146, 171, 0.35); }
+.dd-field.is-error .dd-input { border-color: var(--dd-danger); }
+.dd-field.is-error .dd-help { color: var(--dd-danger); display: flex; align-items: center; gap: 6px; }
+.dd-field.is-error .dd-help svg { width: 14px; height: 14px; }
+
+/* ── Kotak info ──────────────────────────────────────────── */
+.dd-notice {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--dd-radius-md);
+  background: var(--dd-info-bg);
+  color: var(--dd-abyss);
+  font-size: 15px;
+}
+.dd-notice svg { width: 22px; height: 22px; color: var(--dd-info-fg); }
+.dd-notice--warn { background: var(--dd-warning-bg); }
+.dd-notice--warn svg, .dd-notice--warn strong { color: var(--dd-warning-fg); }
+
+.dd-conditions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--dd-mist);
+  border: 1px solid var(--dd-mist);
+  border-radius: var(--dd-radius-md);
+  overflow: hidden;
+}
+.dd-conditions > div { background: var(--dd-lagoon-wash); padding: 14px 18px; display: grid; gap: 2px; }
+.dd-conditions dt { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dd-teal); }
+.dd-conditions dt svg { width: 16px; height: 16px; }
+.dd-conditions dd { margin: 0; font: 700 20px/1.3 var(--dd-font-body); color: var(--dd-abyss); font-variant-numeric: tabular-nums; }
+
+/* ── Tabel ───────────────────────────────────────────────── */
+.dd-table-wrap { overflow-x: auto; border: 1px solid var(--dd-mist); border-radius: var(--dd-radius-md); }
+.dd-table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 400px; }
+.dd-table th { background: var(--dd-foam); text-align: left; font-size: 13px; font-weight: 700; color: var(--dd-abyss); padding: 12px 16px; }
+.dd-table td { padding: 14px 16px; border-top: 1px solid var(--dd-mist); color: var(--dd-abyss); }
+.dd-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Header ──────────────────────────────────────────────── */
+.dd-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 72px;
+  padding: 0 var(--dd-gutter);
+  background: var(--dd-white);
+  border-bottom: 1px solid var(--dd-mist);
+}
+.dd-lockup { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+.dd-lockup img { width: 46px; height: 46px; }
+.dd-lockup__name { display: grid; line-height: 1; }
+.dd-lockup__name b { font: 600 20px/1 var(--dd-font-display); color: var(--dd-teal); }
+.dd-lockup__name small { font: 700 10px/1 var(--dd-font-body); letter-spacing: 0.2em; color: var(--dd-slate); margin-top: 5px; }
+.dd-nav { display: flex; gap: 28px; margin-left: auto; }
+.dd-nav a { position: relative; font: 600 15px/1 var(--dd-font-body); color: var(--dd-abyss); text-decoration: none; padding: 8px 0; }
+.dd-nav a[aria-current="page"] { color: var(--dd-teal); }
+.dd-nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 8px;
+  background: url("./patterns/wave-divider.svg") no-repeat left center / auto 100%;
+}
+.dd-lang { display: inline-flex; border: 1px solid var(--dd-mist); border-radius: var(--dd-radius-full); padding: 3px; font: 700 12px/1 var(--dd-font-body); }
+.dd-lang span { padding: 7px 10px; border-radius: var(--dd-radius-full); color: var(--dd-slate); }
+.dd-lang span[aria-current="true"] { background: var(--dd-teal-soft); color: var(--dd-teal); }
+
+/* ── Footer ──────────────────────────────────────────────── */
+.dd-footer { background: var(--dd-abyss); color: var(--dd-white); }
+.dd-footer a { color: var(--dd-white); text-decoration: none; }
+.dd-footer__muted { color: var(--dd-on-dark-muted); }
+
+/* ── Tombol WhatsApp mengambang ──────────────────────────── */
+.dd-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--dd-teal);
+  color: var(--dd-white);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--dd-shadow-md);
+  border: 0;
+}
+.dd-fab svg { width: 26px; height: 26px; }
+
+/* ── Ikon ────────────────────────────────────────────────── */
+.dd-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Bingkai foto & placeholder ──────────────────────────── */
+.dd-frame { border-radius: var(--dd-radius-lg); overflow: hidden; }
+.dd-photo-ph {
+  position: relative;
+  background:
+    url("./patterns/wave-divider.svg") repeat 0 0 / 120px 20px,
+    linear-gradient(165deg, var(--dd-lagoon) 0%, var(--dd-teal-dark) 62%, var(--dd-abyss) 100%);
+  background-blend-mode: soft-light, normal;
+  color: rgba(255, 255, 255, 0.92);
+}
+.dd-photo-ph::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  font: 700 11px/1.2 var(--dd-font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

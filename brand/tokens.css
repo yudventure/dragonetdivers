@@ -1,0 +1,129 @@
+/*
+ * Dragonet Divers Raja Ampat — design tokens
+ * Sumber kebenaran untuk warna, tipografi, jarak, radius, dan bayangan.
+ * Semua warna brand diambil langsung dari logo (lihat BRANDING.md §3).
+ * Dasar website: putih. Warna logo hanya dipakai sebagai aksen.
+ */
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("./fonts/Fredoka-Variable.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("./fonts/PlusJakartaSans-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("./fonts/PlusJakartaSans-Italic-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ── Warna brand (dari logo) ─────────────────────────────── */
+  --dd-teal: #146e7f;          /* Teal Dragonet — cincin & tulisan logo. Warna utama. */
+  --dd-teal-dark: #0f5866;     /* Hover/pressed tombol teal */
+  --dd-teal-soft: #d9e8eb;     /* Latar chip, item terpilih */
+  --dd-teal-wash: #ecf3f5;     /* Latar tipis */
+
+  --dd-lagoon: #1592ab;        /* Biru Laguna — air laut di logo. Ikon, ilustrasi, focus ring. Bukan untuk teks kecil. */
+  --dd-lagoon-wash: #ecf6f8;   /* Latar info */
+
+  --dd-mandarin: #eb7817;      /* Oranye Mandarin — tubuh ikan. Aksen CTA (teks di atasnya: abyss). */
+  --dd-mandarin-hover: #f28a33;
+  --dd-mandarin-fin: #d9651f;  /* Koral Sirip — hanya ilustrasi/pola, bukan teks */
+  --dd-ember: #b4560f;         /* Oranye untuk teks di atas putih (4.9:1) */
+  --dd-mandarin-wash: #fdf4ec;
+
+  --dd-sunrise: #f9d13e;       /* Kuning Fajar — langit di logo. Sorotan kecil, bintang rating. Bukan untuk teks. */
+  --dd-sunrise-wash: #fef8e0;
+
+  /* ── Netral ──────────────────────────────────────────────── */
+  --dd-white: #ffffff;         /* Dasar (±80% permukaan) */
+  --dd-foam: #f4f9fa;          /* Section selang-seling */
+  --dd-mist: #dce8eb;          /* Garis rambut, pembatas */
+  --dd-line-strong: #78939a;   /* Border input (3.3:1 di atas putih) */
+  --dd-slate: #557079;         /* Teks sekunder */
+  --dd-abyss: #0a323b;         /* Teks utama, footer */
+  --dd-on-dark-muted: #9db9bf; /* Teks sekunder di atas Abyss (6.6:1) */
+
+  /* ── Semantik ────────────────────────────────────────────── */
+  --dd-success: #1e8257;
+  --dd-danger: #c0392b;
+  --dd-warning-bg: var(--dd-sunrise-wash);
+  --dd-warning-fg: var(--dd-ember);
+  --dd-info-bg: var(--dd-lagoon-wash);
+  --dd-info-fg: var(--dd-teal);
+
+  /* ── Peran (pakai ini di komponen) ───────────────────────── */
+  --dd-bg: var(--dd-white);
+  --dd-bg-alt: var(--dd-foam);
+  --dd-fg: var(--dd-abyss);
+  --dd-fg-muted: var(--dd-slate);
+  --dd-border: var(--dd-mist);
+  --dd-link: var(--dd-teal);
+  --dd-focus: var(--dd-lagoon);
+
+  /* ── Tipografi ───────────────────────────────────────────── */
+  --dd-font-display: "Fredoka", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+  --dd-font-body: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --dd-text-display: clamp(2.5rem, 1.6rem + 3.6vw, 3.75rem);  /* 40 → 60px */
+  --dd-text-h1: clamp(2.125rem, 1.6rem + 2vw, 2.75rem);       /* 34 → 44px */
+  --dd-text-h2: clamp(1.75rem, 1.4rem + 1.4vw, 2.125rem);     /* 28 → 34px */
+  --dd-text-h3: 1.5rem;     /* 24px */
+  --dd-text-h4: 1.25rem;    /* 20px */
+  --dd-text-lead: 1.125rem; /* 18px */
+  --dd-text-body: 1rem;     /* 16px */
+  --dd-text-small: 0.875rem;/* 14px */
+  --dd-text-eyebrow: 0.75rem;/* 12px, huruf besar */
+
+  --dd-leading-tight: 1.1;
+  --dd-leading-snug: 1.3;
+  --dd-leading-body: 1.65;
+  --dd-tracking-eyebrow: 0.14em;
+
+  /* ── Jarak (basis 4px) ───────────────────────────────────── */
+  --dd-space-1: 4px;
+  --dd-space-2: 8px;
+  --dd-space-3: 12px;
+  --dd-space-4: 16px;
+  --dd-space-5: 24px;
+  --dd-space-6: 32px;
+  --dd-space-7: 48px;
+  --dd-space-8: 64px;
+  --dd-space-9: 96px;
+  --dd-space-10: 128px;
+
+  --dd-container: 1200px;
+  --dd-gutter: clamp(16px, 4vw, 32px);
+  --dd-section-y: clamp(64px, 8vw, 112px);
+
+  /* ── Radius (dari bentuk badge bulat) ────────────────────── */
+  --dd-radius-sm: 10px;     /* input */
+  --dd-radius-md: 16px;     /* kartu */
+  --dd-radius-lg: 28px;     /* bingkai foto besar */
+  --dd-radius-full: 999px;  /* tombol, chip, avatar */
+
+  /* ── Bayangan (hemat; hanya elemen mengambang) ───────────── */
+  --dd-shadow-sm: 0 1px 2px rgba(10, 50, 59, 0.06);
+  --dd-shadow-md: 0 10px 30px rgba(10, 50, 59, 0.1);
+
+  /* ── Gerak ───────────────────────────────────────────────── */
+  --dd-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dd-duration: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dd-duration: 0ms; }
+}
