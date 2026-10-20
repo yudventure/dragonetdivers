@@ -1,9 +1,11 @@
-import Image from "next/image";
-// Potongan penyelam + gelembung tanpa latar laut (WebP transparan).
-// Sumber: foto pada desain referensi yang diberikan pemilik. Ganti dengan foto
-// milik sendiri / berlisensi jelas sebelum peluncuran resmi (BRANDING.md §7).
-import diver from "../assets/hero-diver.webp";
+import { preload } from "react-dom";
+// Penyelam menghembuskan gelembung di atas latar putih: ilustrasi AI buatan
+// Higgsfield di akun pemilik (gambar GPT Image 2.5, animasi Kling 3.0), bukan
+// dokumentasi lokasi (BRANDING.md §7). Video loop di public/media/hero-diver.*,
+// poster = frame pertamanya. Cara membuat ulang: brand/hero/README.md.
+import poster from "../assets/hero-diver.webp";
 import { site, whatsappLink } from "@/lib/site";
+import HeroVideo from "./HeroVideo";
 import { ArrowIcon, CapIcon, FishIcon, WavesIcon } from "./icons";
 
 // Layanan dari BRANDING.md §1 (yang dijual). Tanpa harga atau jadwal.
@@ -16,18 +18,13 @@ const services = [
 // Hero beranda: judul besar huruf kecil di kiri menimpa sebagian gambar,
 // penyelam di tengah di atas putih, daftar layanan bernomor di kanan.
 export default function HomeHero() {
+  preload(poster.src, { as: "image", fetchPriority: "high" });
   return (
     <section className="relative isolate overflow-hidden bg-white" aria-labelledby="hero-title">
       <div className="gutter relative mx-auto flex max-w-[1200px] flex-col lg:block lg:h-[clamp(640px,calc(100svh-72px),880px)]">
-        {/* Penyelam: di tengah, menempel ke bawah */}
-        <div className="order-2 mx-auto w-[min(78vw,420px)] lg:absolute lg:inset-y-0 lg:left-1/2 lg:w-auto lg:-translate-x-[46%]">
-          <Image
-            src={diver}
-            alt="Diver in a mask breathing out a cloud of bubbles"
-            priority
-            sizes="(min-width: 1024px) 640px, 78vw"
-            className="h-auto w-full lg:h-full lg:w-auto lg:max-w-none"
-          />
+        {/* Penyelam: video loop persegi di tengah, menempel ke bawah */}
+        <div className="order-2 mx-auto aspect-square w-[min(88vw,480px)] lg:absolute lg:top-0 lg:left-1/2 lg:h-full lg:w-auto lg:-translate-x-[42%]">
+          <HeroVideo poster={poster.src} className="size-full object-contain" />
         </div>
 
         {/* Judul */}
@@ -71,15 +68,21 @@ export default function HomeHero() {
           })}
         </ol>
 
-        {/* Baris bawah: hak cipta, scroll, lokasi */}
+        {/* Baris bawah: hak cipta & lokasi */}
         <div className="pointer-events-none absolute inset-x-[max(32px,env(safe-area-inset-left,0px))] bottom-6 z-10 hidden items-end justify-between text-xs text-slate lg:flex">
           <span>© {new Date().getFullYear()} {site.shortName}</span>
-          <a href="#story" className="pointer-events-auto flex flex-col items-center gap-3 text-abyss" aria-label="Scroll down to our story">
-            <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">Scroll down</span>
-            <span className="h-12 w-px bg-abyss/40" aria-hidden="true" />
-          </a>
           <span>Raja Ampat · Indonesia</span>
         </div>
+
+        {/* Penanda scroll di atas badan penyelam: warna dibalik (putih di atas hitam, hitam di atas putih) */}
+        <a
+          href="#story"
+          className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white mix-blend-difference lg:flex"
+          aria-label="Scroll down to our story"
+        >
+          <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">Scroll down</span>
+          <span className="h-12 w-px bg-white/60" aria-hidden="true" />
+        </a>
       </div>
     </section>
   );
