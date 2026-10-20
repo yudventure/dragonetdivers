@@ -29,8 +29,8 @@ export function databaseIssues(env = process.env) {
     reason: "Belum diisi atau belum terbaca oleh aplikasi.",
   }));
   const host = env.MYSQL_HOST?.trim();
-  if (host && (host.includes("://") || host.includes("/") || /^["']|["']$/.test(host))) {
-    issues.push({ name: "MYSQL_HOST", reason: "Isi hostname saja, tanpa URL, path, atau tanda kutip." });
+  if (host && (host.includes("://") || host.includes("/") || /\s/.test(host) || /^["']|["']$/.test(host))) {
+    issues.push({ name: "MYSQL_HOST", reason: "Isi hostname saja, tanpa URL, path, spasi, atau tanda kutip." });
   }
   const { port } = mysqlSettings(env);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {

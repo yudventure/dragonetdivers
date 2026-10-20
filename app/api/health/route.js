@@ -1,4 +1,5 @@
 import { databaseStatus } from "@/server/db";
+import { siteConfigWarnings } from "@/lib/site";
 import pkg from "../../../package.json" with { type: "json" };
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const database = await databaseStatus();
   return Response.json(
-    { app: pkg.name, version: pkg.version, node: process.version, time: new Date().toISOString(), database },
+    { app: pkg.name, version: pkg.version, node: process.version, time: new Date().toISOString(), warnings: siteConfigWarnings(), database },
     { status: database.configured && !database.ok ? 503 : 200, headers: { "Cache-Control": "no-store" } },
   );
 }
