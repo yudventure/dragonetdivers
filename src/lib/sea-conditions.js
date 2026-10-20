@@ -139,5 +139,8 @@ export async function loadSeaConditions({ fetchImpl = fetch, fetchOptions = {}, 
     if (result.status === "rejected") warn(`[sea-conditions] Open-Meteo ${name} gagal: ${result.reason?.message ?? result.reason}`);
   }
   const conditions = normalize(weather.value, marine.value);
+  // Jawaban sukses tetapi kosong (mis. titik terbaca sebagai daratan) juga dicatat agar terlihat di log build.
+  if (weather.status === "fulfilled" && conditions.weather.tempC === null) warn("[sea-conditions] Open-Meteo cuaca kosong");
+  if (marine.status === "fulfilled" && conditions.sea.waveM === null && conditions.sea.currentKn === null) warn("[sea-conditions] Open-Meteo laut kosong");
   return hasData(conditions) ? conditions : null;
 }
