@@ -28,7 +28,7 @@ Tanpa token, cek **deploy** tetap hijau tetapi hanya memberi peringatan "Deploy 
 
 1. hPanel akun hosting → ikon profil kanan atas → **Profile** → **API** ([hpanel.hostinger.com/profile/api](https://hpanel.hostinger.com/profile/api)) → buat token baru, mis. nama `github-dragonetdivers`. Salin token (hanya tampil sekali).
 2. github.com/yudventure/dragonetdivers → Settings → Secrets and variables → Actions → **New repository secret**: nama `HOSTINGER_API_TOKEN`, isi token tadi. Jangan tempel token di chat, issue, atau file di repo.
-3. Opsional, tab **Variables** → `HOSTINGER_DOMAIN` = domain website di Hostinger (sekarang domain sementara `….hostingersite.com`, nanti `dragonetdiversrajaampat.com`). Bila kosong, website dicari otomatis: website Node.js yang auto-deploy-nya terhubung ke repo ini, atau satu-satunya website Node.js di akun. Bila diisi, perbarui setelah domain asli disambungkan.
+3. Opsional, tab **Variables** → `HOSTINGER_DOMAIN` = domain website di Hostinger (`dragonetdivers.com`). Bila kosong, website dicari otomatis: website Node.js yang auto-deploy-nya terhubung ke repo ini, atau satu-satunya website Node.js di akun. Bila diisi, perbarui setiap kali domain website diganti.
 4. Tab **Actions** → **Deploy** → **Run workflow** untuk deploy pertama. Setelah itu deploy berjalan sendiri setiap merge ke `main`.
 
 Token berlaku untuk seluruh akun Hostinger. Bila bocor, hapus di halaman API hPanel dan buat yang baru.
@@ -60,13 +60,23 @@ Di akun Hostinger yang memegang paket **Business** (yang berisi thedampier.com, 
    `npm run build` sudah memakai `next build --webpack`. Turbopack bawaan Next.js 16 bisa gagal di server Hostinger karena versi GLIBC (pengalaman di Zanclus), jadi jangan ganti menjadi `next build` polos.
 4. Isi **environment variables** (bagian 4) sebelum deploy pertama.
 5. Branch harus **`main`**. Bila terlanjur memilih branch lain (mis. `claude/…`), merge ke `main` tidak akan tayang; cek **deploy** memindahkannya ke `main` otomatis begitu token API terpasang (bagian 1). Tanpa token: ubah branch di pengaturan Git website, lalu tekan **Redeploy**.
-6. Pilih domain: klik **Gunakan domain sementara**. `dragonetdiversrajaampat.com` belum bisa dipilih di sini karena masih tercatat di akun Hostinger lain (muncul tercoret, "Sudah terdaftar di Hostinger"). Domain asli disambungkan belakangan (bagian 3).
+6. Pilih domain. Domain yang masih tercatat di akun Hostinger lain muncul tercoret ("Sudah terdaftar di Hostinger"); pakai **domain sementara** dulu dan sambungkan domain asli belakangan (bagian 3).
 
-## 3. Sambungkan domain dragonetdiversrajaampat.com
+## 3. Domain
 
-Domain ini masih tercatat di **akun Hostinger lain** (akses collaborator `backupdata@dewarangga.com`), sedangkan hosting ada di akun paket Business. Hostinger hanya mengizinkan satu domain berada di satu akun, jadi wizard menolak domain ini ("Sudah terdaftar di Hostinger"). Domain harus dipindah atau dilepas dari akun lama dulu.
+Domain utama website: **dragonetdivers.com** (sudah tersambung ke website Node.js di akun hosting, 20 Oktober 2026; sebelumnya domain sementara `gold-walrus-261903.hostingersite.com`).
 
-Zona DNS di akun lama per 20 Oktober 2026 (simpan sebagai cadangan):
+Setelah domain website diganti:
+1. **Environment variables:** `NEXT_PUBLIC_SITE_URL` = `https://dragonetdivers.com`, atau hapus barisnya (nilai bawaan sama). Nilai lama seperti `https://dragonetdiversrajaampat.com` membuat tautan bagikan (Open Graph) menunjuk domain yang salah.
+2. **SSL:** Security → SSL, pastikan sertifikat aktif untuk `dragonetdivers.com` dan `www`.
+3. **Variabel GitHub** `HOSTINGER_DOMAIN` (bila diisi) diganti ke `dragonetdivers.com`.
+4. **Deploy ulang** (Actions → **Deploy** → **Run workflow**), lalu uji `https://dragonetdivers.com/api/health` harus menampilkan `"app":"dragonet-divers"`.
+
+### dragonetdiversrajaampat.com (opsional)
+
+Domain lama ini masih tercatat di **akun Hostinger lain** (akses collaborator `backupdata@dewarangga.com`), jadi tidak bisa ditambahkan ke akun hosting. Bila nanti ingin dipakai sebagai alamat kedua yang dialihkan ke `dragonetdivers.com`: minta Hostinger memindahkan domain itu ke akun hosting (chat bantuan dari akun lama), lalu di akun hosting tambahkan sebagai domain parkir/alias atau buat redirect 301 ke `https://dragonetdivers.com`.
+
+Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 
 | Tipe | Nama | Isi | TTL |
 | --- | --- | --- | --- |
@@ -74,22 +84,11 @@ Zona DNS di akun lama per 20 Oktober 2026 (simpan sebagai cadangan):
 | CNAME | `www` | `www.dragonetdiversrajaampat.com.cdn.hstgr.net` | 300 |
 | A | `ftp` | `46.202.138.217` | 1800 |
 
-### Langkah
-
-1. **Jalankan website dulu di domain sementara** (bagian 2, langkah 6), lalu uji `https://<domain-sementara>/api/health`.
-2. **Bebaskan domain dari akun lama.** Pilih salah satu:
-   - **Pindahkan domain ke akun hosting (disarankan, tidak ada yang dihapus).** Dari akun lama, buka chat bantuan Hostinger dan minta: *"Tolong pindahkan domain dragonetdiversrajaampat.com dari akun ini ke akun Hostinger saya [email akun hosting]."* Pemindahan antar-akun diproses Hostinger dan biasanya butuh konfirmasi pemilik kedua akun.
-   - **Hapus dari akun lama (lebih cepat, hanya bila domain tidak dibeli di akun itu).** Screenshot semua record DNS terlebih dahulu, terutama MX/TXT bila ada email. Lalu di akun lama hapus website yang memakai domain ini (Websites) dan/atau entri domainnya (Domains). Domain akan tidak bisa dibuka sebentar sampai langkah 3 selesai.
-3. **Akun hosting:** dashboard website → **Hubungkan / ganti domain** → `dragonetdiversrajaampat.com`.
-4. **DNS:** bila nameserver domain mengarah ke Hostinger (`ns1.dns-parking.com`, `ns2.dns-parking.com`), zona DNS kini dikelola di akun hosting dan record untuk website dibuat otomatis. Masukkan kembali record lain (MX/TXT) dari cadangan bila ada. Bila nameserver di tempat lain, isi record yang diminta hPanel di tempat DNS itu.
-5. **Akun hosting:** pasang/cek **SSL** (Security → SSL) setelah DNS mengarah ke hosting ini.
-6. Uji: `https://dragonetdiversrajaampat.com/api/health` harus menampilkan `"app":"dragonet-divers"`.
-
 ## 4. Environment variables (hPanel → website → Environment variables)
 
 | Nama | Isi |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://dragonetdiversrajaampat.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://dragonetdivers.com` (boleh dihapus: nilai bawaan sama) |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Nomor booking, mis. `6281234567890` (tanpa `+`, spasi, atau `0` di depan). Kosong = tombol WhatsApp disembunyikan. |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |

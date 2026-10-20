@@ -1,6 +1,6 @@
 # Dragonet Divers — catatan untuk agen
 
-Website dive center Dragonet Divers Raja Ampat (dragonetdiversrajaampat.com). Pemilik berbahasa Indonesia: dokumentasi & komentar kode dalam Bahasa Indonesia, UI website English (default) dengan versi Indonesia.
+Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik berbahasa Indonesia: dokumentasi & komentar kode dalam Bahasa Indonesia, UI website English (default) dengan versi Indonesia.
 
 ## Stack & perintah
 - Next.js 16 App Router (JavaScript, bukan TypeScript), React 19, Tailwind CSS 4, MySQL via `mysql2`.
