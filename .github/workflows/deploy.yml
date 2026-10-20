@@ -1,0 +1,31 @@
+name: Deploy
+
+# Deploy website ke Hostinger lewat API Hostinger (scripts/hostinger-deploy.mjs).
+# Dipanggil CI otomatis setelah merge ke main; bisa juga dijalankan manual:
+# Actions → Deploy → Run workflow. Butuh secret HOSTINGER_API_TOKEN (HOSTINGER-DEPLOY.md §1).
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hostinger:
+    name: hostinger
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Satu deploy pada satu waktu; deploy yang sedang jalan tidak dibatalkan.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - name: Build & deploy di Hostinger
+        run: node scripts/hostinger-deploy.mjs
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTINGER_DOMAIN: ${{ vars.HOSTINGER_DOMAIN }}

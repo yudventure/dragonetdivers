@@ -20,7 +20,7 @@ npm run build && npm start
 
 1. Kerjakan perubahan di branch selain `main`, lalu push.
 2. GitHub Actions menjalankan test + build. Bila lulus, branch **otomatis digabung ke `main`** (lewat PR bila diizinkan).
-3. Hostinger membangun dan menayangkan versi baru dari `main`.
+3. Cek **deploy** menyuruh Hostinger membangun versi baru dari `main` lewat API, menunggu sampai selesai, lalu membuka `/api/health`. Butuh secret `HOSTINGER_API_TOKEN` (sekali pasang). Deploy ulang manual: Actions → **Deploy** → **Run workflow**.
 
 Branch berawalan `wip/` tidak digabung otomatis; variabel repo `AUTO_MERGE=false` mematikannya untuk semua branch.
 
