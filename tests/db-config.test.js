@@ -18,6 +18,11 @@ test("hostname berbentuk URL dan port tidak valid ditolak", () => {
   assert.deepEqual(names, ["MYSQL_HOST", "MYSQL_PORT"]);
 });
 
+test("teks contoh di hPanel (berisi spasi) ditolak sebelum mencoba koneksi", () => {
+  const names = databaseIssues({ ...full, MYSQL_HOST: "masih uji coba", MYSQL_PORT: "masih uji coba" }).map((issue) => issue.name);
+  assert.deepEqual(names, ["MYSQL_HOST", "MYSQL_PORT"]);
+});
+
 test("localhost dipetakan ke IPv4, password tidak dipangkas", () => {
   const settings = mysqlSettings({ ...full, MYSQL_HOST: "LocalHost" });
   assert.equal(settings.host, "127.0.0.1");

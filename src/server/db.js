@@ -39,7 +39,7 @@ export async function query(sql, params = []) {
 // Status untuk /api/health: tidak pernah menampilkan host, user, atau password.
 export async function databaseStatus() {
   const issues = databaseIssues();
-  if (issues.length) return { configured: false, ok: false, missing: issues.map((issue) => issue.name) };
+  if (issues.length) return { configured: false, ok: false, issues };
   const started = Date.now();
   try {
     const migrations = await ensureMigrated();

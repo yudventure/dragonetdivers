@@ -85,6 +85,8 @@ Zona DNS di akun lama per 20 Oktober 2026 (simpan sebagai cadangan):
 | `MYSQL_USER` | User database lengkap, mis. `u123456789_dragonet` |
 | `MYSQL_PASSWORD` | Password user database |
 
+Jangan isi dengan teks contoh (mis. `masih uji coba`): variabel yang belum punya nilai **hapus barisnya**. Isian yang salah tidak lagi menggagalkan build, tetapi diabaikan dan dilaporkan di `warnings` / `database.issues` pada `/api/health`.
+
 Variabel `NEXT_PUBLIC_*` ditanam saat build; setelah diubah, deploy ulang. Daftar lengkap ada di `.env.example`.
 
 ## 5. Database MySQL
