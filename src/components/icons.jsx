@@ -82,6 +82,46 @@ export function SunsetIcon(props) {
   );
 }
 
+export function MapPinIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+      <circle cx="12" cy="10" r="3" />
+    </Icon>
+  );
+}
+
+export function LeafIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+    </Icon>
+  );
+}
+
+export function LifeBuoyIcon(props) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="m4.93 4.93 4.24 4.24" />
+      <path d="m14.83 9.17 4.24-4.24" />
+      <path d="m14.83 14.83 4.24 4.24" />
+      <path d="m9.17 14.83-4.24 4.24" />
+      <circle cx="12" cy="12" r="4" />
+    </Icon>
+  );
+}
+
+export function GaugeIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="m12 14 4-4" />
+      <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+    </Icon>
+  );
+}
+
 // Motif garis ombak dari logo (brand/patterns/wave-divider.svg).
 export function Wave({ className = "h-4 w-24" }) {
   return (
