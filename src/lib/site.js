@@ -1,6 +1,6 @@
 // Data situs yang dipakai di banyak halaman. Nilai NEXT_PUBLIC_* ditanam saat build.
 
-const DEFAULT_URL = "https://dragonetdiversrajaampat.com";
+const DEFAULT_URL = "https://dragonetdivers.com";
 
 // Origin http(s) dari sebuah isian, atau null bila bukan URL yang valid.
 function parseSiteUrl(raw) {

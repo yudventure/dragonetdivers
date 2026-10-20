@@ -17,16 +17,16 @@ test("tautan WhatsApp dibuat hanya bila nomor valid", () => {
 test("URL situs: isian valid dipakai, isian salah jatuh ke alamat bawaan tanpa error", (t) => {
   t.mock.method(console, "warn", () => {});
   assert.equal(siteUrl("https://gold-walrus-261903.hostingersite.com/"), "https://gold-walrus-261903.hostingersite.com");
-  assert.equal(siteUrl(" https://dragonetdiversrajaampat.com/path "), "https://dragonetdiversrajaampat.com");
-  assert.equal(siteUrl(undefined), "https://dragonetdiversrajaampat.com");
+  assert.equal(siteUrl(" https://dragonetdivers.com/path "), "https://dragonetdivers.com");
+  assert.equal(siteUrl(undefined), "https://dragonetdivers.com");
   // Kasus nyata di Hostinger: teks contoh membuat build gagal (ERR_INVALID_URL).
-  assert.equal(siteUrl("masih uji coba"), "https://dragonetdiversrajaampat.com");
-  assert.equal(siteUrl("ftp://example.com"), "https://dragonetdiversrajaampat.com");
+  assert.equal(siteUrl("masih uji coba"), "https://dragonetdivers.com");
+  assert.equal(siteUrl("ftp://example.com"), "https://dragonetdivers.com");
   assert.equal(console.warn.mock.callCount(), 2);
 });
 
 test("peringatan konfigurasi publik untuk /api/health", () => {
-  assert.deepEqual(siteConfigWarnings({ NEXT_PUBLIC_SITE_URL: "https://dragonetdiversrajaampat.com", NEXT_PUBLIC_WHATSAPP_NUMBER: "6281234567890" }), []);
+  assert.deepEqual(siteConfigWarnings({ NEXT_PUBLIC_SITE_URL: "https://dragonetdivers.com", NEXT_PUBLIC_WHATSAPP_NUMBER: "6281234567890" }), []);
   assert.deepEqual(siteConfigWarnings({}), []);
   const warnings = siteConfigWarnings({ NEXT_PUBLIC_SITE_URL: "masih uji coba", NEXT_PUBLIC_WHATSAPP_NUMBER: "masih uji coba" });
   assert.equal(warnings.length, 2);

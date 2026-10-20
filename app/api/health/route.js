@@ -4,7 +4,7 @@ import pkg from "../../../package.json" with { type: "json" };
 
 export const dynamic = "force-dynamic";
 
-// Cek cepat setelah deploy: buka https://dragonetdiversrajaampat.com/api/health
+// Cek cepat setelah deploy: buka https://dragonetdivers.com/api/health
 // Tidak menampilkan host, user, atau password database.
 export async function GET() {
   const database = await databaseStatus();
