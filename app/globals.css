@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/*
+ * Tema Tailwind = token brand Dragonet Divers (brand/tokens.json, BRANDING.md §3–4).
+ * Palet bawaan Tailwind dimatikan agar hanya warna brand yang bisa dipakai:
+ * bg-white, bg-foam, text-abyss, text-slate, bg-teal, bg-mandarin, text-ember, dst.
+ * tests/brand-tokens.test.js memastikan nilai di sini sama dengan brand/tokens.json.
+ */
+@theme {
+  --color-*: initial;
+  --color-white: #FFFFFF;
+  --color-foam: #F4F9FA;
+  --color-mist: #DCE8EB;
+  --color-line-strong: #78939A;
+  --color-slate: #557079;
+  --color-abyss: #0A323B;
+  --color-on-dark-muted: #9DB9BF;
+
+  --color-teal: #146E7F;
+  --color-teal-dark: #0F5866;
+  --color-teal-soft: #D9E8EB;
+  --color-teal-wash: #ECF3F5;
+  --color-lagoon: #1592AB;
+  --color-lagoon-wash: #ECF6F8;
+  --color-mandarin: #EB7817;
+  --color-mandarin-hover: #F28A33;
+  --color-mandarin-fin: #D9651F;
+  --color-ember: #B4560F;
+  --color-mandarin-wash: #FDF4EC;
+  --color-sunrise: #F9D13E;
+  --color-sunrise-wash: #FEF8E0;
+
+  --color-success: #1E8257;
+  --color-danger: #C0392B;
+
+  /* Font dimuat lewat next/font/local di app/layout.jsx */
+  --font-sans: var(--font-jakarta), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-fredoka), "Nunito", "Trebuchet MS", system-ui, sans-serif;
+
+  --radius-input: 10px;
+  --radius-card: 16px;
+  --radius-frame: 28px;
+
+  --shadow-float: 0 10px 30px rgb(10 50 59 / 0.1);
+
+  --ease-brand: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: var(--color-white);
+    color: var(--color-abyss);
+    line-height: 1.65;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-lagoon);
+    outline-offset: 2px;
+  }
+}
+
+/* Komponen kecil yang dipakai berulang (BRANDING.md §9) */
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ember);
+}
+
+@utility mandarin-stripe {
+  background: url("../brand/patterns/mandarin-stripe.svg") repeat-x left center / auto 100%;
+}
+
+@utility gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  @media (width >= 40rem) {
+    padding-left: max(32px, env(safe-area-inset-left, 0px));
+    padding-right: max(32px, env(safe-area-inset-right, 0px));
+  }
+}

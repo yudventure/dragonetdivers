@@ -1,0 +1,60 @@
+name: Auto PR
+
+# Setiap push ke branch selain main otomatis dibuatkan PR ke main (sekali per branch).
+# Syarat: Settings → Actions → General → centang
+# "Allow GitHub Actions to create and approve pull requests".
+# Opsional: variabel repo AUTO_MERGE=true untuk menyalakan auto-merge (squash)
+# setelah CI hijau; butuh "Allow auto-merge" + branch protection main yang mewajibkan cek "build".
+on:
+  push:
+    branches-ignore: [main]
+
+concurrency:
+  group: auto-pr-${{ github.ref }}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    if: ${{ !github.event.deleted }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Buka PR ke main bila belum ada
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          AUTO_MERGE: ${{ vars.AUTO_MERGE }}
+        run: |
+          set -euo pipefail
+
+          existing=$(gh pr list --repo "$REPO" --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
+          if [ -n "$existing" ]; then
+            echo "PR sudah ada: $existing"
+            exit 0
+          fi
+
+          ahead=$(gh api "repos/$REPO/compare/main...$SHA" --jq '.ahead_by')
+          if [ "$ahead" = "0" ]; then
+            echo "Branch tidak punya commit baru dibanding main; PR tidak dibuat."
+            exit 0
+          fi
+
+          title=$(gh api "repos/$REPO/commits/$SHA" --jq '.commit.message | split("\n")[0]')
+          commits=$(gh api "repos/$REPO/compare/main...$SHA" --jq '.commits[] | "- " + (.commit.message | split("\n")[0])')
+          body=$(printf '## Ringkasan\nPR otomatis dari branch `%s`.\n\n## Commit\n%s\n\n## Catatan deploy\nSetelah di-merge ke `main`, Hostinger membangun ulang website (auto-deploy, atau tekan Redeploy di hPanel).\n' "$BRANCH" "$commits")
+
+          if ! url=$(gh pr create --repo "$REPO" --base main --head "$BRANCH" --title "$title" --body "$body"); then
+            echo "::warning title=PR tidak bisa dibuat otomatis::Centang Settings → Actions → General → 'Allow GitHub Actions to create and approve pull requests', lalu push ulang."
+            exit 0
+          fi
+          echo "PR dibuat: $url"
+
+          if [ "${AUTO_MERGE:-}" = "true" ]; then
+            gh pr merge "$url" --auto --squash --delete-branch \
+              || echo "::warning title=Auto-merge belum aktif::Nyalakan 'Allow auto-merge' dan branch protection main yang mewajibkan cek build."
+          fi
