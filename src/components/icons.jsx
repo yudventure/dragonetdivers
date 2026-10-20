@@ -56,17 +56,6 @@ export function WavesIcon(props) {
   );
 }
 
-export function UsersIcon(props) {
-  return (
-    <Icon {...props}>
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </Icon>
-  );
-}
-
 export function SunsetIcon(props) {
   return (
     <Icon {...props}>
@@ -78,24 +67,6 @@ export function SunsetIcon(props) {
       <path d="M22 22H2" />
       <path d="m16 6-4 4-4-4" />
       <path d="M16 18a4 4 0 0 0-8 0" />
-    </Icon>
-  );
-}
-
-export function MapPinIcon(props) {
-  return (
-    <Icon {...props}>
-      <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-      <circle cx="12" cy="10" r="3" />
-    </Icon>
-  );
-}
-
-export function LeafIcon(props) {
-  return (
-    <Icon {...props}>
-      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
     </Icon>
   );
 }

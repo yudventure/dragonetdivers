@@ -16,7 +16,7 @@ export default function LearnToDive() {
   const ask = whatsappLink("Hi Dragonet Divers, I'd like to ask about dive courses.");
   return (
     <section aria-labelledby="learn-title" className="overflow-hidden bg-white">
-      <div className="gutter mx-auto grid max-w-[1200px] items-center gap-12 pb-20 md:pb-28 lg:grid-cols-2 lg:gap-16">
+      <div className="gutter mx-auto grid max-w-[1200px] items-center gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-16">
         <div className="relative mx-auto w-full max-w-[520px]">
           {/* Lingkaran gelembung di belakang foto */}
           <div
