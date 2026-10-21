@@ -322,7 +322,8 @@ const id = {
     pricesNote: "Harga ditetapkan dalam rupiah. Nilai dolar adalah perkiraan dengan kurs ini.",
   },
   hero: {
-    title: ["menyelam ke", "dalam warna."],
+    // Tiga baris (\n = pindah baris) supaya selebar judul English dan tidak menutupi wajah penyelam.
+    title: ["menyelam\nke dalam", "warna."],
     services: [
       { title: "Fun dive", text: "Menyelam bersama pemandu di karang-karang Selat Dampier.", topic: "fun dive" },
       { title: "Kursus selam", text: "Dari napas pertamamu di bawah air sampai level berikutnya.", topic: "kursus selam" },

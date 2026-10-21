@@ -31,7 +31,8 @@ export default function SiteHeader({ lang, path = "/" }) {
 
   return (
     <HeaderShell>
-      <div className="gutter mx-auto flex h-16 max-w-[1200px] items-center gap-4 sm:h-[72px] xl:gap-6">
+      {/* Selebar hero beranda: 85% layar, minimal 1200 px. */}
+      <div className="gutter mx-auto flex h-16 max-w-[max(1200px,85%)] items-center gap-4 sm:h-[72px] xl:gap-6">
         <Link href={home} className="flex shrink-0 items-center gap-3" aria-label={homeLabel}>
           <Image src={logo} alt="" width={44} height={44} priority className="size-11" />
           {/* Nama disembunyikan di 1024–1279 px agar menu desktop muat di satu baris. */}
