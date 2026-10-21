@@ -3,26 +3,23 @@ import heroPhoto from "../assets/ocean-manta-loop.webp";
 import { gallery } from "@/content/gallery";
 import { greeting, setupChecklist } from "@/lib/admin-overview";
 import { socialLinks, whatsappNumber } from "@/lib/site";
+import { witDate } from "@/lib/records";
 import { adminWarnings } from "@/server/admin-auth";
-import { databaseStatus, query } from "@/server/db";
+import { todaySummary } from "@/server/admin-data";
+import { databaseStatus } from "@/server/db";
 import { orderCounts } from "@/server/orders";
 import { getSeaConditions } from "@/server/sea-conditions";
+import { siteGallery } from "@/server/site-gallery";
 import { ArrowIcon, CheckIcon, WavesIcon } from "../components/icons";
 import AdminShell, { Card } from "./AdminShell";
 import LiveClock from "./LiveClock";
 
-const ACTIVITY = { fun_dive: "Fun dive", course: "Dive course", snorkeling: "Snorkeling", island_trip: "Island trip", dusk_dive: "Dusk dive" };
 const number = (n, digits = 0) => (n == null ? "–" : new Intl.NumberFormat("id-ID", { maximumFractionDigits: digits }).format(n));
-const date = (d) => (d ? new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", timeZone: "Asia/Jayapura" }).format(new Date(d)) : "–");
 
-async function bookingSummary(databaseOk) {
+async function todayInfo(databaseOk, today) {
   if (!databaseOk) return null;
   try {
-    const [counts] = await query(
-      "SELECT COUNT(*) AS total, COALESCE(SUM(status = 'new'), 0) AS fresh, COALESCE(SUM(created_at >= DATE_FORMAT(UTC_TIMESTAMP(), '%Y-%m-01')), 0) AS month FROM booking_requests",
-    );
-    const recent = await query("SELECT id, full_name, activity, dive_date, guests, status, created_at FROM booking_requests ORDER BY created_at DESC LIMIT 5");
-    return { total: Number(counts.total), fresh: Number(counts.fresh), month: Number(counts.month), recent };
+    return await todaySummary(today);
   } catch {
     return null;
   }
@@ -39,13 +36,14 @@ async function orderSummary(databaseOk) {
   }
 }
 
-// "Ringkasan cepat": kartu sambutan berjam WIT dan ringkasan berisi data nyata (pesanan dan permintaan
-// booking dari MySQL, kondisi laut Open-Meteo, status pengaturan situs). Kerangka di AdminShell.
+// "Ringkasan cepat": kartu sambutan berjam WIT dan ringkasan berisi data nyata (pesanan, tamu hari ini dari
+// kalender, stok gudang, kondisi laut Open-Meteo, status pengaturan situs). Kerangka di AdminShell.
 export default async function AdminDashboard({ admin }) {
   const [sea, database] = await Promise.all([getSeaConditions().catch(() => null), databaseStatus()]);
-  const [bookings, orders] = await Promise.all([bookingSummary(database.ok), orderSummary(database.ok)]);
+  const today = witDate();
+  const [day, orders, ownGallery] = await Promise.all([todayInfo(database.ok, today), orderSummary(database.ok), database.ok ? siteGallery() : null]);
   const socials = socialLinks().length;
-  const illustrations = gallery.filter((item) => item.illustration).length;
+  const illustrations = ownGallery ? 0 : gallery.filter((item) => item.illustration).length;
   const checklist = setupChecklist({
     whatsapp: Boolean(whatsappNumber()),
     socials,
@@ -57,13 +55,13 @@ export default async function AdminDashboard({ admin }) {
   const now = new Date();
   const waiting = orders?.pending?.count ?? 0;
   const headline =
-    bookings == null
-      ? "Database belum terhubung, jadi pesanan dan permintaan booking belum bisa dipantau di sini."
+    day == null
+      ? "Database belum terhubung, jadi pesanan, kalender, dan modul tim belum bisa dipantau di sini."
       : waiting > 0
         ? `${number(waiting)} pesanan menunggu pembayaran.`
-        : bookings.fresh > 0
-          ? `${number(bookings.fresh)} permintaan booking baru menunggu jawaban.`
-          : "Tidak ada pesanan atau permintaan booking yang menunggu saat ini.";
+        : day.guests > 0
+          ? `${number(day.guests)} tamu dijadwalkan hari ini.`
+          : "Tidak ada pesanan yang menunggu dan belum ada tamu dijadwalkan hari ini.";
 
   return (
     <AdminShell
@@ -112,10 +110,19 @@ export default async function AdminDashboard({ admin }) {
             )}
           </p>
         </Card>
-        <Card title="Permintaan booking bulan ini">
-          <p className="font-display text-4xl font-semibold text-abyss tabular-nums">{bookings ? number(bookings.month) : "–"}</p>
+        <Card title="Tamu hari ini">
+          <p className="font-display text-4xl font-semibold text-abyss tabular-nums">{day ? number(day.guests) : "–"}</p>
           <p className="text-sm text-slate">
-            {bookings ? `${number(bookings.total)} tercatat sejak awal · ${number(bookings.fresh)} menunggu jawaban` : "Hubungkan database untuk mulai mencatat."}
+            {day ? (
+              <>
+                {day.closed ? "Tanggal ini ditutup · " : ""}
+                <a href="/admin/kalender" className="font-semibold text-teal hover:underline">
+                  Buka kalender reservasi
+                </a>
+              </>
+            ) : (
+              "Hubungkan database untuk mulai mencatat."
+            )}
           </p>
         </Card>
         <Card title="Kondisi laut · Selat Dampier">
@@ -160,23 +167,36 @@ export default async function AdminDashboard({ admin }) {
         </Card>
 
         <div className="grid content-start gap-4">
-          <Card title="Permintaan terbaru">
-            {bookings?.recent.length ? (
-              <ul className="grid gap-3">
-                {bookings.recent.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="grid">
-                      <span className="font-semibold text-abyss">{b.full_name}</span>
-                      <span className="text-slate">
-                        {ACTIVITY[b.activity] ?? b.activity} · {b.guests} orang · {date(b.dive_date)}
-                      </span>
+          <Card title="Perlu perhatian">
+            {day == null ? (
+              <p className="text-sm text-slate">Hubungkan database untuk melihat pesanan dan stok yang perlu ditindaklanjuti.</p>
+            ) : waiting === 0 && day.low.length === 0 ? (
+              <p className="text-sm text-slate">Tidak ada pesanan yang menunggu dan semua stok di atas batas minimum.</p>
+            ) : (
+              <ul className="grid gap-2 text-sm">
+                {waiting > 0 && (
+                  <li>
+                    <a href="/admin/pesanan?status=pending" className="font-semibold text-teal hover:underline">
+                      {number(waiting)} pesanan menunggu pembayaran
+                    </a>
+                  </li>
+                )}
+                {day.low.slice(0, 5).map((it) => (
+                  <li key={it.id} className="flex items-center justify-between gap-3">
+                    <span className="text-abyss">{it.name}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${it.status.key === "empty" ? "bg-danger/10 text-danger" : "bg-sunrise-wash text-ember"}`}>
+                      {it.status.label} · {number(it.stock)} {it.unit}
                     </span>
-                    {b.status === "new" && <span className="rounded-full bg-mandarin-wash px-2 py-0.5 text-xs font-bold text-ember">Baru</span>}
                   </li>
                 ))}
+                {day.low.length > 0 && (
+                  <li>
+                    <a href="/admin/stok" className="font-semibold text-teal hover:underline">
+                      Lihat barang & stok
+                    </a>
+                  </li>
+                )}
               </ul>
-            ) : (
-              <p className="text-sm text-slate">Belum ada permintaan yang tercatat. Permintaan dari form booking akan muncul di sini.</p>
             )}
           </Card>
           <Card title="Tautan cepat">

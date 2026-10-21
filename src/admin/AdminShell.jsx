@@ -15,21 +15,73 @@ import {
 } from "../components/icons";
 import LogoutButton from "./LogoutButton";
 
-// Menu mengikuti dashboard Zanclus. Modul yang sudah ada punya alamat sendiri; sisanya ditandai
-// "Segera" dan dibangun bertahap sesuai prioritas pemilik.
+// Menu mengikuti dashboard Zanclus: modul utama di atas, lalu kelompok Situs web, PR & mitra, HRD,
+// Keuangan, dan Gudang dengan halaman-halamannya.
 const MENU = [
   { key: "ringkasan", label: "Ringkasan cepat", icon: GridIcon, href: "/admin" },
+  { key: "kalender", label: "Kalender reservasi", icon: CalendarIcon, href: "/admin/kalender" },
+  { key: "tamu", label: "Tamu", icon: UserIcon, href: "/admin/tamu" },
   { key: "pesanan", label: "Pesanan", icon: ReceiptIcon, href: "/admin/pesanan" },
-  { key: "paket", label: "Paket & harga", icon: TagIcon, href: "/admin/paket" },
-  { key: "pembayaran", label: "Pembayaran", icon: BanknoteIcon, href: "/admin/pembayaran" },
-  { label: "Kalender reservasi", icon: CalendarIcon },
-  { label: "Tamu", icon: UserIcon },
-  { label: "Situs web", icon: GlobeIcon },
-  { label: "PR & mitra", icon: LifeBuoyIcon },
-  { label: "HRD", icon: UsersIcon },
-  { label: "Keuangan", icon: WalletIcon },
-  { label: "Gudang", icon: BoxIcon },
+  {
+    group: "Situs web",
+    icon: GlobeIcon,
+    items: [
+      { key: "paket", label: "Paket & harga", icon: TagIcon, href: "/admin/paket" },
+      { key: "situs", label: "Galeri foto & video", icon: GlobeIcon, href: "/admin/situs" },
+    ],
+  },
+  {
+    group: "PR & mitra",
+    icon: LifeBuoyIcon,
+    items: [
+      { key: "konten", label: "Kalender konten", icon: CalendarIcon, href: "/admin/konten" },
+      { key: "mitra", label: "Agen & mitra", icon: LifeBuoyIcon, href: "/admin/mitra" },
+    ],
+  },
+  {
+    group: "HRD",
+    icon: UsersIcon,
+    items: [
+      { key: "pegawai", label: "Pegawai", icon: UsersIcon, href: "/admin/pegawai" },
+      { key: "absensi", label: "Absensi", icon: CalendarIcon, href: "/admin/absensi" },
+      { key: "gaji", label: "Slip gaji", icon: ReceiptIcon, href: "/admin/gaji" },
+    ],
+  },
+  {
+    group: "Keuangan",
+    icon: WalletIcon,
+    items: [
+      { key: "pembayaran", label: "Pembayaran online", icon: BanknoteIcon, href: "/admin/pembayaran" },
+      { key: "kas", label: "Buku kas", icon: WalletIcon, href: "/admin/kas" },
+      { key: "laporan", label: "Laba rugi & pajak", icon: ReceiptIcon, href: "/admin/laporan" },
+    ],
+  },
+  {
+    group: "Gudang",
+    icon: BoxIcon,
+    items: [
+      { key: "stok", label: "Barang & stok", icon: BoxIcon, href: "/admin/stok" },
+      { key: "mutasi", label: "Keluar masuk", icon: TagIcon, href: "/admin/mutasi" },
+    ],
+  },
 ];
+
+function MenuLink({ item, active, nested = false }) {
+  const { key, label, icon: Icon, href } = item;
+  const current = key === active;
+  return (
+    <a
+      href={href}
+      aria-current={current ? "page" : undefined}
+      className={`flex items-center gap-3 rounded-input font-semibold whitespace-nowrap transition-colors duration-200 ease-brand ${nested ? "h-10 px-4 text-[15px] lg:pl-11" : "h-11 px-4"} ${
+        current ? "bg-abyss text-white shadow-float" : "text-abyss hover:bg-white hover:text-teal"
+      }`}
+    >
+      <Icon className={`size-5 ${nested ? "lg:hidden" : ""}`} />
+      {label}
+    </a>
+  );
+}
 
 /** Kartu putih bertajuk untuk isi modul. */
 export function Card({ title, children, className = "", action }) {
@@ -106,28 +158,27 @@ export default function AdminShell({ admin, active, aside, children }) {
         <nav aria-label="Menu admin" className="grid content-start gap-4 lg:sticky lg:top-28">
           <p className="hidden text-xs font-bold tracking-[0.16em] text-teal lg:block">MENU</p>
           <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0">
-            {MENU.map(({ key, label, icon: Icon, href }) => (
-              <li key={label} className="shrink-0">
-                {href ? (
-                  <a
-                    href={href}
-                    aria-current={key === active ? "page" : undefined}
-                    className={`flex h-11 items-center gap-3 rounded-input px-4 font-semibold whitespace-nowrap transition-colors duration-200 ease-brand ${
-                      key === active ? "bg-abyss text-white shadow-float" : "text-abyss hover:bg-white hover:text-teal"
-                    }`}
-                  >
-                    <Icon className="size-5" />
-                    {label}
-                  </a>
-                ) : (
-                  <span aria-disabled="true" className="flex h-11 items-center gap-3 rounded-input px-4 whitespace-nowrap text-slate/70" title="Segera">
-                    <Icon className="size-5" />
-                    {label}
-                    <span className="ml-auto rounded-full bg-teal-wash px-2 py-0.5 text-[10px] font-bold tracking-wide text-teal uppercase">Segera</span>
-                  </span>
-                )}
-              </li>
-            ))}
+            {MENU.map((entry) =>
+              entry.group ? (
+                <li key={entry.group} className="contents lg:grid lg:gap-1 lg:pt-3">
+                  <p className="hidden items-center gap-3 px-4 text-xs font-bold tracking-[0.12em] text-slate uppercase lg:flex">
+                    <entry.icon className="size-4" />
+                    {entry.group}
+                  </p>
+                  <ul className="contents lg:grid lg:gap-0.5">
+                    {entry.items.map((item) => (
+                      <li key={item.key} className="shrink-0">
+                        <MenuLink item={item} active={active} nested />
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
+                <li key={entry.key} className="shrink-0">
+                  <MenuLink item={entry} active={active} />
+                </li>
+              ),
+            )}
           </ul>
           {aside}
         </nav>

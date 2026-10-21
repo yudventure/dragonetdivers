@@ -83,6 +83,24 @@ export async function listOrders({ status } = {}) {
   return rows.map(orderFromRow);
 }
 
+/** Pesanan dengan tanggal menyelam di antara from dan to (YYYY-MM-DD), untuk kalender dan tamu. */
+export async function ordersForDates(from, to) {
+  const rows = await query(`SELECT ${COLUMNS} FROM orders WHERE dive_date BETWEEN ? AND ? ORDER BY dive_date, created_at`, [from, to]);
+  return rows.map(orderFromRow);
+}
+
+/** Pesanan lunas dengan waktu lunas di antara dua waktu (Date), untuk buku kas. */
+export async function paidOrdersBetween(start, end) {
+  const rows = await query(`SELECT ${COLUMNS} FROM orders WHERE status = 'paid' AND paid_at >= ? AND paid_at < ? ORDER BY paid_at`, [start, end]);
+  return rows.map(orderFromRow);
+}
+
+/** Semua pesanan (terbatas), untuk daftar tamu. */
+export async function allOrders(limit = 5000) {
+  const rows = await query(`SELECT ${COLUMNS} FROM orders ORDER BY created_at DESC LIMIT ${Number(limit)}`);
+  return rows.map(orderFromRow);
+}
+
 export async function orderCounts() {
   const rows = await query("SELECT status, COUNT(*) AS n, COALESCE(SUM(amount_idr), 0) AS amount FROM orders GROUP BY status");
   return Object.fromEntries(rows.map((r) => [r.status, { count: Number(r.n), amount: Number(r.amount) }]));
