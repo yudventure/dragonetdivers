@@ -35,7 +35,8 @@ export function ferryEntry([x0, y0, w] = CROP, from = PLACES.waisai, to = PLACES
 /** Letak titik peta sebagai persen dari potongan, untuk label HTML di atas gambar. */
 export const percentIn = ([x, y], [x0, y0, w, h] = CROP) => ({ left: `${((x - x0) / w) * 100}%`, top: `${((y - y0) / h) * 100}%` });
 
-export const steps = [
+// Empat langkah perjalanan, English (en) dan Bahasa Indonesia (id) berurutan sama.
+const en = [
   {
     title: "Fly to Sorong",
     text: "Land at Domine Eduard Osok Airport (SOQ) in Sorong, the gateway to Raja Ampat. Most international travellers connect through Jakarta or Bali.",
@@ -54,3 +55,25 @@ export const steps = [
     text: "Our base is in Kurkapa, a village on the north coast of Mansuar island, about an hour by speedboat from Waisai across the Dampier Strait. Message us before you travel to plan this last leg.",
   },
 ];
+
+const id = [
+  {
+    title: "Terbang ke Sorong",
+    text: "Mendarat di Bandara Domine Eduard Osok (SOQ) di Sorong, gerbang menuju Raja Ampat. Penerbangan dari luar negeri biasanya transit di Jakarta atau Bali.",
+  },
+  {
+    title: "Kapal cepat ke Waisai",
+    text: "Dari Pelabuhan Sorong, kapal cepat menyeberang ke Waisai, ibu kota Raja Ampat di Pulau Waigeo, dalam sekitar dua jam. Tiket dijual di loket pelabuhan.",
+  },
+  {
+    title: "Urus kartu masuk taman laut",
+    text: "Setiap pengunjung wajib punya kartu masuk Kawasan Konservasi Perairan Raja Ampat sebelum memasuki perairan yang dilindungi. Kartu dijual di kantor pengelola di Waisai dan berlaku 12 bulan.",
+    link: { href: "https://kkprajaampat.com/en/entry-card/", label: "Detail kartu masuk" },
+  },
+  {
+    title: "Speedboat ke Kurkapa",
+    text: "Base kami di Kurkapa, kampung di pesisir utara Pulau Mansuar, sekitar satu jam naik speedboat dari Waisai menyeberangi Selat Dampier. Kabari kami sebelum berangkat supaya perjalanan terakhir ini bisa kami bantu atur.",
+  },
+];
+
+export const steps = { en, id };

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 
 // Pembungkus header: tanpa latar saat halaman di paling atas, lalu putih transparan + blur
-// dan garis bawah Mist begitu halaman di-scroll.
+// dan garis bawah Mist begitu halaman di-scroll. data-scrolled dipakai isi header (group/header),
+// mis. menu desktop yang berlatar pil putih selama header masih transparan.
 export default function HeaderShell({ children }) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -16,7 +17,8 @@ export default function HeaderShell({ children }) {
 
   return (
     <header
-      className={`sticky top-0 z-20 border-b transition-[background-color,border-color,backdrop-filter] duration-300 ease-brand ${
+      data-scrolled={scrolled}
+      className={`group/header sticky top-0 z-20 border-b transition-[background-color,border-color,backdrop-filter] duration-300 ease-brand ${
         scrolled ? "border-mist/80 bg-white/70 backdrop-blur-md" : "border-transparent bg-transparent"
       }`}
     >

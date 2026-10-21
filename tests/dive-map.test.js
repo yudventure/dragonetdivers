@@ -40,9 +40,12 @@ test("kotak kamera tiap wilayah memuat semua titiknya", () => {
 });
 
 test("teks peta bersih dari titik dua, titik koma, tanda pisah panjang, dan harga", () => {
-  for (const [key, value] of Object.entries(mapText)) {
-    assert.doesNotMatch(value, /[:;—]| – /, key);
-    assert.doesNotMatch(value, /\$|USD|IDR|Rp|price/i, key);
+  assert.deepEqual(Object.keys(mapText.id), Object.keys(mapText.en));
+  for (const [lang, text] of Object.entries(mapText)) {
+    for (const [key, value] of Object.entries(text)) {
+      assert.doesNotMatch(value, /[:;—]| – /, `${lang}.${key}`);
+      assert.doesNotMatch(value, /\$|USD|IDR|Rp|price|harga/i, `${lang}.${key}`);
+    }
   }
 });
 

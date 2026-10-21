@@ -24,5 +24,11 @@ test("jenis dan ukuran petak galeri valid, berkas yang dirujuk ada", () => {
   for (const [, file] of source.matchAll(/from "\.\.\/assets\/([^"]+)"/g)) {
     assert.ok(existsSync(new URL(`../src/assets/${file}`, import.meta.url)), file);
   }
-  for (const alt of values("alt")) assert.ok(alt.length > 10, `alt terlalu pendek: ${alt}`);
+  // Teks alt dan judul ada dalam kedua bahasa.
+  const texts = [...source.matchAll(/(alt|title): \{\s*en: "([^"]*)",\s*id: "([^"]*)",?\s*\}/g)];
+  assert.equal(texts.length, types.length, "setiap item punya alt atau title { en, id }");
+  for (const [, key, en, id] of texts) {
+    assert.ok(en.length > 10 && id.length > 10, `${key} terlalu pendek: ${en} / ${id}`);
+    assert.notEqual(en, id, `${key} belum diterjemahkan: ${en}`);
+  }
 });

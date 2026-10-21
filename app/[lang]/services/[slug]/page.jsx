@@ -5,53 +5,60 @@ import ServiceCard, { ServiceVisual } from "@/components/ServiceCard";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { CheckIcon, ChatIcon, Wave } from "@/components/icons";
-import { serviceBySlug, services } from "@/lib/services";
+import { uiText } from "@/content/ui";
+import { alternates, format, localeHref, locales } from "@/lib/i18n";
+import { serviceBySlug, services, servicesIn } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
 
-// Halaman detail layanan: /services/fun-dives, /services/dive-courses, dst. (isi di src/lib/services.js).
+// Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
 // Dibangun saat build; kondisi laut di dalamnya diperbarui paling lama tiap 15 menit.
 export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return services.map(({ slug }) => ({ slug }));
+  return locales.flatMap((lang) => services.map(({ slug }) => ({ lang, slug })));
 }
 
 export async function generateMetadata({ params }) {
-  const service = serviceBySlug((await params).slug);
+  const { lang, slug } = await params;
+  const service = serviceBySlug(slug, lang);
   if (!service) return {};
+  const path = `/services/${service.slug}`;
   return {
     title: service.title,
     description: `${service.summary} ${service.intro[0]}`.slice(0, 160),
-    alternates: { canonical: `/services/${service.slug}` },
-    openGraph: { title: service.title, description: service.summary, url: `/services/${service.slug}` },
+    alternates: { canonical: localeHref(lang, path), languages: { ...alternates(path), "x-default": path } },
+    openGraph: { title: service.title, description: service.summary, url: localeHref(lang, path) },
   };
 }
 
 export default async function ServicePage({ params }) {
-  const service = serviceBySlug((await params).slug);
+  const { lang, slug } = await params;
+  const service = serviceBySlug(slug, lang);
   if (!service) notFound();
-  const ask = whatsappLink(`Hi Dragonet Divers, I'd like to ask about ${service.ask}.`);
-  const others = services.filter(({ slug }) => slug !== service.slug);
+  const t = uiText(lang);
+  const text = t.servicePage;
+  const ask = whatsappLink(format(t.whatsapp.about, { topic: service.ask }));
+  const others = servicesIn(lang).filter((other) => other.slug !== service.slug);
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader lang={lang} path={`/services/${service.slug}`} />
       <main>
         <section aria-labelledby="service-title" className="bg-white">
           <div className="gutter mx-auto grid max-w-[1200px] items-center gap-10 pt-8 pb-4 md:pt-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
             <div className="grid content-start gap-4">
-              <nav aria-label="Breadcrumb" className="text-sm text-slate">
+              <nav aria-label={text.breadcrumb} className="text-sm text-slate">
                 <ol className="flex flex-wrap items-center gap-2">
                   <li>
-                    <Link href="/" className="hover:text-teal hover:underline">
-                      Home
+                    <Link href={localeHref(lang, "/")} className="hover:text-teal hover:underline">
+                      {text.home}
                     </Link>
                   </li>
                   <li aria-hidden="true">/</li>
                   <li>
-                    <Link href="/#services" className="hover:text-teal hover:underline">
-                      Services
+                    <Link href={localeHref(lang, "/#services")} className="hover:text-teal hover:underline">
+                      {text.services}
                     </Link>
                   </li>
                   <li aria-hidden="true">/</li>
@@ -60,7 +67,7 @@ export default async function ServicePage({ params }) {
                   </li>
                 </ol>
               </nav>
-              <p className="eyebrow mt-4">Raja Ampat · Dampier Strait</p>
+              <p className="eyebrow mt-4">{text.eyebrow}</p>
               <h1 id="service-title" className="text-[2.5rem] leading-[1.05] text-abyss sm:text-[3.5rem]">
                 {service.title}
               </h1>
@@ -79,11 +86,11 @@ export default async function ServicePage({ params }) {
                     className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
                   >
                     <ChatIcon className="size-[18px]" />
-                    Ask about {service.title.toLowerCase()}
+                    {format(text.ask, { topic: service.title.toLowerCase() })}
                   </a>
                 ) : (
                   <span className="inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] text-teal uppercase">
-                    Bookings open soon
+                    {text.bookingsSoon}
                   </span>
                 )}
               </div>
@@ -92,14 +99,14 @@ export default async function ServicePage({ params }) {
           </div>
         </section>
 
-        <SeaConditions />
+        <SeaConditions lang={lang} />
 
         <section aria-labelledby="about-title" className="bg-white">
           <div className="gutter mx-auto grid max-w-[1200px] gap-10 py-16 md:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
             <div className="grid content-start gap-3">
-              <p className="eyebrow">About</p>
+              <p className="eyebrow">{text.about}</p>
               <h2 id="about-title" className="text-[1.75rem] leading-[1.15] text-abyss sm:text-[2.125rem]">
-                What to expect
+                {text.expect}
               </h2>
               <Wave />
               {service.intro.map((paragraph) => (
@@ -108,12 +115,12 @@ export default async function ServicePage({ params }) {
                 </p>
               ))}
               <p className="mt-2 max-w-[60ch] rounded-card bg-foam p-4 text-[15px] text-abyss">
-                <span className="font-bold">Who it is for: </span>
+                <span className="font-bold">{text.forWho} </span>
                 {service.forWho}
               </p>
             </div>
             <div className="grid content-start gap-4 rounded-card border border-mist p-6 sm:p-8">
-              <h2 className="text-xl text-abyss">Good to know</h2>
+              <h2 className="text-xl text-abyss">{text.goodToKnow}</h2>
               <ul className="grid gap-4">
                 {service.goodToKnow.map((item) => (
                   <li key={item} className="grid grid-cols-[28px_1fr] items-start gap-3 text-[15px] text-slate">
@@ -124,7 +131,7 @@ export default async function ServicePage({ params }) {
                   </li>
                 ))}
               </ul>
-              <p className="border-t border-mist pt-4 text-sm text-slate">Prices and schedules will be published here soon. Until then, just ask us.</p>
+              <p className="border-t border-mist pt-4 text-sm text-slate">{text.pricesSoon}</p>
             </div>
           </div>
         </section>
@@ -132,19 +139,25 @@ export default async function ServicePage({ params }) {
         <section aria-labelledby="others-title" className="bg-foam">
           <div className="gutter mx-auto grid max-w-[1200px] gap-8 py-16 md:py-20">
             <h2 id="others-title" className="text-[1.75rem] leading-[1.15] text-abyss sm:text-[2.125rem]">
-              More in Raja Ampat
+              {text.more}
             </h2>
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {others.map((other) => (
                 <li key={other.slug} className="grid">
-                  <ServiceCard service={other} compact visualClassName="h-44" sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 90vw" />
+                  <ServiceCard
+                    service={other}
+                    lang={lang}
+                    compact
+                    visualClassName="h-44"
+                    sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 90vw"
+                  />
                 </li>
               ))}
             </ul>
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter lang={lang} />
     </>
   );
 }

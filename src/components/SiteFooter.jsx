@@ -1,19 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import plate from "../../brand/logo/dragonet-divers-logo-plate.png";
-import { services } from "@/lib/services";
+import { uiText } from "@/content/ui";
+import { format, localeHref } from "@/lib/i18n";
+import { servicesIn } from "@/lib/services";
 import { contact, mapsLink, site, socialLinks, whatsappLink } from "@/lib/site";
 import { ChatIcon, FacebookIcon, InstagramIcon, LockIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "./icons";
 
 const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: FacebookIcon, youtube: YouTubeIcon };
-
-const PLAN_LINKS = [
-  { href: "/#conditions", label: "Live sea conditions" },
-  { href: "/#dive-sites", label: "Dive site map" },
-  { href: "/#learn", label: "Learn to dive" },
-  { href: "/#getting-here", label: "How to get here" },
-  { href: "/#faq", label: "FAQ" },
-];
 
 function Column({ id, title, children }) {
   return (
@@ -32,12 +26,14 @@ const linkClass = "text-[15px] text-white/90 transition-colors duration-200 ease
 // dan media sosial, layanan, rencana perjalanan, kontak. Ikon media sosial muncul hanya bila akunnya
 // diisi (NEXT_PUBLIC_INSTAGRAM dst., src/lib/site.js). Logo versi plate karena pita tulisan asli transparan.
 // Bagian bawah dipisah dengan latar sedikit lebih terang, tanpa garis pemisah; kanan bawah tautan
-// "Operator sign in" ke dashboard tim.
-export default function SiteFooter() {
-  const chat = whatsappLink("Hi Dragonet Divers, I'd like to ask about diving in Raja Ampat.");
+// "Operator sign in" ke dashboard tim. Teks dalam bahasa halaman (src/content/ui.js, footer).
+export default function SiteFooter({ lang }) {
+  const all = uiText(lang);
+  const t = all.footer;
+  const chat = whatsappLink(all.whatsapp.general);
   const icons = [
-    { id: "email", label: `Email ${contact.email}`, href: `mailto:${contact.email}`, Icon: MailIcon },
-    { id: "maps", label: "Find us on Google Maps", href: mapsLink(), Icon: MapPinIcon },
+    { id: "email", label: format(t.emailLabel, { email: contact.email }), href: `mailto:${contact.email}`, Icon: MailIcon },
+    { id: "maps", label: t.mapsLabel, href: mapsLink(), Icon: MapPinIcon },
     ...(chat ? [{ id: "whatsapp", label: "WhatsApp", href: chat, Icon: ChatIcon }] : []),
     ...socialLinks().map((s) => ({ ...s, Icon: SOCIAL_ICONS[s.id] })),
   ];
@@ -46,7 +42,7 @@ export default function SiteFooter() {
       <div className="mandarin-stripe h-2" aria-hidden="true" />
       <div className="gutter mx-auto grid max-w-[1200px] gap-x-10 gap-y-12 py-14 sm:grid-cols-2 md:py-16 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         <div className="grid content-start gap-5">
-          <Link href="/" className="flex w-fit items-center gap-3" aria-label={`${site.name}, home`}>
+          <Link href={localeHref(lang, "/")} className="flex w-fit items-center gap-3" aria-label={format(all.nav.home, { name: site.name })}>
             <Image src={plate} alt="" width={56} height={56} className="size-14" />
             <span className="grid leading-none">
               <span className="font-display text-xl font-semibold">{site.shortName}</span>
@@ -54,10 +50,10 @@ export default function SiteFooter() {
             </span>
           </Link>
           <div className="grid gap-2">
-            <p className="font-display text-lg font-semibold text-sunrise">{site.tagline}</p>
-            <p className="max-w-[38ch] text-sm text-on-dark-muted">{site.description}</p>
+            <p className="font-display text-lg font-semibold text-sunrise">{all.meta.tagline}</p>
+            <p className="max-w-[38ch] text-sm text-on-dark-muted">{all.meta.description}</p>
           </div>
-          <ul className="flex flex-wrap gap-2" aria-label="Contact and social media">
+          <ul className="flex flex-wrap gap-2" aria-label={t.contactLinks}>
             {icons.map(({ id, label, href, Icon }) => (
               <li key={id}>
                 <a
@@ -74,12 +70,12 @@ export default function SiteFooter() {
           </ul>
         </div>
 
-        <Column id="footer-services" title="Services">
+        <Column id="footer-services" title={t.services}>
           <nav aria-labelledby="footer-services">
             <ul className="grid gap-2.5">
-              {services.map((service) => (
+              {servicesIn(lang).map((service) => (
                 <li key={service.slug}>
-                  <Link href={`/services/${service.slug}`} className={linkClass}>
+                  <Link href={localeHref(lang, `/services/${service.slug}`)} className={linkClass}>
                     {service.title}
                   </Link>
                 </li>
@@ -88,12 +84,12 @@ export default function SiteFooter() {
           </nav>
         </Column>
 
-        <Column id="footer-plan" title="Plan your trip">
+        <Column id="footer-plan" title={t.plan}>
           <nav aria-labelledby="footer-plan">
             <ul className="grid gap-2.5">
-              {PLAN_LINKS.map((link) => (
+              {t.planLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className={linkClass}>
+                  <Link href={localeHref(lang, link.href)} className={linkClass}>
                     {link.label}
                   </Link>
                 </li>
@@ -102,7 +98,7 @@ export default function SiteFooter() {
           </nav>
         </Column>
 
-        <Column title="Contact">
+        <Column title={t.contact}>
           <ul className="grid gap-4 text-[15px]">
             <li className="flex gap-3">
               <MapPinIcon className="mt-0.5 size-5 shrink-0 text-sunrise" />
@@ -113,7 +109,7 @@ export default function SiteFooter() {
                   </span>
                 ))}
                 <a href={mapsLink()} target="_blank" rel="noopener" className="mt-1 w-fit text-sm font-bold text-sunrise underline-offset-4 hover:underline">
-                  Open in Google Maps
+                  {t.openMaps}
                 </a>
               </address>
             </li>
@@ -127,7 +123,7 @@ export default function SiteFooter() {
               <li className="flex gap-3">
                 <ChatIcon className="mt-0.5 size-5 shrink-0 text-sunrise" />
                 <a href={chat} className={linkClass}>
-                  Chat on WhatsApp
+                  {t.chat}
                 </a>
               </li>
             )}
@@ -148,7 +144,7 @@ export default function SiteFooter() {
             className="inline-flex items-center gap-2 font-semibold text-white/90 transition-colors duration-200 ease-brand hover:text-sunrise"
           >
             <LockIcon className="size-4" />
-            Operator sign in
+            {t.signIn}
           </a>
         </div>
       </div>

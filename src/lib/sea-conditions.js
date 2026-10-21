@@ -76,6 +76,36 @@ export function seaState(waveM) {
   return "Very rough";
 }
 
+// Label English di atas dalam Bahasa Indonesia, memakai istilah BMKG untuk cuaca dan tinggi gelombang.
+export const LABELS_ID = {
+  Clear: "Cerah",
+  "Mostly clear": "Cerah berawan",
+  "Partly cloudy": "Cerah berawan",
+  Overcast: "Berawan tebal",
+  Fog: "Kabut",
+  Drizzle: "Gerimis",
+  Rain: "Hujan",
+  Showers: "Hujan lokal",
+  Thunderstorm: "Hujan petir",
+  Cloudy: "Berawan",
+  Calm: "Sangat tenang",
+  Smooth: "Tenang",
+  Slight: "Rendah",
+  Moderate: "Sedang",
+  Rough: "Tinggi",
+  "Very rough": "Sangat tinggi",
+};
+
+export const translateLabel = (label, lang) => (lang === "id" && label ? (LABELS_ID[label] ?? label) : label);
+
+// Arah mata angin delapan penjuru dalam Bahasa Indonesia (singkatan 16 penjuru jarang dipakai di sini).
+const ARAH = ["utara", "timur laut", "timur", "tenggara", "selatan", "barat daya", "barat", "barat laut"];
+
+export function arah(degrees) {
+  if (!Number.isFinite(degrees)) return null;
+  return ARAH[Math.round((((degrees % 360) + 360) % 360) / 45) % 8];
+}
+
 const num = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
 const round = (value, digits = 0) => (value === null ? null : Number(value.toFixed(digits)));
 const clock = (iso) => (typeof iso === "string" && iso.includes("T") ? iso.split("T")[1].slice(0, 5) : null);

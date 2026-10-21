@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { format } from "@/lib/i18n";
 import EmbedVideo from "./EmbedVideo";
 import LoopVideo from "./LoopVideo";
 import { ChevronIcon, CloseIcon } from "./icons";
@@ -18,8 +19,8 @@ const tileSizes = (size) => (size === "big" || size === "wide" ? "(min-width: 76
 // Kisi galeri gaya bento (grid-flow-dense mengisi celah) + penampil foto layar penuh. Penampil memakai
 // <dialog> (fokus dan Esc ditangani peramban), panah kiri/kanan berpindah foto, ketuk di luar foto
 // menutup. Gulir halaman dikunci dengan membekukan body (position: fixed), karena Safari di iPhone
-// mengabaikan overflow: hidden untuk sentuhan.
-export default function GalleryGrid({ items }) {
+// mengabaikan overflow: hidden untuk sentuhan. t = teks galeri dalam bahasa halaman (src/content/ui.js).
+export default function GalleryGrid({ items, t }) {
   const photos = items.filter((item) => item.type === "photo");
   const [open, setOpen] = useState(null);
   const dialog = useRef(null);
@@ -54,7 +55,7 @@ export default function GalleryGrid({ items }) {
                 type="button"
                 onClick={() => setOpen(photos.indexOf(item))}
                 className="group block size-full cursor-zoom-in"
-                aria-label={`Open photo: ${item.alt}`}
+                aria-label={format(t.openPhoto, { alt: item.alt })}
               >
                 <Image
                   src={item.image}
@@ -68,14 +69,14 @@ export default function GalleryGrid({ items }) {
             {item.type === "video" && (
               <LoopVideo sources={item.sources} poster={item.poster.src} className="size-full object-cover" />
             )}
-            {item.type === "embed" && <EmbedVideo video={item.video} title={item.title} />}
+            {item.type === "embed" && <EmbedVideo video={item.video} title={item.title} t={t} />}
           </li>
         ))}
       </ul>
 
       <dialog
         ref={dialog}
-        aria-label={photo?.alt ?? "Photo"}
+        aria-label={photo?.alt ?? t.photo}
         onClose={() => setOpen(null)}
         onClick={(e) => e.target === e.currentTarget && setOpen(null)}
         onKeyDown={(e) => {
@@ -100,7 +101,7 @@ export default function GalleryGrid({ items }) {
           type="button"
           onClick={() => setOpen(null)}
           className="fixed top-4 right-4 grid size-11 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 hover:bg-white hover:text-abyss"
-          aria-label="Close"
+          aria-label={t.close}
         >
           <CloseIcon className="size-5" />
         </button>
@@ -110,7 +111,7 @@ export default function GalleryGrid({ items }) {
               type="button"
               onClick={() => step(-1)}
               className="fixed top-1/2 left-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 hover:bg-white hover:text-abyss"
-              aria-label="Previous photo"
+              aria-label={t.previous}
             >
               <ChevronIcon className="size-5 rotate-180" />
             </button>
@@ -118,7 +119,7 @@ export default function GalleryGrid({ items }) {
               type="button"
               onClick={() => step(1)}
               className="fixed top-1/2 right-3 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white ring-1 ring-white/30 hover:bg-white hover:text-abyss"
-              aria-label="Next photo"
+              aria-label={t.next}
             >
               <ChevronIcon className="size-5" />
             </button>

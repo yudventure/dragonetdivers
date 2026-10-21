@@ -6,6 +6,8 @@ import diveCourses from "../assets/services/dive-courses.webp";
 import snorkeling from "../assets/services/snorkeling.webp";
 import islandTrips from "../assets/services/island-trips.webp";
 import duskDives from "../assets/services/dusk-dives.webp";
+import { uiText } from "@/content/ui";
+import { localeHref } from "@/lib/i18n";
 import { ArrowIcon } from "./icons";
 
 export const serviceArt = {
@@ -36,11 +38,12 @@ export function ServiceVisual({ service, className = "", sizes, priority = false
   );
 }
 
-// Kartu layanan: seluruh kartu adalah tautan ke halaman detail. compact = kartu kecil tanpa chip.
-export default function ServiceCard({ service, className = "", visualClassName = "h-52 md:h-56", sizes = "(min-width: 768px) 360px, 90vw", compact = false }) {
+// Kartu layanan: seluruh kartu adalah tautan ke halaman detail. service = layanan dalam bahasa lang
+// (localizeService di src/lib/services.js). compact = kartu kecil tanpa chip.
+export default function ServiceCard({ service, lang = "en", className = "", visualClassName = "h-52 md:h-56", sizes = "(min-width: 768px) 360px, 90vw", compact = false }) {
   return (
     <Link
-      href={`/services/${service.slug}`}
+      href={localeHref(lang, `/services/${service.slug}`)}
       className={`group flex flex-col overflow-hidden rounded-card border border-mist bg-white transition duration-200 ease-brand hover:border-teal hover:shadow-float motion-safe:hover:-translate-y-0.5 ${className}`}
     >
       <ServiceVisual service={service} className={visualClassName} sizes={sizes} chips={!compact} />
@@ -48,7 +51,7 @@ export default function ServiceCard({ service, className = "", visualClassName =
         <span className="font-display text-xl leading-tight font-semibold text-abyss">{service.title}</span>
         <span className="text-[15px] text-slate">{service.summary}</span>
         <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-teal">
-          View details
+          {uiText(lang).services.viewDetails}
           <ArrowIcon className="size-4 transition-transform duration-200 ease-brand motion-safe:group-hover:translate-x-0.5" />
         </span>
       </span>

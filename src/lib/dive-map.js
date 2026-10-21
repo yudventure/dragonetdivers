@@ -35,17 +35,28 @@ export function areasWithSites(wilayah, sites, bingkai) {
   });
 }
 
-// Teks peta yang ditimpa (kunci dari data/teks.json). Tanpa titik dua, titik koma, atau tanda pisah
-// panjang (aturan pemilik untuk peta), tanpa harga, jadwal, atau klaim bisnis (CLAUDE.md).
+// Teks peta yang ditimpa per bahasa (kunci dari data/teks.json). Tanpa titik dua, titik koma, atau tanda
+// pisah panjang (aturan pemilik untuk peta), tanpa harga, jadwal, atau klaim bisnis (CLAUDE.md).
 export const mapText = {
-  awalJudul: "Dive and snorkel sites",
-  awalTeks:
-    "The sites on this map spread across the Dampier Strait around Kri, Mansuar, Arborek, Gam and Friwen, out to Piaynemo in the west. Pick an island to see the sites around it.",
-  diWilayah: "Sites around {wilayah}",
-  belumAdaTanda: "No dive or snorkel sites in this area yet.",
-  legenda: "Map markers",
-  lihatLayanan: "See fun dives",
+  en: {
+    awalJudul: "Dive and snorkel sites",
+    awalTeks:
+      "The sites on this map spread across the Dampier Strait around Kri, Mansuar, Arborek, Gam and Friwen, out to Piaynemo in the west. Pick an island to see the sites around it.",
+    diWilayah: "Sites around {wilayah}",
+    belumAdaTanda: "No dive or snorkel sites in this area yet.",
+    legenda: "Map markers",
+    lihatLayanan: "See fun dives",
+  },
+  id: {
+    awalJudul: "Titik selam dan snorkel",
+    awalTeks:
+      "Titik di peta ini tersebar di Selat Dampier sekitar Kri, Mansuar, Arborek, Gam, dan Friwen, sampai Piaynemo di barat. Pilih pulau untuk melihat titik di sekitarnya.",
+    diWilayah: "Titik di sekitar {wilayah}",
+    belumAdaTanda: "Belum ada titik selam atau snorkel di wilayah ini.",
+    legenda: "Tanda di peta",
+    lihatLayanan: "Lihat fun dive",
+  },
 };
 
-/** Tombol di kartu titik: ke halaman layanan fun dives. */
+/** Tombol di kartu titik: ke halaman layanan fun dives (diberi awalan bahasa dengan localeHref). */
 export const SITE_LINK = "/services/fun-dives";

@@ -275,6 +275,26 @@ export function CloseIcon(props) {
   );
 }
 
+export function MenuIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h10" />
+    </Icon>
+  );
+}
+
+export function BanknoteIcon(props) {
+  return (
+    <Icon {...props}>
+      <rect width="20" height="12" x="2" y="6" rx="2" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="M6 12h.01M18 12h.01" />
+    </Icon>
+  );
+}
+
 export function ChevronIcon(props) {
   return (
     <Icon {...props}>
