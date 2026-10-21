@@ -7,7 +7,7 @@ import { missingPackages } from "@/lib/packages";
 import { servicesIn } from "@/lib/services";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
-import { allPackages } from "@/server/packages";
+import { allPackages, ensurePriceList } from "@/server/packages";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Paket & harga" };
@@ -17,6 +17,7 @@ export default async function PackagesPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
+  if (database.ok) await ensurePriceList();
   const packages = database.ok ? await allPackages().catch(() => []) : [];
   const services = servicesIn("id").map(({ slug, title }) => ({ slug, title }));
   // Daftar harga pemilik: paket yang belum ada bisa ditambahkan sekali klik (src/content/price-list.js).

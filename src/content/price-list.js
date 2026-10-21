@@ -1,7 +1,7 @@
 // Daftar harga 2026 dari pemilik (PDF "Turtle Dive Homestay, Price List 2026", versi 7, build 2026-08-29),
-// dijadikan paket checkout per layanan. Halaman publik tidak membaca file ini: tim menambahkannya ke tabel
-// packages sekali lewat tombol di /admin/paket (paket yang namanya sudah ada dilewati), lalu harga dan
-// isinya diubah di sana. Harga dalam Rupiah. Teks tanpa titik dua, titik koma, dan tanda pisah panjang
+// dijadikan paket checkout per layanan. Halaman publik tidak membaca file ini: paket yang belum ada
+// dimasukkan ke tabel packages sekali secara otomatis (ensurePriceList di src/server/packages.js), atau
+// lewat tombol di /admin/paket (paket yang namanya sudah ada dilewati), lalu harga dan isinya diubah di sana. Harga dalam Rupiah. Teks tanpa titik dua, titik koma, dan tanda pisah panjang
 // (aturan tulisan pemilik), diperiksa tests/price-list.test.js.
 //
 // Yang sengaja tidak dijadikan paket: Kri Island View Point (gratis), Tank Rent (khusus tamu homestay),
@@ -55,6 +55,8 @@ const snorkel = (place, price, max, extraPrice, where = ["", ""]) =>
 export const PRICE_LIST = {
   title: "Daftar harga 2026",
   source: "Turtle Dive Homestay, Price List 2026 (versi 7)",
+  // Penanda di tabel settings (price_list_<version>): daftar ini sudah dimasukkan otomatis sekali.
+  version: "2026_v7",
   packages: [
     // Fun dive lokal (per penyelam)
     pkg("fun-dives", 10, ["One fun dive", "Satu kali fun dive"], 900_000, local(["One local fun dive in the Dampier Strait.", "Satu kali fun dive di titik selam lokal Selat Dampier."])),

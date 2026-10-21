@@ -1,5 +1,8 @@
 import "server-only";
+import { PRICE_LIST } from "@/content/price-list";
+import { validatePackage } from "@/lib/checkout";
 import { missingPackages, packageFromRow } from "@/lib/packages";
+import { services } from "@/lib/services";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
 
@@ -17,6 +20,7 @@ const ORDER = "ORDER BY sort_order, price_idr, id";
 export async function activePackages(service) {
   if (!isDatabaseConfigured()) return [];
   try {
+    await ensurePriceList();
     const rows = await query(`SELECT ${COLUMNS} FROM packages WHERE active = 1 AND service = ? ${ORDER}`, [service]);
     return rows.map(packageFromRow);
   } catch (error) {
@@ -85,4 +89,36 @@ export async function importPackages(list) {
   const missing = missingPackages(list, await allPackages());
   for (const pkg of missing) await savePackage(null, pkg);
   return { added: missing.length, skipped: list.length - missing.length };
+}
+
+const auto = (globalThis.__dragonetPriceList ??= { run: null });
+
+/**
+ * Daftar harga pemilik (src/content/price-list.js) dimasukkan sekali secara otomatis, tanpa menunggu tombol
+ * di /admin/paket. Baris settings price_list_<version> menandainya (dan mencegah dua proses mengimpor
+ * bersamaan), jadi paket yang sengaja dihapus tim tidak muncul lagi. Sekali per proses; bila gagal, dicoba
+ * lagi pada pemanggilan berikutnya. Tidak berjalan saat build.
+ */
+export function ensurePriceList() {
+  if (!isDatabaseConfigured() || process.env.NEXT_PHASE === "phase-production-build") return Promise.resolve(null);
+  auto.run ??= (async () => {
+    const name = `price_list_${PRICE_LIST.version}`;
+    const claim = await query("INSERT IGNORE INTO settings (name, value) VALUES (?, ?)", [name, JSON.stringify({ state: "importing" })]);
+    if (claim.affectedRows === 0) return null; // sudah dimasukkan (atau sedang dimasukkan proses lain)
+    try {
+      const slugs = services.map((s) => s.slug);
+      const result = await importPackages(PRICE_LIST.packages.map((pkg) => validatePackage(pkg, slugs)));
+      await query("UPDATE settings SET value = ? WHERE name = ?", [JSON.stringify({ state: "done", at: new Date().toISOString(), ...result }), name]);
+      console.log(`[paket] daftar harga ${PRICE_LIST.version}: ${result.added} paket ditambahkan, ${result.skipped} sudah ada`);
+      return result;
+    } catch (error) {
+      await query("DELETE FROM settings WHERE name = ?", [name]).catch(() => {});
+      throw error;
+    }
+  })().catch((error) => {
+    auto.run = null;
+    console.error(`[paket] daftar harga belum bisa dimasukkan: ${error.code ?? error.message}`);
+    return null;
+  });
+  return auto.run;
 }
