@@ -128,7 +128,7 @@ Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagi
 
 Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pegawai, Absensi, Slip gaji, Buku kas, Laba rugi & pajak, Barang & stok, dan Keluar masuk menyimpan datanya di MySQL (tabel `admin_records`, `media`, dan `settings`, dibuat otomatis oleh migrasi 006). Tidak ada environment variable baru. Setiap modul punya tombol **Unduh Excel**.
 
-- **Paket & harga**: panel **Daftar harga 2026** berisi 34 paket dari daftar harga pemilik untuk kelima layanan. Tekan **Tambahkan paket** sekali, paket yang namanya sudah ada dilewati. Setelah itu harga dan isi paket diubah di daftar paket yang sama.
+- **Paket & harga**: 34 paket dari daftar harga pemilik 2026 masuk otomatis sekali saat aplikasi pertama kali terhubung ke database (paket yang namanya sudah ada dilewati, paket yang kemudian dihapus tim tidak kembali). Panel **Daftar harga 2026** menampilkan isinya, dengan tombol **Tambahkan paket** untuk memasukkan lagi yang belum ada. Harga dan isi paket diubah di daftar paket yang sama dan langsung tampil di halaman layanan.
 - **Kalender reservasi**: pesanan website tampil otomatis. Tanggal yang ditutup (**Tutup tanggal ini**) dan **Kapasitas harian** juga ditolak oleh checkout website.
 - **Galeri foto & video**: foto yang diunggah disimpan di database (diperkecil otomatis), jadi tidak hilang saat situs dibangun ulang. Begitu ada satu item yang tampil, galeri bawaan di beranda diganti.
 - **Buku kas**: pesanan website yang lunas masuk otomatis sebagai pemasukan. Pengeluaran dan pemasukan lain dicatat tim.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import SeaConditions from "@/components/SeaConditions";
 import ServicePackages from "@/components/ServicePackages";
 import ServiceCard, { ServiceVisual } from "@/components/ServiceCard";
@@ -14,10 +15,9 @@ import { whatsappLink } from "@/lib/site";
 import { activePackages } from "@/server/packages";
 
 // Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
-// Dibangun saat build; kondisi laut dan paket (dari /admin/paket) diperbarui paling lama tiap 15 menit,
-// dan langsung setelah tim menyimpan paket (revalidatePath di app/api/admin/packages).
+// Dirender per permintaan supaya paket dan harga dari /admin/paket langsung tampil (tidak tertahan cache
+// halaman atau CDN); kondisi laut tetap dari data cache Next.js 15 menit.
 export const dynamicParams = false;
-export const revalidate = 900;
 
 export function generateStaticParams() {
   return locales.flatMap((lang) => services.map(({ slug }) => ({ lang, slug })));
@@ -37,6 +37,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ServicePage({ params }) {
+  await connection();
   const { lang, slug } = await params;
   const service = serviceBySlug(slug, lang);
   if (!service) notFound();
