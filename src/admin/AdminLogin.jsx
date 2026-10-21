@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import plate from "../../brand/logo/dragonet-divers-logo-plate.png";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import photo from "../assets/gallery/manta-belly.webp";
-import { EyeIcon, LockIcon, MailIcon } from "../components/icons";
+import { EyeIcon, KeyIcon, LockIcon, MailIcon } from "../components/icons";
 
 const MODULES = ["Permintaan booking", "Kondisi laut", "Status situs"];
 
@@ -21,12 +21,175 @@ function Field({ id, label, icon: Icon, children }) {
   );
 }
 
-// Halaman masuk operator, mengikuti tata letak Zanclus: kiri foto laut dengan pesan ruang kerja,
-// kanan kartu login. Password dikirim ke /api/admin/login; sesi disimpan di cookie httpOnly.
-export default function AdminLogin({ configured, issues }) {
+const inputClass = "h-full w-full bg-transparent text-abyss outline-none placeholder:text-slate/60";
+
+/** Kolom password dengan tombol tampilkan/sembunyikan. */
+function PasswordField({ id, name, label, autoComplete, minLength }) {
   const [show, setShow] = useState(false);
+  return (
+    <Field id={id} label={label} icon={LockIcon}>
+      <input
+        id={id}
+        name={name}
+        type={show ? "text" : "password"}
+        autoComplete={autoComplete}
+        autoCapitalize="off"
+        spellCheck={false}
+        minLength={minLength}
+        required
+        className={inputClass}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((v) => !v)}
+        aria-pressed={show}
+        aria-label={show ? "Sembunyikan password" : "Tampilkan password"}
+        className="grid size-8 shrink-0 place-items-center rounded-full text-slate hover:bg-teal-wash hover:text-teal"
+      >
+        <EyeIcon className="size-[18px]" />
+      </button>
+    </Field>
+  );
+}
+
+const Alert = ({ tone = "danger", children }) =>
+  children ? (
+    <p
+      role={tone === "danger" ? "alert" : "status"}
+      className={`rounded-input px-3 py-2 text-sm font-semibold ${tone === "danger" ? "bg-danger/10 text-danger" : "bg-teal-wash text-teal"}`}
+    >
+      {children}
+    </p>
+  ) : null;
+
+const submitClass =
+  "mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark disabled:bg-mist disabled:text-slate";
+const linkClass = "w-fit text-sm font-semibold text-teal underline-offset-4 hover:underline disabled:text-slate";
+
+async function post(url, body) {
+  const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || "Permintaan gagal. Coba lagi.");
+  return result;
+}
+
+/**
+ * "Lupa password": minta kode 6 angka ke email operator (/api/admin/password), lalu isi kode dan
+ * password baru. Berhasil = langsung masuk.
+ */
+function ForgotPassword({ initialEmail, onBack }) {
+  const [email, setEmail] = useState(initialEmail);
+  const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [wait, setWait] = useState(0);
+
+  useEffect(() => {
+    if (!wait) return;
+    const timer = setTimeout(() => setWait((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [wait]);
+
+  async function sendCode(event) {
+    event?.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const result = await post("/api/admin/password", { action: "send", email });
+      setNotice(result.message);
+      setSent(true);
+      setWait(60);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function reset(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    if (form.get("password") !== form.get("repeat")) {
+      setError("Ulangi password baru dengan isi yang sama.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      await post("/api/admin/password", { action: "reset", email, code: form.get("code"), password: form.get("password") });
+      window.location.reload();
+    } catch (e) {
+      setError(e.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="grid gap-4">
+      {!sent ? (
+        // key: dua form dipasang ulang saat berganti, supaya kolom kode tidak mewarisi isi kolom email.
+        <form key="send" onSubmit={sendCode} className="grid gap-4">
+          <p className="text-sm text-slate">Masukkan email operator. Kami kirim kode 6 angka untuk membuat password baru.</p>
+          <Field id="forgot-email" label="Email operator" icon={MailIcon}>
+            <input
+              id="forgot-email"
+              type="email"
+              autoComplete="username"
+              placeholder="operator@dragonetdivers.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </Field>
+          <Alert>{error}</Alert>
+          <button type="submit" disabled={busy} className={submitClass}>
+            {busy ? "Mengirim…" : "Kirim kode"}
+          </button>
+        </form>
+      ) : (
+        <form key="reset" onSubmit={reset} className="grid gap-4">
+          <Alert tone="info">{notice}</Alert>
+          <Field id="forgot-code" label="Kode dari email" icon={KeyIcon}>
+            <input
+              id="forgot-code"
+              name="code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9 ]{6,8}"
+              maxLength={8}
+              placeholder="6 angka"
+              required
+              className={`${inputClass} tracking-[0.3em] tabular-nums`}
+            />
+          </Field>
+          <PasswordField id="forgot-password" name="password" label="Password baru (minimal 10 karakter)" autoComplete="new-password" minLength={10} />
+          <PasswordField id="forgot-repeat" name="repeat" label="Ulangi password baru" autoComplete="new-password" minLength={10} />
+          <Alert>{error}</Alert>
+          <button type="submit" disabled={busy} className={submitClass}>
+            {busy ? "Menyimpan…" : "Simpan password & masuk"}
+          </button>
+          <button type="button" onClick={() => sendCode()} disabled={busy || wait > 0} className={linkClass}>
+            {wait > 0 ? `Kirim ulang kode dalam ${wait} detik` : "Kirim ulang kode"}
+          </button>
+        </form>
+      )}
+      <button type="button" onClick={onBack} className={linkClass}>
+        ← Kembali ke form masuk
+      </button>
+    </div>
+  );
+}
+
+// Halaman masuk operator, mengikuti tata letak Zanclus: kiri foto laut dengan pesan ruang kerja,
+// kanan kartu login. Password dikirim ke /api/admin/login; sesi disimpan di cookie httpOnly.
+// "Lupa password?" mengirim kode OTP ke email operator (ForgotPassword).
+export default function AdminLogin({ configured, issues }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [forgot, setForgot] = useState(false);
+  const [email, setEmail] = useState("");
 
   async function submit(event) {
     event.preventDefault();
@@ -85,11 +248,13 @@ export default function AdminLogin({ configured, issues }) {
           </div>
           <div className="grid gap-2">
             <p className="eyebrow">Operator sign in</p>
-            <h1 className="text-[1.75rem] leading-tight text-abyss">Selamat datang kembali.</h1>
-            <p className="text-sm text-slate">Masuk dengan akun operator untuk membuka dashboard Dragonet.</p>
+            <h1 className="text-[1.75rem] leading-tight text-abyss">{forgot ? "Buat password baru." : "Selamat datang kembali."}</h1>
+            {!forgot && <p className="text-sm text-slate">Masuk dengan akun operator untuk membuka dashboard Dragonet.</p>}
           </div>
 
-          {configured ? (
+          {configured && forgot ? (
+            <ForgotPassword initialEmail={email} onBack={() => setForgot(false)} />
+          ) : configured ? (
             <form onSubmit={submit} className="grid gap-4">
               <Field id="admin-email" label="Email operator" icon={MailIcon}>
                 <input
@@ -98,42 +263,26 @@ export default function AdminLogin({ configured, issues }) {
                   type="email"
                   autoComplete="username"
                   placeholder="operator@dragonetdivers.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-full w-full bg-transparent text-abyss outline-none placeholder:text-slate/60"
+                  className={inputClass}
                 />
               </Field>
-              <Field id="admin-password" label="Password" icon={LockIcon}>
-                <input
-                  id="admin-password"
-                  name="password"
-                  type={show ? "text" : "password"}
-                  autoComplete="current-password"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  required
-                  className="h-full w-full bg-transparent text-abyss outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow((v) => !v)}
-                  aria-pressed={show}
-                  aria-label={show ? "Sembunyikan password" : "Tampilkan password"}
-                  className="grid size-8 shrink-0 place-items-center rounded-full text-slate hover:bg-teal-wash hover:text-teal"
-                >
-                  <EyeIcon className="size-[18px]" />
-                </button>
-              </Field>
-              {error && (
-                <p role="alert" className="rounded-input bg-danger/10 px-3 py-2 text-sm font-semibold text-danger">
-                  {error}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={busy}
-                className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark disabled:bg-mist disabled:text-slate"
-              >
+              <PasswordField id="admin-password" name="password" label="Password" autoComplete="current-password" />
+              <Alert>{error}</Alert>
+              <button type="submit" disabled={busy} className={submitClass}>
                 {busy ? "Memeriksa…" : "Masuk"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  setForgot(true);
+                }}
+                className={`${linkClass} justify-self-center`}
+              >
+                Lupa password?
               </button>
             </form>
           ) : (

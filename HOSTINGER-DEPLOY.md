@@ -92,13 +92,18 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Nomor booking, mis. `6281234567890` (tanpa `+`, spasi, atau `0` di depan). Kosong = tombol WhatsApp disembunyikan. |
 | `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Akun media sosial untuk ikon di footer: handle (`@dragonetdivers`) atau URL lengkap di domain jaringan itu. Kosong = ikon tidak ditampilkan. Perlu build ulang setelah diubah. |
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
-| `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. |
+| `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. Spasi atau tanda kutip yang ikut tersalin ke kolom Value diabaikan. Lupa password: tekan **Lupa password?** di halaman masuk (perlu SMTP dan database). |
 | `SESSION_SECRET` | Teks acak panjang untuk menandatangani sesi (mis. hasil `openssl rand -base64 48`). Tanpa ini operator harus masuk lagi setiap aplikasi dimulai ulang. |
 | `USD_IDR_RATE` | Opsional. Kurs tetap Rupiah per 1 US$ (mis. `16250`) untuk pilihan mata uang di header dan tagihan PayPal. Kosong = kurs harian Bank Sentral Eropa (Frankfurter), diperbarui otomatis. |
 | `MIDTRANS_SERVER_KEY` | Server Key dari dashboard Midtrans (Settings → Access Keys). Awalan `SB-Mid-server-` untuk uji coba, `Mid-server-` untuk pembayaran sungguhan. Rahasia, hanya di hPanel. |
 | `MIDTRANS_PRODUCTION` | `true` untuk pembayaran sungguhan. Hapus barisnya selama uji coba (sandbox). |
 | `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Dari developer.paypal.com → Apps & Credentials (pilih Sandbox atau Live). Rahasia, hanya di hPanel. |
 | `PAYPAL_MODE` | `live` untuk pembayaran sungguhan. Hapus barisnya selama uji coba (sandbox). |
+| `SMTP_HOST` | Server email untuk kode lupa password admin dan email pesanan ke tamu. Email Hostinger: `smtp.hostinger.com`. |
+| `SMTP_PORT` | `465` (SSL, bawaan) atau `587` (STARTTLS). |
+| `SMTP_USER`, `SMTP_PASS` | Alamat email pengirim lengkap (mis. `halo@dragonetdivers.com`) dan password kotak email itu. Rahasia, hanya di hPanel. |
+| `SMTP_FROM` | Opsional. Nama dan alamat pengirim, mis. `Dragonet Divers <halo@dragonetdivers.com>`. Kosong = "Dragonet Divers" dengan alamat `SMTP_USER`. |
+| `ADMIN_OTP_EMAIL` | Opsional. Kotak masuk yang menerima kode **Lupa password**. Kosong = dikirim ke `ADMIN_EMAIL`. |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |
 | `MYSQL_DATABASE` | Nama database lengkap, mis. `u123456789_dragonet` |
@@ -118,6 +123,14 @@ Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagi
 3. Buka `/admin/paket` dan tambahkan paket (nama dan isi dalam English dan Indonesia, harga Rupiah). Paket aktif langsung tampil di halaman layanannya.
 4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdivers.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
 5. Setelah uji coba lancar, ganti ke key production/live dan tambahkan `MIDTRANS_PRODUCTION=true` / `PAYPAL_MODE=live`. Di checkout, label "Mode uji" hilang begitu mode sungguhan aktif.
+
+### Email ke tamu dan lupa password admin
+
+Isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, dan `SMTP_PASS` (tabel di atas), lalu deploy ulang. Di `/admin/pembayaran` bagian **Email ke tamu**, tekan **Kirim email uji ke operator** dan buka pratinjau tiap email. Setelah aktif:
+
+- Tamu menerima email **pesanan diterima** (menunggu pembayaran, dengan rekening untuk transfer bank), email **pembayaran belum masuk** saat separuh waktu bayar lewat (status Midtrans/PayPal dicek dulu), dan email **pembayaran diterima** saat lunas. Email ditulis dalam bahasa yang dipakai tamu saat memesan, dibalas ke `halo@dragonetdivers.com`.
+- `/admin/pesanan` menampilkan email yang sudah terkirim per pesanan, dengan tombol **Email pengingat** dan **Kirim ulang email lunas**.
+- Halaman masuk `/admin` punya **Lupa password?**: kode 6 angka dikirim ke `ADMIN_EMAIL` (atau `ADMIN_OTP_EMAIL`), berlaku 10 menit. Password baru disimpan sebagai hash di database dan berlaku sampai `ADMIN_PASSWORD` di hPanel diganti; setelah itu password hPanel yang berlaku lagi.
 
 Midtrans menagih dalam Rupiah. PayPal tidak menerima Rupiah, jadi menagih dalam dolar AS dengan kurs hari itu (dibulatkan ke atas per sen) yang dikunci saat tamu memesan. Transfer bank ditandai lunas oleh tim di `/admin/pesanan` setelah dana masuk.
 
@@ -145,4 +158,6 @@ Buat file `database/migrations/NNN_nama.sql` (nomor berikutnya, 3 digit) berisi 
 
 - **Build gagal**: pastikan Node 22.x, direktori proyek `.`, dan `package-lock.json` ikut. Baca error pertama di log build.
 - **Website 503 / tidak jalan**: pastikan start command `npm start` dan build selesai. `PORT` diberikan Hostinger, tidak perlu diisi.
+- **Login admin ditolak padahal password benar**: pastikan `ADMIN_EMAIL` sama persis dengan email yang diketik, lalu cek apakah browser mengisi password lama secara otomatis. Atau pakai **Lupa password?** di halaman masuk.
+- **Email tidak terkirim**: `/admin/pembayaran` → **Email ke tamu** menunjukkan variabel SMTP yang kurang dan alasan penolakan server email.
 - **Perubahan tidak muncul**: buka tab Actions → run terakhir → cek **deploy**. "Dilewati" = token API belum dipasang (bagian 1). Merah = baca log build Hostinger di ringkasan run. Deploy ulang kapan saja: Actions → **Deploy** → **Run workflow**.

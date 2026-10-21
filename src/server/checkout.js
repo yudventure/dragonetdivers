@@ -7,6 +7,7 @@ import { localeHref } from "@/lib/i18n";
 import { serviceBySlug } from "@/lib/services";
 import { getUsdIdrRate } from "./exchange-rate";
 import { createTransaction, transactionStatus, validSignature } from "./midtrans";
+import { later, scheduleReminder, sendOrderMail } from "./order-mail";
 import { changeStatus, createOrder, orderByCode, setPaymentDetails } from "./orders";
 import { packageById } from "./packages";
 import { getPayments, methodStatus, readyMethods } from "./payment-settings";
@@ -17,7 +18,8 @@ import { capturePaypalOrder, createPaypalOrder } from "./paypal";
 //               status saat tamu kembali menandai lunas
 //   PayPal    → tamu menyetujui di PayPal, kembali ke /api/payments/paypal/return, uang diambil
 //   Transfer  → tamu melihat rekening di halaman pesanannya; tim menandai lunas di /admin/pesanan
-// Total selalu dihitung ulang di server dari paket di database.
+// Total selalu dihitung ulang di server dari paket di database. Tamu menerima email saat pesanan dibuat,
+// pengingat bila belum membayar (src/server/reminders.js), dan email lunas (src/server/order-mail.js).
 
 const state = (globalThis.__dragonetCheckout ??= { throttle: createThrottle({ limit: 10, windowMs: 15 * 60_000 }) });
 
@@ -82,15 +84,34 @@ export async function startCheckout(request, input, { lang }) {
     now,
   );
   const back = `${origin}${orderPath(order)}`;
-  if (value.method === "transfer") return { code: order.code, redirectUrl: back };
+  if (value.method === "transfer") {
+    afterOrder(order, now);
+    return { code: order.code, redirectUrl: back };
+  }
   try {
     const redirectUrl = paypal ? await openPaypal(order, origin) : await openMidtrans(order, { origin, back, dueHours: settings.dueHours });
+    afterOrder(order, now);
     return { code: order.code, redirectUrl };
   } catch (error) {
     console.error(`[checkout] ${value.method} gagal untuk ${order.code}: ${error.message}`);
     await changeStatus(order.code, "pending", "failed").catch(() => {});
     throw new CheckoutError("provider", 502);
   }
+}
+
+/** Email "pesanan diterima" dan jadwal pengingat bayar, setelah jawaban ke tamu terkirim. */
+function afterOrder(order, now) {
+  later(async () => {
+    await scheduleReminder(order, now);
+    await sendOrderMail(order.code, "order");
+  });
+}
+
+/** Ubah status (bandingkan-lalu-tulis); pesanan yang baru lunas dikirimi email pembayaran diterima. */
+async function setStatus(order, to, details) {
+  const changed = await changeStatus(order.code, order.status, to, details);
+  if (changed && to === "paid") later(() => sendOrderMail(order.code, "paid"));
+  return changed;
 }
 
 /** Simpan pesanan dengan kode baru; kode kembar (sangat jarang) dicoba ulang dengan kode lain. */
@@ -143,7 +164,7 @@ async function openPaypal(order, origin) {
 async function applyMidtrans(order, status) {
   if (Number(status.gross_amount) !== order.amount) throw new Error("MIDTRANS_AMOUNT_MISMATCH");
   const to = nextStatus(order.status, paymentOutcome(status));
-  if (to) await changeStatus(order.code, order.status, to, { providerRef: status.transaction_id, paymentType: status.payment_type });
+  if (to) await setStatus(order, to, { providerRef: status.transaction_id, paymentType: status.payment_type });
   return orderByCode(order.code);
 }
 
@@ -182,7 +203,7 @@ export async function completePaypal(code) {
     return order;
   }
   const to = nextStatus(order.status, "paid");
-  if (to) await changeStatus(code, order.status, to, { providerRef: result.captureId, paymentType: "paypal" });
+  if (to) await setStatus(order, to, { providerRef: result.captureId, paymentType: "paypal" });
   return orderByCode(code);
 }
 
@@ -226,6 +247,6 @@ export async function adminSetStatus(code, to) {
   if (to === "cancelled" && order.status === "paid") throw new Error("Pesanan lunas tidak bisa dibatalkan dari sini. Kembalikan dananya lewat penyedia pembayaran.");
   const next = nextStatus(order.status, to);
   if (!next || (to === "cancelled" && order.status !== "pending")) throw new Error("Status pesanan ini tidak bisa diubah ke sana.");
-  await changeStatus(code, order.status, next, to === "paid" ? { paymentType: "bank_transfer" } : {});
+  await setStatus(order, next, to === "paid" ? { paymentType: "bank_transfer" } : {});
   return orderByCode(code);
 }
