@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// Latar laut dalam dengan bayangan manta di kejauhan (Higgsfield: GPT Image 2.5 + Kling 3.0).
+// Latar laut dalam dengan manta yang berenang bolak-balik (Higgsfield: GPT Image 2.5 + Kling 3.0).
 // Cara membuat: brand/ocean/README.md.
-import oceanPoster from "../assets/ocean-manta-shadow.webp";
+import oceanPoster from "../assets/ocean-manta-loop.webp";
 import LoopVideo from "./LoopVideo";
 import {
   ArrowNorthIcon,
@@ -46,9 +46,10 @@ const join = (...parts) => parts.filter(Boolean).join(", ") || null;
 const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 
 // Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak gelap dengan video laut dalam
-// (sinar matahari, partikel) dan bayangan manta yang muncul dari kejauhan, mendekat, lalu pergi di
-// belakang teks putih; lapisan Abyss menjaga keterbacaan. object-[center_35%]: di panel desktop yang
-// pendek, pita video yang terlihat sedikit di atas tengah, jalur yang dilewati manta.
+// (sinar matahari, partikel) dan manta yang dari kejauhan tampak sebagai siluet, mendekat sampai perut
+// putihnya terlihat, lalu kembali ke tempat awal, di belakang teks putih; lapisan Abyss menjaga
+// keterbacaan. object-[center_35%]: di panel desktop yang pendek, pita video yang terlihat sedikit di
+// atas tengah, jalur yang dilewati manta.
 // Data awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka.
 export default function SeaConditionsPanel({ initial }) {
   const [data, setData] = useState(initial);
@@ -88,13 +89,13 @@ export default function SeaConditionsPanel({ initial }) {
         <div className="relative isolate overflow-hidden rounded-card bg-abyss p-6 sm:p-8 lg:py-10 [text-shadow:0_1px_2px_rgb(10_50_59/0.65),0_0_18px_rgb(10_50_59/0.6)]">
           <LoopVideo
             sources={[
-              { src: "/media/ocean-manta-shadow.webm", type: "video/webm" },
-              { src: "/media/ocean-manta-shadow.mp4", type: "video/mp4" },
+              { src: "/media/ocean-manta-loop.webm", type: "video/webm" },
+              { src: "/media/ocean-manta-loop.mp4", type: "video/mp4" },
             ]}
             poster={oceanPoster.src}
             className="absolute inset-0 -z-10 size-full object-cover object-[center_35%]"
           />
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.6)_0%,rgb(10_50_59/0.4)_45%,rgb(10_50_59/0.7)_100%)]" />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.6)_0%,rgb(10_50_59/0.5)_45%,rgb(10_50_59/0.7)_100%)]" />
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 id="sea-title" className="flex items-center gap-2.5 text-xl text-white">
               <span className="relative flex size-2.5" aria-hidden="true">
