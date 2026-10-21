@@ -13,7 +13,9 @@ import {
   orderTotal,
   paymentOutcome,
   paypalUsd,
-  validateCheckout,
+  MAX_ITEMS,
+  summarizeItems,
+  validateCart,
   validatePackage,
   validatePayments,
   witToday,
@@ -22,9 +24,10 @@ import { keyEnding, keyIssues, productionOn } from "../src/lib/midtrans-key.js";
 
 const NOW = new Date("2026-10-21T05:00:00Z"); // 14.00 WIT
 const pkg = { id: 1, service: "fun-dives", price: 1_250_000, unit: "person", minGuests: 1, maxGuests: 6 };
+const boat = { id: 7, service: "snorkeling", price: 2_000_000, unit: "group", minGuests: 1, maxGuests: 6 };
+const packages = { 1: pkg, 7: boat };
 const good = {
-  guests: 2,
-  date: "2026-11-02",
+  items: [{ packageId: 1, guests: 2, date: "2026-11-02" }],
   name: "  Ana   Lopez ",
   email: "Ana@Example.com",
   whatsapp: "+34 612 345 678",
@@ -32,18 +35,18 @@ const good = {
   notes: "Vegetarian",
   method: "transfer",
 };
-const fails = (input, field, opts = {}) =>
+const withItem = (patch) => ({ ...good, items: [{ ...good.items[0], ...patch }] });
+const fails = (input, field, opts = {}, index = undefined) =>
   assert.throws(
-    () => validateCheckout(input, { pkg, methods: ["midtrans", "transfer"], now: NOW, ...opts }),
-    (e) => e instanceof CheckoutError && e.field === field,
+    () => validateCart(input, { packages, methods: ["midtrans", "transfer"], now: NOW, ...opts }),
+    (e) => e instanceof CheckoutError && e.field === field && (index === undefined || e.index === index),
     field,
   );
 
 test("checkout menghitung total di server dan membersihkan isian", () => {
-  const value = validateCheckout(good, { pkg, methods: ["midtrans", "transfer"], now: NOW });
+  const value = validateCart(good, { packages, methods: ["midtrans", "transfer"], now: NOW });
   assert.deepEqual(value, {
-    guests: 2,
-    date: "2026-11-02",
+    items: [{ pkg, guests: 2, date: "2026-11-02", amount: 2_500_000 }],
     name: "Ana Lopez",
     email: "ana@example.com",
     whatsapp: "34612345678",
@@ -53,18 +56,30 @@ test("checkout menghitung total di server dan membersihkan isian", () => {
     amount: 2_500_000,
   });
   assert.equal(orderTotal({ price: 4_000_000, unit: "group" }, 5), 4_000_000);
-  // Sertifikasi hanya ditanyakan untuk layanan selam.
-  const snorkel = validateCheckout(good, { pkg: { ...pkg, service: "snorkeling" }, methods: ["transfer"], now: NOW });
+  // Beberapa paket: total dijumlahkan, harga per perahu tidak dikali tamu.
+  const cart = validateCart(
+    { ...good, items: [...good.items, { packageId: 7, guests: 5, date: "2026-11-03" }] },
+    { packages, methods: ["transfer"], now: NOW },
+  );
+  assert.equal(cart.amount, 4_500_000);
+  assert.deepEqual(cart.items.map((item) => item.amount), [2_500_000, 2_000_000]);
+  // Sertifikasi hanya ditanyakan bila ada layanan selam di keranjang.
+  const snorkel = validateCart({ ...good, items: [{ packageId: 7, guests: 2, date: "2026-11-02" }] }, { packages, methods: ["transfer"], now: NOW });
   assert.equal(snorkel.certification, null);
 });
 
-test("checkout menolak isian yang salah dengan nama isiannya", () => {
-  fails({ ...good, guests: 0 }, "guests");
-  fails({ ...good, guests: 7 }, "guests");
-  fails({ ...good, guests: "2.5" }, "guests");
-  fails({ ...good, date: "2026-10-21" }, "date"); // hari ini (WIT) belum bisa
-  fails({ ...good, date: "2027-10-23" }, "date"); // lebih dari setahun
-  fails({ ...good, date: "2026-02-30x" }, "date");
+test("checkout menolak isian yang salah dengan nama isiannya dan urutan paketnya", () => {
+  fails(withItem({ guests: 0 }), "guests", {}, 0);
+  fails(withItem({ guests: 7 }), "guests");
+  fails(withItem({ guests: "2.5" }), "guests");
+  fails(withItem({ date: "2026-10-21" }), "date"); // hari ini (WIT) belum bisa
+  fails(withItem({ date: "2027-10-23" }), "date"); // lebih dari setahun
+  fails(withItem({ date: "2026-02-30x" }), "date");
+  fails({ ...good, items: [...good.items, { packageId: 7, guests: 9, date: "2026-11-02" }] }, "guests", {}, 1);
+  fails({ ...good, items: [...good.items, { packageId: 99, guests: 1, date: "2026-11-02" }] }, "package", {}, 1);
+  fails({ ...good, items: [] }, "empty");
+  fails({ ...good, items: "1" }, "empty");
+  fails({ ...good, items: Array.from({ length: MAX_ITEMS + 1 }, () => good.items[0]) }, "form");
   fails({ ...good, name: "A" }, "name");
   fails({ ...good, email: "ana@" }, "email");
   fails({ ...good, whatsapp: "123" }, "whatsapp");
@@ -72,8 +87,26 @@ test("checkout menolak isian yang salah dengan nama isiannya", () => {
   fails({ ...good, method: "paypal" }, "method");
   fails({ ...good, website: "http://spam" }, "form");
   fails(null, "form");
-  fails(good, "package", { pkg: null });
-  assert.throws(() => validateCheckout(good, { pkg, methods: [], now: NOW }), (e) => e.field === "method" && e.status === 409);
+  assert.throws(() => validateCart(good, { packages, methods: [], now: NOW }), (e) => e.field === "method" && e.status === 409);
+});
+
+test("ringkasan pesanan dari isinya", () => {
+  const items = [
+    { packageId: 1, service: "fun-dives", packageName: "Two morning fun dives", unit: "person", unitPrice: 1_600_000, guests: 2, date: "2026-11-04" },
+    { packageId: 7, service: "snorkeling", packageName: "Manta Point snorkeling", unit: "group", unitPrice: 2_000_000, guests: 5, date: "2026-11-02" },
+  ];
+  assert.deepEqual(summarizeItems(items, "en"), {
+    packageId: 1,
+    service: "fun-dives",
+    packageName: "Two morning fun dives + 1 more",
+    unit: "person",
+    unitPrice: 1_600_000,
+    guests: 5,
+    date: "2026-11-02",
+  });
+  assert.equal(summarizeItems(items, "id").packageName, "Two morning fun dives + 1 lainnya");
+  assert.equal(summarizeItems(items.slice(0, 1)).packageName, "Two morning fun dives");
+  assert.equal(summarizeItems([{ ...items[0], packageName: "x".repeat(120) }, items[1]]).packageName.length, 120);
 });
 
 test("WhatsApp, email, tanggal WIT", () => {

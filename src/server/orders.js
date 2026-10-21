@@ -1,11 +1,20 @@
 import "server-only";
 import { query } from "./db";
 
-// Pesanan di MySQL (tabel orders, database/migrations/003_orders.sql).
+// Pesanan di MySQL (tabel orders, database/migrations/003_orders.sql) dan isinya per paket (tabel
+// order_items, migrasi 007). Kolom paket di orders adalah ringkasan; rincian ada di order.items.
 
-const COLUMNS = `id, code, token, package_id, service, package_name, unit, unit_price_idr, guests, amount_idr, amount_usd, usd_rate,
-  method, status, provider_ref, payment_type, redirect_url, full_name, email, whatsapp, DATE_FORMAT(dive_date, '%Y-%m-%d') AS dive_date,
-  certification, notes, locale, due_at, paid_at, created_at`;
+const columns = (p = "") => `${p}id, ${p}code, ${p}token, ${p}package_id, ${p}service, ${p}package_name, ${p}unit, ${p}unit_price_idr, ${p}guests,
+  ${p}amount_idr, ${p}amount_usd, ${p}usd_rate, ${p}method, ${p}status, ${p}provider_ref, ${p}payment_type, ${p}redirect_url, ${p}full_name,
+  ${p}email, ${p}whatsapp, DATE_FORMAT(${p}dive_date, '%Y-%m-%d') AS dive_date, ${p}certification, ${p}notes, ${p}locale, ${p}due_at,
+  ${p}paid_at, ${p}created_at`;
+const COLUMNS = columns();
+const ITEM_COLUMNS = `order_code, position, package_id, service, package_name, unit, unit_price_idr, guests,
+  DATE_FORMAT(dive_date, '%Y-%m-%d') AS dive_date, amount_idr`;
+// Satu baris per paket, dengan data pesanannya (kalender, buku kas).
+const BOOKING_COLUMNS = `${columns("o.")}, i.position AS item_position, i.package_id AS item_package_id, i.service AS item_service,
+  i.package_name AS item_name, i.unit AS item_unit, i.unit_price_idr AS item_price, i.guests AS item_guests,
+  DATE_FORMAT(i.dive_date, '%Y-%m-%d') AS item_date, i.amount_idr AS item_amount`;
 
 const iso = (value) => (value ? new Date(value).toISOString() : null);
 
@@ -39,6 +48,51 @@ export const orderFromRow = (row) => ({
   createdAt: iso(row.created_at),
 });
 
+const itemFromRow = (row) => ({
+  position: Number(row.position),
+  packageId: row.package_id == null ? null : Number(row.package_id),
+  service: row.service,
+  packageName: row.package_name,
+  unit: row.unit,
+  unitPrice: Number(row.unit_price_idr),
+  guests: Number(row.guests),
+  date: row.dive_date,
+  amount: Number(row.amount_idr),
+});
+
+/** Isi pesanan dari kolom ringkasannya, untuk pesanan yang (belum) punya baris di order_items. */
+const itemsFromSummary = (order) => [
+  { position: 0, packageId: order.packageId, service: order.service, packageName: order.packageName, unit: order.unit, unitPrice: order.unitPrice, guests: order.guests, date: order.date, amount: order.amount },
+];
+
+/** Pesanan beserta isinya per paket (order.items). */
+async function withItems(orders) {
+  if (!orders.length) return orders;
+  const codes = orders.map((o) => o.code);
+  const rows = await query(`SELECT ${ITEM_COLUMNS} FROM order_items WHERE order_code IN (${codes.map(() => "?").join(", ")}) ORDER BY order_code, position`, codes);
+  const byCode = new Map();
+  for (const row of rows) byCode.set(row.order_code, [...(byCode.get(row.order_code) ?? []), itemFromRow(row)]);
+  return orders.map((o) => ({ ...o, items: byCode.get(o.code) ?? itemsFromSummary(o) }));
+}
+
+/** Satu paket dari sebuah pesanan sebagai "pesanan" sendiri (layanan, tamu, tanggal, dan jumlahnya sendiri). */
+const bookingFromRow = (row) => ({
+  ...orderFromRow(row),
+  item: Number(row.item_position),
+  packageId: row.item_package_id == null ? null : Number(row.item_package_id),
+  service: row.item_service,
+  packageName: row.item_name,
+  unit: row.item_unit,
+  unitPrice: Number(row.item_price),
+  guests: Number(row.item_guests),
+  date: row.item_date,
+  amount: Number(row.item_amount),
+});
+
+/**
+ * Simpan pesanan baru beserta isinya (o.items = [{ packageId, service, packageName, unit, unitPrice,
+ * guests, date, amount }]). Bila isinya gagal tersimpan, pesanannya dihapus lagi.
+ */
 export async function createOrder(o) {
   await query(
     `INSERT INTO orders (code, token, package_id, service, package_name, unit, unit_price_idr, guests, amount_idr, amount_usd, usd_rate,
@@ -67,12 +121,22 @@ export async function createOrder(o) {
       o.dueAt,
     ],
   );
+  try {
+    await query(
+      `INSERT INTO order_items (order_code, position, package_id, service, package_name, unit, unit_price_idr, guests, dive_date, amount_idr)
+       VALUES ${o.items.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(", ")}`,
+      o.items.flatMap((it, position) => [o.code, position, it.packageId, it.service, it.packageName, it.unit, it.unitPrice, it.guests, it.date, it.amount]),
+    );
+  } catch (error) {
+    await query("DELETE FROM orders WHERE code = ?", [o.code]).catch(() => {});
+    throw error;
+  }
   return orderByCode(o.code);
 }
 
 export async function orderByCode(code) {
   const [row] = await query(`SELECT ${COLUMNS} FROM orders WHERE code = ?`, [code]);
-  return row ? orderFromRow(row) : null;
+  return row ? (await withItems([orderFromRow(row)]))[0] : null;
 }
 
 /** Pesanan terbaru untuk /admin/pesanan, bisa disaring per status. */
@@ -80,19 +144,30 @@ export async function listOrders({ status } = {}) {
   const rows = status
     ? await query(`SELECT ${COLUMNS} FROM orders WHERE status = ? ORDER BY created_at DESC, id DESC LIMIT 200`, [status])
     : await query(`SELECT ${COLUMNS} FROM orders ORDER BY created_at DESC, id DESC LIMIT 200`);
-  return rows.map(orderFromRow);
+  return withItems(rows.map(orderFromRow));
 }
 
-/** Pesanan dengan tanggal menyelam di antara from dan to (YYYY-MM-DD), untuk kalender dan tamu. */
+/**
+ * Paket pesanan dengan tanggal di antara from dan to (YYYY-MM-DD), untuk kalender dan kapasitas harian:
+ * satu baris per paket (pesanan berisi beberapa paket muncul di tanggal dan layanannya masing-masing).
+ */
 export async function ordersForDates(from, to) {
-  const rows = await query(`SELECT ${COLUMNS} FROM orders WHERE dive_date BETWEEN ? AND ? ORDER BY dive_date, created_at`, [from, to]);
-  return rows.map(orderFromRow);
+  const rows = await query(
+    `SELECT ${BOOKING_COLUMNS} FROM order_items i JOIN orders o ON o.code = i.order_code
+     WHERE i.dive_date BETWEEN ? AND ? ORDER BY i.dive_date, o.created_at, i.position`,
+    [from, to],
+  );
+  return rows.map(bookingFromRow);
 }
 
-/** Pesanan lunas dengan waktu lunas di antara dua waktu (Date), untuk buku kas. */
+/** Paket pesanan lunas dengan waktu lunas di antara dua waktu (Date), untuk buku kas (per layanan). */
 export async function paidOrdersBetween(start, end) {
-  const rows = await query(`SELECT ${COLUMNS} FROM orders WHERE status = 'paid' AND paid_at >= ? AND paid_at < ? ORDER BY paid_at`, [start, end]);
-  return rows.map(orderFromRow);
+  const rows = await query(
+    `SELECT ${BOOKING_COLUMNS} FROM order_items i JOIN orders o ON o.code = i.order_code
+     WHERE o.status = 'paid' AND o.paid_at >= ? AND o.paid_at < ? ORDER BY o.paid_at, i.position`,
+    [start, end],
+  );
+  return rows.map(bookingFromRow);
 }
 
 /** Semua pesanan (terbatas), untuk daftar tamu. */

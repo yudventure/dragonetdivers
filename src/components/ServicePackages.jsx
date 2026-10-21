@@ -1,12 +1,13 @@
-import Link from "next/link";
 import { uiText } from "@/content/ui";
-import { format, localeHref } from "@/lib/i18n";
+import { format } from "@/lib/i18n";
+import { servicesIn } from "@/lib/services";
 import { contact, whatsappLink } from "@/lib/site";
-import { Price, RupiahNote } from "./currency";
-import { ArrowIcon, ChatIcon, CheckIcon, MailIcon, Wave } from "./icons";
+import { ChatIcon, MailIcon, Wave } from "./icons";
+import PackageBooking from "./PackageBooking";
 
 // Paket sebuah layanan di halaman layanannya (isi dari /admin/paket, tabel packages). Harga ditulis
-// dalam Rupiah dan tampil sesuai mata uang pilihan tamu (<Price>); "Pesan sekarang" membuka checkout.
+// dalam Rupiah dan tampil sesuai mata uang pilihan tamu (<Price>). "Tambah" memasukkan paket ke
+// keranjang yang rinciannya tampil di sidebar, "Pesan sekarang" langsung ke checkout (PackageBooking).
 // Tanpa paket aktif, seksi menampilkan ajakan bertanya lewat WhatsApp atau email.
 export default function ServicePackages({ lang, service, packages }) {
   const all = uiText(lang);
@@ -40,51 +41,15 @@ export default function ServicePackages({ lang, service, packages }) {
           </div>
         ) : (
           <>
-            <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {packages.map((pkg) => (
-                <li key={pkg.id} className="grid">
-                  <article className="flex flex-col gap-4 rounded-card border border-mist bg-white p-6 transition-shadow duration-200 ease-brand hover:shadow-float">
-                    <div className="grid gap-1.5">
-                      <h3 className="text-xl leading-tight text-abyss">{pkg.name}</h3>
-                      {pkg.summary && <p className="text-[15px] text-slate">{pkg.summary}</p>}
-                    </div>
-                    {pkg.includes.length > 0 && (
-                      <ul className="grid gap-2">
-                        {pkg.includes.map((item) => (
-                          <li key={item} className="grid grid-cols-[20px_1fr] items-start gap-2.5 text-sm text-slate">
-                            <CheckIcon className="mt-0.5 size-4 text-teal" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <div className="mt-auto grid gap-4 border-t border-mist pt-4">
-                      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                        <div className="grid">
-                          <p className="flex items-baseline gap-1.5">
-                            <Price idr={pkg.price} className="font-display text-2xl font-semibold text-abyss tabular-nums" />
-                            <span className="text-sm text-slate">{pkg.unit === "group" ? t.perGroup : t.perPerson}</span>
-                          </p>
-                          <RupiahNote idr={pkg.price} className="text-xs text-slate tabular-nums" />
-                        </div>
-                        <p className="text-xs font-semibold text-slate">
-                          {pkg.minGuests > 1
-                            ? format(t.guestsRange, { min: pkg.minGuests, max: pkg.maxGuests })
-                            : format(t.guestsUpTo, { max: pkg.maxGuests })}
-                        </p>
-                      </div>
-                      <Link
-                        href={localeHref(lang, `/checkout/${pkg.id}`)}
-                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-teal px-5 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
-                      >
-                        {t.book}
-                        <ArrowIcon className="size-[18px]" />
-                      </Link>
-                    </div>
-                  </article>
-                </li>
-              ))}
-            </ul>
+            <PackageBooking
+              lang={lang}
+              packages={packages}
+              t={t}
+              cartText={all.cart}
+              checkoutText={all.checkout}
+              serviceTitles={Object.fromEntries(servicesIn(lang).map((s) => [s.slug, s.title]))}
+              ask={ask}
+            />
             <p className="text-xs text-slate">{t.usdNote}</p>
           </>
         )}

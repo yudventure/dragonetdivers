@@ -17,12 +17,19 @@ export const DIVE_SERVICES = ["fun-dives", "dive-courses", "dusk-dives"];
 
 export const DEFAULT_PAYMENTS = { midtrans: false, paypal: false, transfer: false, accounts: [], dueHours: 24 };
 
-/** Isian tamu yang salah. `field` dipetakan ke pesan dua bahasa di src/content/ui.js (checkout.errors). */
+/** Paket paling banyak dalam satu pesanan (keranjang). */
+export const MAX_ITEMS = 10;
+
+/**
+ * Isian tamu yang salah. `field` dipetakan ke pesan dua bahasa di src/content/ui.js (checkout.errors);
+ * `index` = urutan paket di keranjang bila salahnya ada di tanggal atau jumlah tamu satu paket.
+ */
 export class CheckoutError extends Error {
-  constructor(field, status = 400) {
+  constructor(field, status = 400, index = null) {
     super(field);
     this.field = field;
     this.status = status;
+    this.index = index;
   }
 }
 
@@ -57,31 +64,62 @@ export const dateRange = (now = new Date()) => ({ min: addDays(witToday(now), 1)
 /** Total Rupiah: per orang dikali jumlah tamu, per grup satu harga. */
 export const orderTotal = (pkg, guests) => (pkg.unit === "group" ? pkg.price : pkg.price * guests);
 
+const validDate = (date, { min, max }) => /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && date >= min && date <= max;
+
 /**
- * Periksa isian checkout terhadap paket dan cara bayar yang tersedia. Mengembalikan isian yang
- * sudah dibersihkan beserta totalnya, atau melempar CheckoutError dengan nama isian yang salah.
+ * Periksa isian checkout keranjang. input.items = [{ packageId, guests, date }] (1 sampai MAX_ITEMS),
+ * packages = { [id]: paket aktif dari database }. Mengembalikan isian yang sudah dibersihkan dengan
+ * items = [{ pkg, guests, date, amount }] dan total, atau melempar CheckoutError dengan nama isian yang salah.
  */
-export function validateCheckout(input, { pkg, methods, now = new Date() }) {
+export function validateCart(input, { packages, methods, now = new Date() }) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new CheckoutError("form");
   if (str(input.website)) throw new CheckoutError("form"); // kolom jebakan untuk bot
-  if (!pkg) throw new CheckoutError("package", 404);
-  const guests = Number(input.guests);
-  if (!Number.isInteger(guests) || guests < pkg.minGuests || guests > pkg.maxGuests) throw new CheckoutError("guests");
-  const date = str(input.date);
-  const { min, max } = dateRange(now);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date)) || date < min || date > max) throw new CheckoutError("date");
+  const list = input.items;
+  if (!Array.isArray(list) || list.length === 0) throw new CheckoutError("empty");
+  if (list.length > MAX_ITEMS) throw new CheckoutError("form");
+  const range = dateRange(now);
+  const items = list.map((item, index) => {
+    const pkg = packages[Number(item?.packageId)];
+    if (!pkg) throw new CheckoutError("package", 404, index);
+    const guests = Number(item.guests);
+    if (!Number.isInteger(guests) || guests < pkg.minGuests || guests > pkg.maxGuests) throw new CheckoutError("guests", 400, index);
+    const date = str(item.date);
+    if (!validDate(date, range)) throw new CheckoutError("date", 400, index);
+    return { pkg, guests, date, amount: orderTotal(pkg, guests) };
+  });
   const name = str(input.name).replace(/\s+/g, " ");
   if (name.length < 2 || name.length > 120) throw new CheckoutError("name");
   const email = cleanEmail(input.email);
   if (!email) throw new CheckoutError("email");
   const whatsapp = cleanWhatsApp(input.whatsapp);
   if (!whatsapp) throw new CheckoutError("whatsapp");
-  const certification = DIVE_SERVICES.includes(pkg.service) && CERTIFICATIONS.includes(input.certification) ? input.certification : null;
+  const dive = items.some((item) => DIVE_SERVICES.includes(item.pkg.service));
+  const certification = dive && CERTIFICATIONS.includes(input.certification) ? input.certification : null;
   const notes = str(input.notes);
   if (notes.length > 1000) throw new CheckoutError("notes");
   const method = str(input.method);
   if (!methods.includes(method)) throw new CheckoutError("method", methods.length ? 400 : 409);
-  return { guests, date, name, email, whatsapp, certification, notes, method, amount: orderTotal(pkg, guests) };
+  return { items, name, email, whatsapp, certification, notes, method, amount: items.reduce((sum, item) => sum + item.amount, 0) };
+}
+
+/**
+ * Kolom ringkasan pesanan di tabel orders dari isinya (urut seperti di keranjang): nama paket pertama
+ * (+ jumlah paket lain), layanan dan harga paket pertama, tanggal paling awal, dan tamu terbanyak.
+ * items = [{ service, packageName, unit, unitPrice, guests, date }].
+ */
+export function summarizeItems(items, lang = "en") {
+  const [first] = items;
+  const more = items.length - 1;
+  const suffix = more ? (lang === "id" ? ` + ${more} lainnya` : ` + ${more} more`) : "";
+  return {
+    packageId: first.packageId ?? null,
+    service: first.service,
+    packageName: `${first.packageName.slice(0, 120 - suffix.length)}${suffix}`,
+    unit: first.unit,
+    unitPrice: first.unitPrice,
+    guests: Math.max(...items.map((item) => item.guests)),
+    date: items.map((item) => item.date).sort()[0],
+  };
 }
 
 /** Dolar yang ditagih PayPal untuk jumlah Rupiah (PayPal tidak menerima Rupiah), dibulatkan ke atas per sen. */

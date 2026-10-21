@@ -31,7 +31,7 @@ test("setiap email untuk setiap cara bayar dan bahasa lengkap terisi", () => {
     for (const lang of ["en", "id"]) {
       for (const method of ["midtrans", "paypal", "transfer"]) {
         const order = sampleOrder({ kind, lang, method, now });
-        const mail = orderMail(kind, { order, base, accounts, serviceTitle: "Fun dives", contact, whatsapp: "6281234567890" });
+        const mail = orderMail(kind, { order, base, accounts, serviceTitles: { "fun-dives": "Fun dives" }, contact, whatsapp: "6281234567890" });
         const where = `${kind} ${lang} ${method}`;
         assert.ok(mail.subject.includes(order.code), where);
         for (const part of [mail.subject, mail.html, mail.text]) {

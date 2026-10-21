@@ -4,7 +4,7 @@
 import { orderMailText } from "../content/order-mail.js";
 import { uiText } from "../content/ui.js";
 import { formatMoney } from "./currency.js";
-import { badge, box, button, colors, esc, escKeep, FONT, heading, layout, paragraph, plainText, rows, title } from "./email-layout.js";
+import { badge, box, button, colors, esc, escKeep, FONT, heading, layout, paragraph, plainText, rows, table, title } from "./email-layout.js";
 import { format, intlLocale, localeHref } from "./i18n.js";
 
 export const ORDER_MAIL_KINDS = ["order", "reminder", "paid"];
@@ -19,12 +19,34 @@ const witTime = (iso, lang) =>
 const diveDay = (date, lang) =>
   new Intl.DateTimeFormat(intlLocale[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
 
+/** Isi pesanan per paket (order.items), atau satu paket dari kolom ringkasan untuk pesanan tanpa rincian. */
+const itemsOf = (order) =>
+  order.items?.length
+    ? order.items
+    : [{ service: order.service, packageName: order.packageName, unit: order.unit, unitPrice: order.unitPrice, guests: order.guests, date: order.date, amount: order.amount }];
+
+/** Tabel paket: nama, layanan, tanggal, dan jumlah tamu, dengan harga tiap paket di kanan. */
+function itemsTable(items, { lang, t, money, serviceTitles }) {
+  const c = colors;
+  return table(
+    items
+      .map((item, i) => {
+        const line = i ? `border-top:1px solid ${c.mist};` : "";
+        const service = serviceTitles[item.service] ?? "";
+        const detail = [service, diveDay(item.date, lang), format(t.itemGuests, { guests: item.guests })].filter(Boolean).join(" · ");
+        return `<tr><td style="padding:12px 16px;${line}font-family:${FONT};vertical-align:top;"><p style="margin:0 0 3px;font-size:15px;line-height:1.4;font-weight:700;color:${c.abyss};">${esc(item.packageName)}</p><p style="margin:0;font-size:13px;line-height:1.5;color:${c.slate};">${esc(detail)}</p></td><td style="padding:12px 16px;${line}font-family:${FONT};font-size:14px;line-height:1.4;font-weight:700;color:${c.abyss};vertical-align:top;text-align:right;white-space:nowrap;">${esc(money(item.amount))}</td></tr>`;
+      })
+      .join(""),
+    `border:1px solid ${c.mist};border-radius:14px;background:${c.white};`,
+  );
+}
+
 /**
  * { subject, html, text } untuk satu email. kind: "order" | "reminder" | "paid". accounts = rekening
- * transfer dari /admin/pembayaran, serviceTitle = nama layanan dalam bahasa tamu, contact = { email,
- * address }, whatsapp = nomor WhatsApp (angka saja) atau null.
+ * transfer dari /admin/pembayaran, serviceTitles = { slug: nama layanan dalam bahasa tamu }, contact =
+ * { email, address }, whatsapp = nomor WhatsApp (angka saja) atau null.
  */
-export function orderMail(kind, { order, base, accounts = [], serviceTitle = "", contact = {}, whatsapp = null }) {
+export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}, contact = {}, whatsapp = null }) {
   if (!ORDER_MAIL_KINDS.includes(kind)) throw new Error(`Jenis email tidak dikenal: ${kind}`);
   const lang = order.lang === "id" ? "id" : "en";
   const t = orderMailText[lang];
@@ -43,18 +65,14 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitle = "",
 
   const methodName = ui.order.methodNames[order.method] ?? order.method;
   const paymentType = t.paymentTypes[order.paymentType] ?? "";
+  const items = itemsOf(order);
   const details = [
     [t.code, order.code],
-    [t.service, serviceTitle],
-    [t.package, order.packageName],
-    [t.date, diveDay(order.date, lang)],
-    [t.guests, String(order.guests)],
     [t.certification, order.certification ? (ui.checkout.certifications[order.certification] ?? order.certification) : ""],
     [t.method, paid && paymentType && paymentType !== methodName ? `${methodName} · ${paymentType}` : methodName],
     paid ? [t.paidAt, order.paidAt ? witTime(order.paidAt, lang) : ""] : [t.due, due],
   ];
   const amounts = [
-    ...(order.unit === "group" ? [] : [[format(t.price, { price: money(order.unitPrice), guests: order.guests }), money(order.amount)]]),
     [t.total, money(order.amount), true],
     ...(order.method === "paypal" && usd ? [[t.charged, usd]] : []),
   ];
@@ -96,6 +114,8 @@ ${actions}
 ${already}
 ${heading(t.summary)}
 ${rows(details, keep)}
+${heading(items.length > 1 ? t.packages : t.package)}
+${itemsTable(items, { lang, t, money, serviceTitles })}
 <div style="height:12px;line-height:12px;font-size:0;">&nbsp;</div>
 ${rows(amounts)}`;
 
@@ -150,11 +170,15 @@ export function sampleOrder({ kind = "order", lang = "id", method = "midtrans", 
     lang,
     name: lang === "id" ? "Rani Wijaya" : "Alex Morgan",
     service: "fun-dives",
-    packageName: lang === "id" ? "Contoh paket 2 kali menyelam" : "Sample package, 2 dives",
+    packageName: lang === "id" ? "Contoh paket 2 kali menyelam + 1 lainnya" : "Sample package, 2 dives + 1 more",
     unit: "person",
     unitPrice: 1_000_000,
     guests: 2,
-    amount: 2_000_000,
+    amount: 3_500_000,
+    items: [
+      { service: "fun-dives", packageName: lang === "id" ? "Contoh paket 2 kali menyelam" : "Sample package, 2 dives", unit: "person", unitPrice: 1_000_000, guests: 2, date: day, amount: 2_000_000 },
+      { service: "snorkeling", packageName: lang === "id" ? "Contoh perahu snorkeling" : "Sample snorkeling boat", unit: "group", unitPrice: 1_500_000, guests: 2, date: day, amount: 1_500_000 },
+    ],
     amountUsd: method === "paypal" ? "123.08" : null,
     method,
     paymentType: kind === "paid" ? (method === "paypal" ? "paypal" : method === "transfer" ? "bank_transfer" : "qris") : null,

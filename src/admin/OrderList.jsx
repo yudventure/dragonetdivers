@@ -131,12 +131,18 @@ export default function OrderList({ orders, mails = {} }) {
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${tone}`}>{label}</span>
                 <span className="text-xs text-slate">dibuat {wit(order.createdAt)}</span>
               </div>
-              <p className="font-display text-lg font-semibold text-abyss">
-                {order.packageName} <span className="font-sans text-sm font-semibold text-slate">· {SERVICE[order.service] ?? order.service}</span>
-              </p>
-              <p className="text-sm text-abyss">
-                {day(order.date)} · {order.guests} tamu
-              </p>
+              <ul className="grid gap-1">
+                {(order.items ?? []).map((item) => (
+                  <li key={item.position}>
+                    <p className="font-display text-lg leading-snug font-semibold text-abyss">
+                      {item.packageName} <span className="font-sans text-sm font-semibold text-slate">· {SERVICE[item.service] ?? item.service}</span>
+                    </p>
+                    <p className="text-sm text-abyss">
+                      {day(item.date)} · {item.guests} tamu{order.items.length > 1 ? ` · ${rupiah(item.amount)}` : ""}
+                    </p>
+                  </li>
+                ))}
+              </ul>
               <p className="text-sm text-slate">
                 {order.name} ·{" "}
                 <a href={`https://wa.me/${order.whatsapp}`} target="_blank" rel="noopener" className="font-semibold text-teal hover:underline">

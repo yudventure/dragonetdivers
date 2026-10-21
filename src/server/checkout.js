@@ -1,9 +1,9 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { CheckoutError, isOverdue, newOrderCode, nextStatus, paymentOutcome, paypalUsd, validateCheckout } from "@/lib/checkout";
+import { CheckoutError, isOverdue, MAX_ITEMS, newOrderCode, nextStatus, paymentOutcome, paypalUsd, summarizeItems, validateCart } from "@/lib/checkout";
 import { envText } from "@/lib/env";
 import { createThrottle } from "@/lib/login-throttle";
-import { availability } from "@/lib/modules/calendar";
+import { availability, poolOf } from "@/lib/modules/calendar";
 import { localeHref } from "@/lib/i18n";
 import { serviceBySlug } from "@/lib/services";
 import { dayBookings } from "./admin-data";
@@ -12,7 +12,7 @@ import { getUsdIdrRate } from "./exchange-rate";
 import { createTransaction, transactionStatus, validSignature } from "./midtrans";
 import { later, scheduleReminder, sendOrderMail } from "./order-mail";
 import { changeStatus, createOrder, orderByCode, setPaymentDetails } from "./orders";
-import { packageById } from "./packages";
+import { packagesByIds } from "./packages";
 import { getPayments, methodStatus, readyMethods } from "./payment-settings";
 import { capturePaypalOrder, createPaypalOrder } from "./paypal";
 
@@ -49,29 +49,39 @@ export const orderPath = (order) => `${localeHref(order.lang, `/order/${order.co
 
 const clientKey = (request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
-/** Simpan pesanan dan buka pembayarannya; mengembalikan { code, redirectUrl }. */
+/** Isi keranjang dari permintaan; bentuk lama { packageId, guests, date } (satu paket) tetap diterima. */
+const cartItems = (input) =>
+  Array.isArray(input?.items) ? input.items : input?.packageId != null ? [{ packageId: input.packageId, guests: input.guests, date: input.date }] : [];
+
+/** Simpan pesanan (satu atau beberapa paket) dan buka pembayarannya; mengembalikan { code, redirectUrl }. */
 export async function startCheckout(request, input, { lang }) {
   const key = clientKey(request);
   if (state.throttle.blocked(key)) throw new CheckoutError("busy", 429);
-  const id = Number(input?.packageId);
-  const pkg = Number.isSafeInteger(id) ? await packageById(id, { activeOnly: true }) : null;
+  const list = cartItems(input).slice(0, MAX_ITEMS + 1);
+  const packages = await packagesByIds(list.map((item) => item?.packageId));
   const { settings, rate, methods } = await paymentOptions();
-  const value = validateCheckout(input, { pkg, methods });
-  await checkAvailability(pkg.service, value.date, value.guests);
+  const value = validateCart({ ...input, items: list }, { packages, methods });
+  await checkAvailability(value.items);
   state.throttle.fail(key); // setiap pesanan dihitung, bukan hanya yang gagal
   const origin = siteOrigin(request);
   const now = new Date();
   const paypal = value.method === "paypal";
+  const items = value.items.map(({ pkg, guests, date, amount }) => ({
+    packageId: pkg.id,
+    service: pkg.service,
+    packageName: lang === "id" ? pkg.nameId : pkg.nameEn,
+    unit: pkg.unit,
+    unitPrice: pkg.price,
+    guests,
+    date,
+    amount,
+  }));
   const order = await createUnique(
     (code) => ({
       code,
       token: randomBytes(16).toString("hex"),
-      packageId: pkg.id,
-      service: pkg.service,
-      packageName: lang === "id" ? pkg.nameId : pkg.nameEn,
-      unit: pkg.unit,
-      unitPrice: pkg.price,
-      guests: value.guests,
+      ...summarizeItems(items, lang),
+      items,
       amount: value.amount,
       amountUsd: paypal ? paypalUsd(value.amount, rate.idrPerUsd) : null,
       usdRate: paypal ? rate.idrPerUsd : null,
@@ -79,7 +89,6 @@ export async function startCheckout(request, input, { lang }) {
       name: value.name,
       email: value.email,
       whatsapp: value.whatsapp,
-      date: value.date,
       certification: value.certification,
       notes: value.notes,
       lang,
@@ -118,12 +127,21 @@ async function setStatus(order, to, details) {
   return changed;
 }
 
-/** Tanggal tutup dan kapasitas harian dari /admin/kalender: CheckoutError "closed" atau "full". */
-async function checkAvailability(service, date, guests) {
+/**
+ * Tanggal tutup dan kapasitas harian dari /admin/kalender untuk setiap paket: CheckoutError "closed" atau
+ * "full" (dengan urutan paketnya). Paket di keranjang yang jatuh di tanggal dan kelompok yang sama dijumlahkan.
+ */
+async function checkAvailability(items) {
   if (!isDatabaseConfigured()) return;
-  const a = availability({ date, service, ...(await dayBookings(date)) });
-  if (a.closed) throw new CheckoutError("closed", 409);
-  if (a.left !== null && guests > a.left) throw new CheckoutError("full", 409);
+  const days = new Map();
+  for (const date of new Set(items.map((item) => item.date))) days.set(date, await dayBookings(date));
+  for (const [index, item] of items.entries()) {
+    const a = availability({ date: item.date, service: item.pkg.service, ...days.get(item.date) });
+    if (a.closed) throw new CheckoutError("closed", 409, index);
+    const pool = poolOf(item.pkg.service);
+    const wanted = items.filter((other) => other.date === item.date && poolOf(other.pkg.service) === pool).reduce((sum, other) => sum + other.guests, 0);
+    if (a.left !== null && wanted > a.left) throw new CheckoutError("full", 409, index);
+  }
 }
 
 /** Simpan pesanan dengan kode baru; kode kembar (sangat jarang) dicoba ulang dengan kode lain. */
@@ -138,17 +156,19 @@ async function createUnique(build, now) {
 }
 
 async function openMidtrans(order, { origin, back, dueHours }) {
-  const service = serviceBySlug(order.service, "en");
+  // Satu baris per paket; jumlahnya selalu sama dengan total pesanan.
+  const lines = order.items.map((item) => ({
+    id: `pkg-${item.packageId ?? "x"}-${item.position}`,
+    ...(item.unit === "group" ? { price: item.amount, quantity: 1 } : { price: item.unitPrice, quantity: item.guests }),
+    name: item.packageName.slice(0, 50),
+  }));
+  const dates = order.items.map((item) => `${serviceBySlug(item.service, "en")?.title ?? item.service} ${item.date}`).join(", ");
   const snap = await createTransaction(
     {
       transaction_details: { order_id: order.code, gross_amount: order.amount },
-      item_details: [
-        order.unit === "group"
-          ? { id: `pkg-${order.packageId}`, price: order.amount, quantity: 1, name: order.packageName.slice(0, 50) }
-          : { id: `pkg-${order.packageId}`, price: order.unitPrice, quantity: order.guests, name: order.packageName.slice(0, 50) },
-      ],
+      item_details: lines,
       customer_details: { first_name: order.name.slice(0, 50), email: order.email, phone: order.whatsapp },
-      custom_field1: `${service?.title ?? order.service} ${order.date}`.slice(0, 255),
+      custom_field1: dates.slice(0, 255),
       callbacks: { finish: back },
       expiry: { unit: "hours", duration: dueHours },
     },
@@ -163,7 +183,7 @@ async function openPaypal(order, origin) {
   const paypal = await createPaypalOrder({
     orderId: order.code,
     usd: order.amountUsd,
-    description: `Dragonet Divers ${order.packageName} × ${order.guests}, ${order.date}`,
+    description: `Dragonet Divers ${order.items.map((item) => `${item.packageName} × ${item.guests}, ${item.date}`).join(" · ")}`,
     returnUrl: back("return"),
     cancelUrl: back("cancel"),
     lang: order.lang,

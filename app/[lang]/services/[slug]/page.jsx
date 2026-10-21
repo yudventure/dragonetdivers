@@ -45,7 +45,7 @@ export default async function ServicePage({ params }) {
   const text = t.servicePage;
   const ask = whatsappLink(format(t.whatsapp.about, { topic: service.ask }));
   const others = servicesIn(lang).filter((other) => other.slug !== service.slug);
-  const packages = (await activePackages(service.slug)).map((pkg) => localizePackage(pkg, lang));
+  const packages = (await activePackages(service.slug)).map((pkg) => ({ ...localizePackage(pkg, lang), names: { en: pkg.nameEn, id: pkg.nameId } }));
 
   return (
     <>

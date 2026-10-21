@@ -42,6 +42,14 @@ export async function packageById(id, { activeOnly = false } = {}) {
   return row ? packageFromRow(row) : null;
 }
 
+/** Paket aktif untuk daftar id (keranjang dan checkout): { [id]: paket }. */
+export async function packagesByIds(ids) {
+  const clean = [...new Set(ids.map(Number).filter((id) => Number.isSafeInteger(id) && id > 0))].slice(0, 20);
+  if (!clean.length) return {};
+  const rows = await query(`SELECT ${COLUMNS} FROM packages WHERE active = 1 AND id IN (${clean.map(() => "?").join(", ")})`, clean);
+  return Object.fromEntries(rows.map((row) => [Number(row.id), packageFromRow(row)]));
+}
+
 const values = (p) => [
   p.service,
   p.nameEn,
