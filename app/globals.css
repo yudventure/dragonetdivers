@@ -115,3 +115,43 @@
     padding-right: max(32px, env(safe-area-inset-right, 0px));
   }
 }
+
+/*
+ * Tema Dragonet untuk peta Raja Ampat bersama (src/components/peta-raja-ampat/, variabel --prj-*).
+ * Isi peta sama dengan DAMPIER dan Zanclus, desainnya dibedakan: laut putih ke Laguna Tipis,
+ * pulau Teal, pulau terpilih Abyss bergaris Kuning Fajar, titik selam Oranye Mandarin (data/tata.json)
+ * dengan ikon dan teks Abyss, karena teks putih di atas oranye dilarang (BRANDING.md §3).
+ */
+.peta-dragonet {
+  --prj-darat: var(--color-teal);
+  --prj-darat-arah: var(--color-teal-dark);
+  --prj-darat-sorot: var(--color-abyss);
+  --prj-garis-sorot: var(--color-sunrise);
+  --prj-karang: color-mix(in srgb, var(--color-lagoon) 42%, var(--color-white));
+  --prj-laut: radial-gradient(120% 100% at 50% 55%, var(--color-white) 0%, var(--color-lagoon-wash) 55%, var(--color-teal-wash) 100%);
+  --prj-latar: var(--color-foam);
+  --prj-kartu: var(--color-white);
+  --prj-tinta: var(--color-abyss);
+  --prj-tinta-2: var(--color-slate);
+  --prj-biru: var(--color-teal);
+  --prj-aksen: var(--color-teal);
+  --prj-bingkai: var(--color-mist);
+  --prj-bayang: 0 1px 2px rgb(10 50 59 / 0.06), 0 8px 24px rgb(10 50 59 / 0.07);
+  --prj-sudut: var(--radius-frame);
+  --prj-huruf-judul: var(--font-display);
+}
+.peta-dragonet :is(.prj-bulat, .prj-legenda-ikon, .prj-jenis) {
+  color: var(--color-abyss);
+}
+/* Judul seksi sudah di luar peta (judul={false}), jadi jarak atas bawaan tidak perlu. */
+.peta-dragonet > .prj-kisi:first-child {
+  margin-top: 0;
+}
+/* Nama perairan dan pulau kecil kadang menjorok ke daratan Teal: tinta Abyss dengan pendar putih. */
+.peta-dragonet :is(.prj-laut, .prj-nama-pulau) {
+  color: color-mix(in srgb, var(--color-abyss) 72%, transparent);
+  text-shadow: 0 0 2px var(--color-white), 0 0 6px var(--color-white);
+}
+.peta-dragonet .prj-kartu-judul {
+  font-weight: 600;
+}
