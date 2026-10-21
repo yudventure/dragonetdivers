@@ -1,7 +1,7 @@
 """Olah video Kling (frame awal = frame akhir) menjadi video loop website + poster.
 
     python3 brand/video/make-loop.py hasil-kling.mp4 --name hero-diver --size 1080x1080 --whiten
-    python3 brand/video/make-loop.py hasil-kling.mp4 --name ocean-manta --size 1280x720
+    python3 brand/video/make-loop.py hasil-kling.mp4 --name ocean-deep --size 1280x720 --blend 8
 
 Menghasilkan public/media/<name>.mp4 + .webm (tanpa suara, 24 fps) dan
 src/assets/<name>.webp (poster = frame pertama). Butuh ffmpeg (libx264,
@@ -21,6 +21,7 @@ parser.add_argument("source")
 parser.add_argument("--name", required=True)
 parser.add_argument("--size", default="1080x1080", help="LEBARxTINGGI")
 parser.add_argument("--whiten", action="store_true", help="latar keabuan (±250) dijadikan putih 255")
+parser.add_argument("--blend", type=int, default=0, help="crossfade N frame di sambungan loop (0 = tanpa)")
 parser.add_argument("--crf-mp4", default="26")
 parser.add_argument("--crf-webm", default="40")
 args = parser.parse_args()
@@ -35,6 +36,15 @@ frames = np.frombuffer(raw, np.uint8).reshape(-1, height, width, 3)
 
 # Frame terakhir sama dengan frame pertama, jadi dibuang agar loop tidak tersendat.
 loop = frames[:-1]
+if args.blend:
+    # Bila frame akhir Kling tidak persis sama dengan frame awal: N frame terakhir dilebur
+    # perlahan ke N frame pertama, lalu N frame pertama dibuang, jadi sambungannya halus.
+    n = args.blend
+    blended = loop[n:].astype(np.float32)
+    for j in range(n):
+        a = (j + 1) / (n + 1)
+        blended[len(blended) - n + j] = blended[len(blended) - n + j] * (1 - a) + loop[j] * a
+    loop = np.clip(blended + 0.5, 0, 255).astype(np.uint8)
 if args.whiten:
     # Latar Kling sekitar 247-252, bukan putih murni: nada >= 244 dipetakan ke 255,
     # nada di bawah 200 tidak berubah, supaya video menyatu dengan halaman putih.
