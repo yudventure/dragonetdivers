@@ -22,9 +22,9 @@ function Column({ id, title, children }) {
 
 const linkClass = "text-[15px] text-white/90 transition-colors duration-200 ease-brand hover:text-sunrise";
 
-// Area gelap utama: Abyss + pita garis mandarin (BRANDING.md §9.10). Empat kolom: brand + ikon kontak
-// dan media sosial, layanan, rencana perjalanan, kontak. Ikon media sosial muncul hanya bila akunnya
-// diisi (NEXT_PUBLIC_INSTAGRAM dst., src/lib/site.js). Logo versi plate karena pita tulisan asli transparan.
+// Area gelap utama: Abyss + pita garis mandarin (BRANDING.md §9.10). Empat kolom: brand + ikon WhatsApp
+// dan media sosial (email dan peta sudah ada di kolom kontak), layanan, rencana perjalanan, kontak. Ikon
+// media sosial muncul hanya bila akunnya diisi (NEXT_PUBLIC_INSTAGRAM dst., src/lib/site.js). Logo versi plate karena pita tulisan asli transparan.
 // Bagian bawah dipisah dengan latar sedikit lebih terang, tanpa garis pemisah; kanan bawah tautan
 // "Operator sign in" ke dashboard tim. Teks dalam bahasa halaman (src/content/ui.js, footer).
 export default function SiteFooter({ lang }) {
@@ -32,8 +32,6 @@ export default function SiteFooter({ lang }) {
   const t = all.footer;
   const chat = whatsappLink(all.whatsapp.general);
   const icons = [
-    { id: "email", label: format(t.emailLabel, { email: contact.email }), href: `mailto:${contact.email}`, Icon: MailIcon },
-    { id: "maps", label: t.mapsLabel, href: mapsLink(), Icon: MapPinIcon },
     ...(chat ? [{ id: "whatsapp", label: "WhatsApp", href: chat, Icon: ChatIcon }] : []),
     ...socialLinks().map((s) => ({ ...s, Icon: SOCIAL_ICONS[s.id] })),
   ];
@@ -53,21 +51,24 @@ export default function SiteFooter({ lang }) {
             <p className="font-display text-lg font-semibold text-sunrise">{all.meta.tagline}</p>
             <p className="max-w-[38ch] text-sm text-on-dark-muted">{all.meta.description}</p>
           </div>
-          <ul className="flex flex-wrap gap-2" aria-label={t.contactLinks}>
-            {icons.map(({ id, label, href, Icon }) => (
-              <li key={id}>
-                <a
-                  href={href}
-                  aria-label={label}
-                  title={label}
-                  {...(href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}
-                  className="grid size-9 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition-colors duration-200 ease-brand hover:bg-white hover:text-abyss"
-                >
-                  <Icon className="size-[18px]" />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {icons.length > 0 && (
+            <ul className="flex flex-wrap gap-2" aria-label={t.contactLinks}>
+              {icons.map(({ id, label, href, Icon }) => (
+                <li key={id}>
+                  <a
+                    href={href}
+                    aria-label={label}
+                    title={label}
+                    target="_blank"
+                    rel="noopener"
+                    className="grid size-9 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/15 transition-colors duration-200 ease-brand hover:bg-white hover:text-abyss"
+                  >
+                    <Icon className="size-[18px]" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <Column id="footer-services" title={t.services}>
