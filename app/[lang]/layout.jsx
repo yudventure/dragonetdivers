@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { CartProvider } from "@/components/cart";
 import { CurrencyProvider } from "@/components/currency";
 import DeveloperBar from "@/components/DeveloperBar";
 import { uiText } from "@/content/ui";
@@ -44,7 +45,7 @@ export default async function SiteLayout({ children, params }) {
     <html lang={lang} className={fontVariables}>
       <body className="min-h-dvh font-sans">
         <CurrencyProvider lang={lang} rate={rate}>
-          {children}
+          <CartProvider>{children}</CartProvider>
         </CurrencyProvider>
         <DeveloperBar />
       </body>

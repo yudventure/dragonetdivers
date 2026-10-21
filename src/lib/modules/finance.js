@@ -86,7 +86,7 @@ export function orderIncome(orders) {
   return orders
     .filter((o) => o.status === "paid" && o.paidAt)
     .map((o) => ({
-      id: `auto:${o.code}`,
+      id: o.item ? `auto:${o.code}:${o.item}` : `auto:${o.code}`, // satu baris per paket pesanan
       auto: true,
       date: new Date(new Date(o.paidAt).getTime() + 9 * 3600_000).toISOString().slice(0, 10),
       description: `Pesanan website ${o.code} · ${o.name}`,

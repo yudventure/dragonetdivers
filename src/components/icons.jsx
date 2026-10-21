@@ -275,6 +275,24 @@ export function CloseIcon(props) {
   );
 }
 
+export function PlusIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </Icon>
+  );
+}
+
+export function BagIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6 7h12l1 13H5L6 7Z" />
+      <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+    </Icon>
+  );
+}
+
 export function MenuIcon(props) {
   return (
     <Icon {...props}>

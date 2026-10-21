@@ -142,7 +142,7 @@ export default async function CalendarPage({ searchParams }) {
               <Card title="Pesanan website">
                 <ul className="grid gap-2 text-sm">
                   {dayOrders.map(({ order: o }) => (
-                    <li key={o.code} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <li key={`${o.code}-${o.item ?? 0}`} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${CHIP[o.status === "paid" ? "paid" : "waiting"]}`}>{o.status === "paid" ? "Lunas" : "Menunggu bayar"}</span>
                       <span className="font-semibold text-abyss">{o.name}</span>
                       <span className="text-slate">

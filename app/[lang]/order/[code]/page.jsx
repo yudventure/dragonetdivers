@@ -44,9 +44,8 @@ export default async function OrderPage({ params, searchParams }) {
   const money = (amount, currency = "IDR") => formatMoney(amount, currency, lang);
   const wit = (iso) =>
     `${new Intl.DateTimeFormat(intlLocale[lang], { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jayapura" }).format(new Date(iso))} WIT`;
-  const day = new Intl.DateTimeFormat(intlLocale[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
-    new Date(`${order.date}T00:00:00Z`),
-  );
+  const day = (date) =>
+    new Intl.DateTimeFormat(intlLocale[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
   const transfer = order.method === "transfer" && order.status === "pending";
   const state = transfer ? "transfer" : order.status;
   const info = t.states[state] ?? t.states.pending;
@@ -57,9 +56,6 @@ export default async function OrderPage({ params, searchParams }) {
 
   const details = [
     [t.code, order.code],
-    [t.package, order.packageName],
-    [t.date, day],
-    [t.guests, String(order.guests)],
     [t.name, order.name],
     [t.method, t.methodNames[order.method] ?? order.method],
     [t.total, money(order.amount)],
@@ -92,6 +88,23 @@ export default async function OrderPage({ params, searchParams }) {
                 </div>
               ))}
             </dl>
+
+            <div className="grid gap-2">
+              <p className="text-xs font-bold tracking-[0.12em] text-slate uppercase">{order.items.length > 1 ? t.packages : t.package}</p>
+              <ul className="grid divide-y divide-mist rounded-card ring-1 ring-mist">
+                {order.items.map((item) => (
+                  <li key={item.position} className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 p-4">
+                    <span className="grid gap-0.5">
+                      <span className="font-semibold text-abyss">{item.packageName}</span>
+                      <span className="text-sm text-slate">
+                        {[serviceBySlug(item.service, lang)?.title, day(item.date), `${t.guests} ${item.guests}`].filter(Boolean).join(" · ")}
+                      </span>
+                    </span>
+                    <span className="font-semibold text-abyss tabular-nums">{money(item.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             {accounts.length > 0 && (
               <ul className="grid gap-3">

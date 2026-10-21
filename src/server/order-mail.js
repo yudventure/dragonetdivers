@@ -1,7 +1,7 @@
 import "server-only";
 import { after } from "next/server";
 import { orderMail } from "@/lib/order-mail";
-import { serviceBySlug } from "@/lib/services";
+import { servicesIn } from "@/lib/services";
 import { contact, site, whatsappNumber } from "@/lib/site";
 import { query } from "./db";
 import { mailConfigured, mailFailure, mailIssues, sendMail } from "./mailer";
@@ -47,7 +47,7 @@ export async function buildOrderMail(order, kind, { accounts } = {}) {
     order,
     base: site.url,
     accounts,
-    serviceTitle: serviceBySlug(order.service, order.lang)?.title ?? "",
+    serviceTitles: Object.fromEntries(servicesIn(order.lang).map((s) => [s.slug, s.title])),
     contact: { email: contact.email, address: contact.address },
     whatsapp: whatsappNumber(),
   });
