@@ -111,14 +111,29 @@ export function ModuleTitle({ title, children }) {
 /** Peringatan database untuk modul yang membutuhkan MySQL. */
 export function DatabaseNotice({ database }) {
   if (database.ok) return null;
+  const issues = database.issues ?? [];
   return (
-    <div className="grid gap-1 rounded-card bg-sunrise-wash p-4 text-sm text-abyss ring-1 ring-sunrise">
-      <p className="font-bold">{database.configured ? "Database tidak bisa dihubungi." : "Database belum diisi di hPanel."}</p>
-      <p>
-        {database.configured
-          ? database.hint
-          : "Isi MYSQL_HOST, MYSQL_DATABASE, MYSQL_USER, dan MYSQL_PASSWORD di hPanel (lihat HOSTINGER-DEPLOY.md), lalu deploy ulang. Paket dan pesanan disimpan di sana."}
-      </p>
+    <div className="grid gap-1.5 rounded-card bg-sunrise-wash p-4 text-sm text-abyss ring-1 ring-sunrise">
+      <p className="font-bold">{database.configured ? "Database tidak bisa dihubungi." : "Pengaturan database belum terbaca aplikasi."}</p>
+      {database.configured ? (
+        <p>
+          {database.hint} <span className="text-slate">Kode {database.code}.</span>
+        </p>
+      ) : (
+        <>
+          {/* Nama variabel dan alasannya saja, nilainya tidak pernah ditampilkan. */}
+          <ul className="grid gap-1">
+            {issues.map((issue) => (
+              <li key={issue.name}>
+                <code className="font-bold text-ember">{issue.name}</code> {issue.reason}
+              </li>
+            ))}
+          </ul>
+          <p className="text-slate">
+            Perubahan di hPanel (Variabel environment) baru terbaca setelah deploy ulang di menu Penempatan. Panduan lengkap di HOSTINGER-DEPLOY.md.
+          </p>
+        </>
+      )}
     </div>
   );
 }

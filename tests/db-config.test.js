@@ -44,3 +44,14 @@ test("error database diringkas tanpa pesan mentah", () => {
   assert.ok(!known.hint.includes("1.2.3.4"));
   assert.equal(databaseFailure(new Error("x")).code, "DATABASE_UNAVAILABLE");
 });
+
+test("alasan menyebut nilai - yang belum dideploy ulang", () => {
+  const issues = databaseIssues({ MYSQL_HOST: "-", MYSQL_DATABASE: "u1_db", MYSQL_USER: "u1_user" });
+  assert.deepEqual(
+    issues.map((i) => i.name),
+    ["MYSQL_HOST", "MYSQL_PASSWORD"],
+  );
+  assert.match(issues[0].reason, /Masih berisi - .*deploy ulang/);
+  assert.match(issues[1].reason, /Belum ada di aplikasi/);
+  assert.ok(!JSON.stringify(issues).includes("u1_"), "nilai tidak pernah ikut ditampilkan");
+});
