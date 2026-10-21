@@ -77,7 +77,7 @@ export default async function ReportPage({ searchParams }) {
               { label: report.taxSettings.taxLabel, value: rupiah(report.tax), tone: "warn" },
             ]}
           />
-          <div className="overflow-x-auto rounded-card bg-white ring-1 ring-mist">
+          <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
             <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-foam text-xs tracking-[0.08em] text-slate uppercase">
                 <tr>

@@ -1,9 +1,11 @@
 import { CheckoutError } from "@/lib/checkout";
+import { pageLocked } from "@/lib/developer";
 import { format } from "@/lib/i18n";
 import { uiText } from "@/content/ui";
 import { contact } from "@/lib/site";
 import { readJson, sameOrigin } from "@/server/admin-auth";
 import { startCheckout } from "@/server/checkout";
+import { developerView } from "@/server/developer";
 
 export const dynamic = "force-dynamic";
 const noStore = { "Cache-Control": "no-store" };
@@ -18,6 +20,8 @@ export async function POST(request) {
   const fail = (field, status) =>
     Response.json({ error: FIELD[field] ?? field, message: format(errors[field] ?? errors.server, { email: contact.email }) }, { status, headers: noStore });
   if (!sameOrigin(request)) return fail("form", 403);
+  // Mode developer: checkout (atau seluruh website) ditutup untuk pengunjung, operator tetap bisa mencoba.
+  if (pageLocked((await developerView()).locks, "checkout")) return fail("maintenance", 503);
   const input = await readJson(request);
   if (!input) return fail("form", 400);
   try {

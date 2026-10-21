@@ -58,7 +58,7 @@ export default function StockTable({ items, itemOptions }) {
       {shown.length === 0 ? (
         <p className="rounded-card bg-white p-5 text-sm text-slate ring-1 ring-mist">Belum ada barang. Tambahkan alat selam, tabung, suku cadang, dan bahan habis pakai.</p>
       ) : (
-        <div className="overflow-x-auto rounded-card bg-white ring-1 ring-mist">
+        <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-foam text-xs tracking-[0.08em] text-slate uppercase">
               <tr>

@@ -213,6 +213,7 @@ const en = {
       busy: "Too many bookings from this connection. Please try again in 15 minutes.",
       provider: "The payment page could not be opened. Try another payment method, or email {email}.",
       server: "Your booking could not be saved right now. Please try again, or email {email}.",
+      maintenance: "Online booking is paused while we update the website. Please try again soon, or email {email}.",
     },
   },
   order: {
@@ -484,6 +485,7 @@ const id = {
       busy: "Terlalu banyak pesanan dari koneksi ini. Coba lagi dalam 15 menit.",
       provider: "Halaman pembayaran belum bisa dibuka. Coba cara bayar lain, atau kirim email ke {email}.",
       server: "Pesananmu belum bisa disimpan saat ini. Coba lagi, atau kirim email ke {email}.",
+      maintenance: "Pemesanan online sedang dijeda karena website diperbarui. Coba lagi sebentar lagi, atau kirim email ke {email}.",
     },
   },
   order: {

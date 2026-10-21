@@ -222,7 +222,7 @@ export default function RecordManager({ kind, records, refs = {}, columns, defau
       {visible.length === 0 ? (
         <p className="rounded-card bg-white p-5 text-sm text-slate ring-1 ring-mist">{empty}</p>
       ) : (
-        <div className="overflow-x-auto rounded-card bg-white ring-1 ring-mist">
+        <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="bg-foam text-xs tracking-[0.08em] text-slate uppercase">
               <tr>

@@ -1,0 +1,32 @@
+// Teks halaman perawatan dan kartu "sedang diperbarui" saat mode developer menutup website, halaman,
+// atau bagian beranda (src/lib/developer.js). Kunci en dan id sama (tests/developer.test.js).
+export const maintenanceText = {
+  en: {
+    siteTitle: "We'll be back soon",
+    siteText: "Dragonet Divers is updating this website. Please check back shortly.",
+    pageTitle: "This page is being updated",
+    pageText: "We are working on this page right now. Please check back shortly or see the rest of the site.",
+    sectionTitle: "Being updated",
+    sectionText: "This part of the page is being updated. Please check back soon.",
+    until: "Expected back around {until} WIT",
+    contact: "Need us now?",
+    whatsapp: "Chat on WhatsApp",
+    email: "Email {email}",
+    home: "Back to the homepage",
+    language: "Bahasa Indonesia",
+  },
+  id: {
+    siteTitle: "Kami segera kembali",
+    siteText: "Dragonet Divers sedang memperbarui website ini. Coba buka lagi sebentar lagi ya.",
+    pageTitle: "Halaman ini sedang diperbarui",
+    pageText: "Kami sedang mengerjakan halaman ini. Coba buka lagi sebentar lagi, atau lihat bagian lain website.",
+    sectionTitle: "Sedang diperbarui",
+    sectionText: "Bagian ini sedang diperbarui. Coba lihat lagi sebentar lagi ya.",
+    until: "Perkiraan selesai sekitar {until} WIT",
+    contact: "Perlu bantuan sekarang?",
+    whatsapp: "Chat lewat WhatsApp",
+    email: "Email {email}",
+    home: "Kembali ke beranda",
+    language: "English",
+  },
+};

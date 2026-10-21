@@ -33,7 +33,7 @@ export default async function AttendancePage({ searchParams }) {
         <>
           <AttendanceSheet key={date} date={date} employees={active.map(({ id, name, position }) => ({ id, name, position }))} saved={saved} />
           <Card title={`Rekap ${monthLabel(month)}`} action={<ExportLink query={{ type: "absensi", bulan: month }} />}>
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="w-full min-w-[640px] text-sm">
                 <thead className="text-xs tracking-[0.08em] text-slate uppercase">
                   <tr>

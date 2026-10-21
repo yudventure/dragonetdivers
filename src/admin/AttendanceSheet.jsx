@@ -52,7 +52,7 @@ export default function AttendanceSheet({ date, employees, saved }) {
           .
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-card bg-white ring-1 ring-mist">
+        <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-foam text-xs tracking-[0.08em] text-slate uppercase">
               <tr>
