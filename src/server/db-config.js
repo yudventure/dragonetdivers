@@ -25,9 +25,13 @@ export function mysqlSettings(env = process.env) {
 
 // Daftar masalah konfigurasi tanpa menampilkan nilai rahasia.
 export function databaseIssues(env = process.env) {
+  // "-" berarti nilai dari file impor belum diganti, atau sudah diganti tetapi belum dideploy ulang.
   const issues = REQUIRED.filter((name) => !envText(env[name])).map((name) => ({
     name,
-    reason: "Belum diisi atau belum terbaca oleh aplikasi.",
+    reason:
+      String(env[name] ?? "").trim() === "-"
+        ? "Masih berisi - di aplikasi. Kalau sudah diganti di hPanel, deploy ulang supaya terbaca."
+        : "Belum ada di aplikasi. Tambahkan di hPanel, lalu deploy ulang.",
   }));
   const host = envText(env.MYSQL_HOST);
   if (host && (host.includes("://") || host.includes("/") || /\s/.test(host) || /^["']|["']$/.test(host))) {
