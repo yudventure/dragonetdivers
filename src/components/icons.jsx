@@ -258,6 +258,31 @@ export function YouTubeIcon(props) {
   );
 }
 
+export function PlayIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M7 4.5v15a1 1 0 0 0 1.5.87l12-7.5a1 1 0 0 0 0-1.74l-12-7.5A1 1 0 0 0 7 4.5Z" />
+    </Icon>
+  );
+}
+
+export function CloseIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </Icon>
+  );
+}
+
+export function ChevronIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="m9 18 6-6-6-6" />
+    </Icon>
+  );
+}
+
 // Motif garis ombak dari logo (brand/patterns/wave-divider.svg).
 export function Wave({ className = "h-4 w-24" }) {
   return (
