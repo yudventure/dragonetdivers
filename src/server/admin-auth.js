@@ -2,6 +2,7 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { createSessionToken, passwordFingerprint, readSessionToken, sameText, SESSION_HOURS } from "@/lib/admin-session";
+import { envText } from "@/lib/env";
 import { createThrottle } from "@/lib/login-throttle";
 
 // Login operator dashboard (/admin), mengikuti cara Zanclus: akun operator dari variabel server
@@ -16,8 +17,8 @@ const state = (globalThis.__dragonetAdmin ??= { secret: null, throttle: createTh
 
 /** Akun operator dan masalah pengaturannya (tanpa menampilkan nilai rahasia). */
 export function adminConfig(env = process.env) {
-  const email = env.ADMIN_EMAIL?.trim().toLowerCase() ?? "";
-  const password = env.ADMIN_PASSWORD ?? "";
+  const email = envText(env.ADMIN_EMAIL).toLowerCase();
+  const password = envText(env.ADMIN_PASSWORD) ? env.ADMIN_PASSWORD : "";
   const issues = [];
   if (!email || !email.includes("@")) issues.push({ name: "ADMIN_EMAIL", reason: "Isi email operator, mis. operator@dragonetdivers.com." });
   if (!password) issues.push({ name: "ADMIN_PASSWORD", reason: "Isi password operator." });
@@ -27,13 +28,13 @@ export function adminConfig(env = process.env) {
 
 /** Peringatan yang tidak menghalangi login, untuk ditampilkan di dashboard. */
 export function adminWarnings(env = process.env) {
-  return env.SESSION_SECRET?.trim()
+  return envText(env.SESSION_SECRET)
     ? []
     : ["SESSION_SECRET belum diisi, jadi operator harus masuk lagi setiap kali aplikasi dimulai ulang."];
 }
 
 function secret() {
-  const fromEnv = process.env.SESSION_SECRET?.trim();
+  const fromEnv = envText(process.env.SESSION_SECRET);
   if (fromEnv) return fromEnv;
   state.secret ??= randomBytes(48).toString("base64url");
   return state.secret;

@@ -1,15 +1,18 @@
 import "server-only";
+import { envText } from "@/lib/env";
 
 // PayPal Checkout (Orders API v2), diambil dari Zanclus. Key dari hPanel: PAYPAL_CLIENT_ID dan
 // PAYPAL_CLIENT_SECRET (developer.paypal.com → Apps & Credentials), PAYPAL_MODE=live untuk
 // pembayaran sungguhan (selain itu sandbox). PAYPAL_API_URL hanya untuk uji lokal. PayPal tidak
 // menerima Rupiah, jadi pesanan ditagih dalam dolar AS dengan kurs hari itu.
 
+// "-" berarti belum diisi (file impor .env, src/lib/env.js).
 const clean = (value) =>
-  String(value ?? "")
-    .trim()
-    .replace(/^["']|["']$/g, "")
-    .trim();
+  envText(
+    String(value ?? "")
+      .trim()
+      .replace(/^["']|["']$/g, ""),
+  );
 const clientId = () => clean(process.env.PAYPAL_CLIENT_ID);
 const secret = () => clean(process.env.PAYPAL_CLIENT_SECRET);
 export const paypalConfigured = () => clientId().length > 0 && secret().length > 0;

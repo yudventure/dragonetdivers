@@ -1,12 +1,15 @@
 // Membaca pengaturan Midtrans dari hPanel (diambil dari Zanclus). Spasi dan tanda kutip di sekitar
 // nilai diabaikan. Kesalahan isian lain dijelaskan di /admin/pembayaran dengan kata-kata biasa,
 // karena Midtrans hanya menjawab 401.
+import { envText } from "./env.js";
 
+// "-" berarti belum diisi (file impor .env, src/lib/env.js).
 const unquote = (value) =>
-  String(value ?? "")
-    .trim()
-    .replace(/^(["'])(.*)\1$/, "$2")
-    .trim();
+  envText(
+    String(value ?? "")
+      .trim()
+      .replace(/^(["'])(.*)\1$/, "$2"),
+  );
 
 export const cleanKey = unquote;
 

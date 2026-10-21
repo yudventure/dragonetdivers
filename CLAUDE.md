@@ -20,6 +20,7 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik ber
 - `src/components/peta-raja-ampat/`: peta Raja Ampat bersama (skill peta-raja-ampat, sama dengan DAMPIER & Zanclus); di beranda hanya titik selam & snorkel (`DiveSiteMap.jsx`, `src/lib/dive-map.js`, tema `.peta-dragonet`). Baca README di folder itu sebelum mengubah datanya.
 - `/admin` dashboard tim (acuan: admin Zanclus): login operator `ADMIN_EMAIL` + `ADMIN_PASSWORD` dari hPanel, sesi cookie httpOnly bertanda tangan `SESSION_SECRET` (`src/server/admin-auth.js`, `src/lib/admin-session.js`, batas 5 percobaan/15 menit per IP). UI di `src/admin/` (kerangka `AdminShell.jsx`, halaman tanpa sesi → `AdminGate.jsx`); modul: Ringkasan cepat, Pesanan, Paket & harga, Pembayaran; sisanya "Segera". API admin memakai `guardAdmin(request)`.
 - FAQ beranda: `src/content/faq.js` (fakta umum dicek ke sumber, tanpa harga/jadwal).
+- Environment: baca nilai lewat `envText()` (`src/lib/env.js`); `-` berarti belum diisi, karena hPanel menolak value kosong dan pemilik mengimpor semua key sekaligus lewat **Impor .env** lalu mengisi value-nya sendiri. Key baru wajib ikut ditambahkan ke `.env.example` dan tabel di `HOSTINGER-DEPLOY.md`.
 - `src/server/db.js` → pakai `query(sql, params)` untuk semua akses database (server saja).
 - `database/migrations/NNN_nama.sql`: skema, idempoten (`CREATE TABLE IF NOT EXISTS`), dijalankan otomatis. Jangan ubah file migrasi yang sudah di-merge; buat nomor baru.
 - `brand/`: identitas visual. Pedoman di `BRANDING.md`.
