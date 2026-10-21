@@ -91,6 +91,9 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 | `NEXT_PUBLIC_SITE_URL` | `https://dragonetdivers.com` (boleh dihapus: nilai bawaan sama) |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Nomor booking, mis. `6281234567890` (tanpa `+`, spasi, atau `0` di depan). Kosong = tombol WhatsApp disembunyikan. |
 | `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Akun media sosial untuk ikon di footer: handle (`@dragonetdivers`) atau URL lengkap di domain jaringan itu. Kosong = ikon tidak ditampilkan. Perlu build ulang setelah diubah. |
+| `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
+| `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. |
+| `SESSION_SECRET` | Teks acak panjang untuk menandatangani sesi (mis. hasil `openssl rand -base64 48`). Tanpa ini operator harus masuk lagi setiap aplikasi dimulai ulang. |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |
 | `MYSQL_DATABASE` | Nama database lengkap, mis. `u123456789_dragonet` |

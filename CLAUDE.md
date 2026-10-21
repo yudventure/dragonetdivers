@@ -13,6 +13,8 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik ber
 - `src/lib/getting-here.js` + `GettingHere.jsx`: seksi "How to get here" (Sorong → Waisai → Kurkapa); peta rutenya `public/media/getting-here-map.svg` dibuat `node scripts/getting-here-map.mjs`.
 - `src/content/gallery.js`: isi galeri beranda (foto di `src/assets/gallery/`, klip loop sendiri di `public/media/`, tautan YouTube/Shorts/TikTok/Instagram/Facebook dibaca `src/lib/video-embed.js`). Player pihak ketiga dimuat hanya saat petaknya terlihat (`EmbedVideo.jsx`).
 - `src/components/peta-raja-ampat/`: peta Raja Ampat bersama (skill peta-raja-ampat, sama dengan DAMPIER & Zanclus); di beranda hanya titik selam & snorkel (`DiveSiteMap.jsx`, `src/lib/dive-map.js`, tema `.peta-dragonet`). Baca README di folder itu sebelum mengubah datanya.
+- `/admin` dashboard tim (acuan: admin Zanclus): login operator `ADMIN_EMAIL` + `ADMIN_PASSWORD` dari hPanel, sesi cookie httpOnly bertanda tangan `SESSION_SECRET` (`src/server/admin-auth.js`, `src/lib/admin-session.js`, batas 5 percobaan/15 menit per IP). UI di `src/admin/`; baru "Ringkasan cepat", modul lain menyusul.
+- FAQ beranda: `src/content/faq.js` (fakta umum dicek ke sumber, tanpa harga/jadwal).
 - `src/server/db.js` → pakai `query(sql, params)` untuk semua akses database (server saja).
 - `database/migrations/NNN_nama.sql`: skema, idempoten (`CREATE TABLE IF NOT EXISTS`), dijalankan otomatis. Jangan ubah file migrasi yang sudah di-merge; buat nomor baru.
 - `brand/`: identitas visual. Pedoman di `BRANDING.md`.
