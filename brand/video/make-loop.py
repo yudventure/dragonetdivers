@@ -1,7 +1,7 @@
 """Olah video Kling (frame awal = frame akhir) menjadi video loop website + poster.
 
     python3 brand/video/make-loop.py hasil-kling.mp4 --name hero-diver --size 1080x1080 --whiten
-    python3 brand/video/make-loop.py hasil-kling.mp4 --name ocean-manta-shadow --size 1280x720 --blend 8
+    python3 brand/video/make-loop.py hasil-kling.mp4 --name ocean-manta-loop --size 1280x720 --crf-mp4 27 --crf-webm 42
 
 Menghasilkan public/media/<name>.mp4 + .webm (tanpa suara, 24 fps) dan
 src/assets/<name>.webp (poster = frame pertama). Butuh ffmpeg (libx264,
