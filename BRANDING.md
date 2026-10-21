@@ -261,7 +261,7 @@ Input tinggi 48 px, radius 10 px, border 1 px Garis Tegas, label di atas (14 px 
 ### 9.7 Kotak info & kondisi laut
 Latar Laguna Tipis, ikon Teal, teks Abyss, radius 16 px. Peringatan cuaca: Fajar Tipis + teks Bara.
 
-Pengecualian (permintaan pemilik, Oktober 2026): panel **kondisi laut live** di beranda dan halaman layanan memakai latar video laut dalam dengan manta yang lewat (`public/media/ocean-manta.*`, cara membuat di `brand/ocean/README.md`). Teks putih, ikon putih, panah arah Kuning Fajar, lapisan gradasi Abyss 40–70% dan bayangan teks di atas video agar teks tetap terbaca.
+Pengecualian (permintaan pemilik, Oktober 2026): panel **kondisi laut live** di beranda dan halaman layanan memakai latar video laut dalam (`public/media/ocean-deep.*`) dengan siluet manta jauh yang mondar-mandir (animasi CSS); cara membuat di `brand/ocean/README.md`. Teks putih, ikon putih, panah arah Kuning Fajar, lapisan gradasi Abyss 40–70% dan bayangan teks di atas video agar teks tetap terbaca.
 
 ### 9.8 Judul section
 Eyebrow (Bara) → H2 (Abyss) → garis ombak (Teal, 96 px) → paragraf Slate maks. 60 karakter. Rata kiri di desktop.

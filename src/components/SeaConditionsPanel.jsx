@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
-// Latar laut dalam + manta yang lewat (Higgsfield: GPT Image 2.5 + Kling 3.0), cara membuat: brand/ocean/README.md.
-import oceanPoster from "../assets/ocean-manta.webp";
+// Latar laut dalam (Higgsfield: GPT Image 2.5 + Kling 3.0) + siluet manta jauh yang dianimasikan
+// dengan CSS (app/globals.css, animate-manta-*). Cara membuat: brand/ocean/README.md.
+import oceanPoster from "../assets/ocean-deep.webp";
+import manta from "../assets/manta-silhouette.webp";
 import LoopVideo from "./LoopVideo";
 import {
   ArrowNorthIcon,
@@ -45,7 +48,8 @@ const join = (...parts) => parts.filter(Boolean).join(", ") || null;
 const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 
 // Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak gelap dengan video laut dalam
-// (sinar matahari, partikel, manta lewat) di belakang teks putih; lapisan Abyss menjaga keterbacaan.
+// (sinar matahari, partikel) dan siluet manta jauh yang mondar-mandir di belakang teks putih;
+// lapisan Abyss menjaga keterbacaan.
 // Data awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka.
 export default function SeaConditionsPanel({ initial }) {
   const [data, setData] = useState(initial);
@@ -85,12 +89,22 @@ export default function SeaConditionsPanel({ initial }) {
         <div className="relative isolate overflow-hidden rounded-card bg-abyss p-6 sm:p-8 lg:py-10 [text-shadow:0_1px_2px_rgb(10_50_59/0.65),0_0_18px_rgb(10_50_59/0.6)]">
           <LoopVideo
             sources={[
-              { src: "/media/ocean-manta.webm", type: "video/webm" },
-              { src: "/media/ocean-manta.mp4", type: "video/mp4" },
+              { src: "/media/ocean-deep.webm", type: "video/webm" },
+              { src: "/media/ocean-deep.mp4", type: "video/mp4" },
             ]}
             poster={oceanPoster.src}
             className="absolute inset-0 -z-10 size-full object-cover"
           />
+          {/* Siluet manta di kejauhan: berenang ke kanan, berbelok, kembali ke kiri, sayap mengepak */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden [container-type:inline-size]">
+            <div className="absolute top-[39%] left-0 w-[clamp(64px,9cqw,120px)] motion-safe:animate-manta-cruise sm:top-[12%]">
+              <div className="motion-safe:animate-manta-bob">
+                <div className="motion-safe:animate-manta-turn">
+                  <Image src={manta} alt="" sizes="120px" className="h-auto w-full origin-[50%_70%] opacity-80 blur-[0.5px] motion-safe:animate-manta-flap" />
+                </div>
+              </div>
+            </div>
+          </div>
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.6)_0%,rgb(10_50_59/0.4)_45%,rgb(10_50_59/0.7)_100%)]" />
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 id="sea-title" className="flex items-center gap-2.5 text-xl text-white">
