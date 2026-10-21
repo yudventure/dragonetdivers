@@ -94,7 +94,7 @@ export default function PaymentSettings({ initial, status, providers, rate }) {
           </Status>
         ))}
         <p className="text-sm text-slate">
-          Notifikasi pembayaran dikirim otomatis ke <code className="font-semibold text-abyss">{midtrans.notifyUrl}</code>. Alamat yang sama boleh juga
+          Notifikasi pembayaran dikirim otomatis ke <code className="font-semibold break-all text-abyss">{midtrans.notifyUrl}</code>. Alamat yang sama boleh juga
           diisi di dashboard Midtrans (Settings → Payment → Notification URL).
         </p>
         {midtrans.lastError && (

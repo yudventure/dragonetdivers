@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { CurrencyProvider } from "@/components/currency";
+import DeveloperBar from "@/components/DeveloperBar";
 import { uiText } from "@/content/ui";
 import { isLocale, localeHref, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
@@ -45,6 +46,7 @@ export default async function SiteLayout({ children, params }) {
         <CurrencyProvider lang={lang} rate={rate}>
           {children}
         </CurrencyProvider>
+        <DeveloperBar />
       </body>
     </html>
   );

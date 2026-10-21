@@ -1,17 +1,64 @@
 import { NextResponse } from "next/server";
+import { ADMIN_COOKIE, pageForPath, pageLocked, PREVIEW_COOKIE, PREVIEW_MINUTES, visitorLocks } from "./src/lib/developer.js";
 import { localeRoute } from "./src/lib/i18n.js";
+import { adminFromToken } from "./src/server/admin-auth.js";
+import { getDeveloper } from "./src/server/developer-state.js";
 
-// Bahasa dari alamat: English di akar ditulis ulang ke app/[lang] dengan lang "en", /id diteruskan,
-// /en/... dialihkan ke alamat tanpa /en. Aturannya di src/lib/i18n.js (localeRoute).
-export function proxy(request) {
+// Alamat English tanpa awalan ditulis ulang ke /en/... (aturan di src/lib/i18n.js), lalu mode developer
+// (src/lib/developer.js): halaman yang ditutup dijawab halaman perawatan 503 (app/maintenance), kecuali
+// untuk operator yang masuk di /admin. ?pratinjau=pengunjung membuat operator melihat seperti pengunjung
+// selama 30 menit, ?pratinjau=admin mengembalikannya. Halaman status pesanan tidak pernah ditutup.
+export async function proxy(request) {
+  const preview = request.nextUrl.searchParams.get("pratinjau");
+  if (preview === "pengunjung" || preview === "admin") {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete("pratinjau");
+    const response = NextResponse.redirect(url, 303);
+    if (preview === "pengunjung") {
+      response.cookies.set(PREVIEW_COOKIE, "1", { path: "/", maxAge: PREVIEW_MINUTES * 60, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
+    } else {
+      response.cookies.delete(PREVIEW_COOKIE);
+    }
+    return response;
+  }
+
   const route = localeRoute(request.nextUrl.pathname);
-  if (!route.redirect && !route.rewrite) return NextResponse.next();
+  if (route.redirect) {
+    const url = request.nextUrl.clone();
+    url.pathname = route.redirect;
+    return NextResponse.redirect(url, 308);
+  }
+
+  const lock = await maintenanceLock(request, route.rewrite ?? request.nextUrl.pathname);
+  if (lock) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/maintenance";
+    url.search = "";
+    const headers = new Headers(request.headers);
+    headers.set("x-dd-lock", lock.kind);
+    headers.set("x-dd-lang", lock.lang);
+    headers.set("x-dd-path", lock.path);
+    return NextResponse.rewrite(url, { request: { headers } });
+  }
+
+  if (!route.rewrite) return NextResponse.next();
   const url = request.nextUrl.clone();
-  url.pathname = route.redirect ?? route.rewrite;
-  return route.redirect ? NextResponse.redirect(url, 308) : NextResponse.rewrite(url);
+  url.pathname = route.rewrite;
+  return NextResponse.rewrite(url);
 }
 
-// Tanpa API, admin, berkas Next.js, dan berkas berekstensi (media, ikon, favicon).
-export const config = {
-  matcher: ["/((?!api(?:/|$)|admin(?:/|$)|_next/|.*\\..*).*)"],
-};
+/** { kind, lang, path } bila halaman ini ditutup untuk penampil ini, atau null. target = /en/... atau /id/... */
+async function maintenanceLock(request, target) {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const [, lang, ...rest] = target.split("/");
+  const path = `/${rest.join("/")}`;
+  if (path === "/order" || path.startsWith("/order/")) return null;
+  const developer = await getDeveloper();
+  const page = pageForPath(path);
+  if (!pageLocked(visitorLocks(developer), page)) return null;
+  const { cookies } = request;
+  if (!cookies.has(PREVIEW_COOKIE) && (await adminFromToken(cookies.get(ADMIN_COOKIE)?.value))) return null;
+  return { kind: developer.site ? "site" : "page", lang: lang === "id" ? "id" : "en", path };
+}
+
+export const config = { matcher: ["/((?!api(?:/|$)|admin(?:/|$)|maintenance(?:/|$)|_next/|.*\\..*).*)"] };

@@ -131,6 +131,7 @@ Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pe
 - **Kalender reservasi**: pesanan website tampil otomatis. Tanggal yang ditutup (**Tutup tanggal ini**) dan **Kapasitas harian** juga ditolak oleh checkout website.
 - **Galeri foto & video**: foto yang diunggah disimpan di database (diperkecil otomatis), jadi tidak hilang saat situs dibangun ulang. Begitu ada satu item yang tampil, galeri bawaan di beranda diganti.
 - **Buku kas**: pesanan website yang lunas masuk otomatis sebagai pemasukan. Pengeluaran dan pemasukan lain dicatat tim.
+- **Mode developer** (menu Sistem): tutup seluruh website, halaman tertentu, atau bagian beranda selama sedang diperbaiki. Pengunjung mendapat halaman perawatan (status 503, jadi Google kembali lagi nanti) atau kartu "sedang diperbarui" di bagian itu, dan checkout menolak pesanan baru bila ikut ditutup. Operator yang masuk di `/admin` tetap melihat semuanya dengan bilah kecil di bawah layar, dan bisa memakai **Lihat seperti pengunjung** selama 30 menit. Halaman status pesanan tamu dan pembayaran yang sedang berjalan tidak pernah ditutup. Disimpan di tabel `settings`, tanpa environment variable baru.
 
 ### Email ke tamu dan lupa password admin
 

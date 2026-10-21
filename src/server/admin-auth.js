@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { envPasswordForms, envPasswordMatches, MIN_PASSWORD, replacementActive, replacementRecord, typedPasswordMatches } from "@/lib/admin-password";
 import { createSessionToken, passwordFingerprint, readSessionToken, sameText, SESSION_HOURS } from "@/lib/admin-session";
 import { envText } from "@/lib/env";
+import { OPERATOR_COOKIE } from "@/lib/developer";
 import { createThrottle } from "@/lib/login-throttle";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
@@ -72,7 +73,11 @@ const sessionFingerprint = (config, saved) => passwordFingerprint(saved ? `saved
 
 /** Operator yang sedang masuk ({ email }) atau null. */
 export async function currentAdmin() {
-  const token = (await cookies()).get(COOKIE)?.value;
+  return adminFromToken((await cookies()).get(COOKIE)?.value);
+}
+
+/** Operator dari isi cookie sesi ({ email }) atau null. Dipakai juga proxy.js untuk mode developer. */
+export async function adminFromToken(token) {
   if (!token) return null;
   const config = adminConfig();
   if (config.issues.length) return null;
@@ -125,7 +130,11 @@ export async function login(request, { email, password }) {
 
 async function startSession(config, saved) {
   const token = createSessionToken({ email: config.email, fingerprint: sessionFingerprint(config, saved), secret: secret() });
-  (await cookies()).set(COOKIE, token, cookieOptions());
+  const jar = await cookies();
+  jar.set(COOKIE, token, cookieOptions());
+  // Penanda tanpa rahasia yang bisa dibaca peramban: bilah mode developer di situs publik hanya
+  // menanyakan statusnya bila penanda ini ada, jadi pengunjung biasa tidak membuat permintaan tambahan.
+  jar.set(OPERATOR_COOKIE, "1", { ...cookieOptions(), httpOnly: false });
 }
 
 /** Email ini email operator (ADMIN_EMAIL)? Untuk "Lupa password". */
@@ -145,7 +154,9 @@ export async function replacePassword(request, password) {
 }
 
 export async function logout() {
-  (await cookies()).set(COOKIE, "", cookieOptions(0));
+  const jar = await cookies();
+  jar.set(COOKIE, "", cookieOptions(0));
+  jar.set(OPERATOR_COOKIE, "", { ...cookieOptions(0), httpOnly: false });
 }
 
 /** Penjaga API admin: asal permintaan harus situs ini dan operator harus masuk. { admin } atau { error: Response }. */

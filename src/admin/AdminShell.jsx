@@ -4,19 +4,24 @@ import {
   BanknoteIcon,
   BoxIcon,
   CalendarIcon,
+  ChevronIcon,
   GlobeIcon,
   GridIcon,
   LifeBuoyIcon,
+  LockIcon,
+  MenuIcon,
   ReceiptIcon,
   TagIcon,
   UserIcon,
   UsersIcon,
   WalletIcon,
 } from "../components/icons";
+import { getDeveloper } from "../server/developer-state";
 import LogoutButton from "./LogoutButton";
 
 // Menu mengikuti dashboard Zanclus: modul utama di atas, lalu kelompok Situs web, PR & mitra, HRD,
-// Keuangan, dan Gudang dengan halaman-halamannya.
+// Keuangan, Gudang, dan Sistem. Kelompok tertutup (hanya judulnya yang terlihat) kecuali kelompok
+// halaman yang sedang dibuka; di ponsel seluruh menu dilipat di balik tombol Menu.
 const MENU = [
   { key: "ringkasan", label: "Ringkasan cepat", icon: GridIcon, href: "/admin" },
   { key: "kalender", label: "Kalender reservasi", icon: CalendarIcon, href: "/admin/kalender" },
@@ -64,22 +69,76 @@ const MENU = [
       { key: "mutasi", label: "Keluar masuk", icon: TagIcon, href: "/admin/mutasi" },
     ],
   },
+  {
+    group: "Sistem",
+    icon: LockIcon,
+    items: [{ key: "developer", label: "Mode developer", icon: LockIcon, href: "/admin/developer" }],
+  },
 ];
 
-function MenuLink({ item, active, nested = false }) {
+const activeLabel = (active) => MENU.flatMap((entry) => entry.items ?? [entry]).find((item) => item.key === active)?.label;
+
+function MenuLink({ item, active, nested = false, badge }) {
   const { key, label, icon: Icon, href } = item;
   const current = key === active;
   return (
     <a
       href={href}
       aria-current={current ? "page" : undefined}
-      className={`flex items-center gap-3 rounded-input font-semibold whitespace-nowrap transition-colors duration-200 ease-brand ${nested ? "h-10 px-4 text-[15px] lg:pl-11" : "h-11 px-4"} ${
+      className={`flex items-center gap-3 rounded-input font-semibold whitespace-nowrap transition-colors duration-200 ease-brand ${nested ? "h-10 px-3 text-[15px]" : "h-11 px-4"} ${
         current ? "bg-abyss text-white shadow-float" : "text-abyss hover:bg-white hover:text-teal"
       }`}
     >
-      <Icon className={`size-5 ${nested ? "lg:hidden" : ""}`} />
+      {!nested && <Icon className="size-5" />}
       {label}
+      {badge && <span className="ml-auto rounded-full bg-sunrise-wash px-2 py-0.5 text-[11px] font-bold text-ember ring-1 ring-sunrise">{badge}</span>}
     </a>
+  );
+}
+
+/** Daftar menu: kelompok berupa dropdown (details) yang terbuka bila berisi halaman aktif. */
+function MenuList({ active, badges }) {
+  return (
+    <ul className="grid gap-1">
+      {MENU.map((entry) => {
+        if (!entry.group) {
+          return (
+            <li key={entry.key}>
+              <MenuLink item={entry} active={active} />
+            </li>
+          );
+        }
+        const open = entry.items.some((item) => item.key === active);
+        const badge = entry.items.map((item) => badges[item.key]).find(Boolean);
+        return (
+          <li key={entry.group}>
+            <details open={open} className="group">
+              <summary
+                className={`flex h-11 cursor-pointer list-none items-center gap-3 rounded-input px-4 font-semibold transition-colors duration-200 ease-brand hover:bg-white hover:text-teal [&::-webkit-details-marker]:hidden ${
+                  open ? "text-teal" : "text-abyss"
+                }`}
+              >
+                <entry.icon className="size-5" />
+                {entry.group}
+                {badge && (
+                  <span className="size-2 rounded-full bg-ember group-open:hidden" title={badge}>
+                    <span className="sr-only">{badge}</span>
+                  </span>
+                )}
+                <ChevronIcon className="ml-auto size-4 text-slate transition-transform duration-200 group-open:rotate-90" />
+              </summary>
+              <ul className="mt-1 mb-2 ml-[1.6rem] grid gap-0.5 border-l border-mist pl-3">
+                {entry.items.map((item) => (
+                  <li key={item.key}>
+                    <MenuLink item={item} active={active} badge={badges[item.key]} nested />
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -140,8 +199,10 @@ export function DatabaseNotice({ database }) {
 
 // Kerangka dashboard operator: kepala halaman, menu samping, dan isi modul. aside = isi tambahan di
 // bawah menu (mis. ringkasan laut di "Ringkasan cepat").
-export default function AdminShell({ admin, active, aside, children }) {
+export default async function AdminShell({ admin, active, aside, children }) {
   const initials = admin.email.slice(0, 2).toUpperCase();
+  const developer = await getDeveloper();
+  const badges = { developer: developer.enabled ? "Aktif" : null };
   return (
     <div className="min-h-dvh bg-foam">
       <header className="sticky top-0 z-20 bg-white/95 shadow-[0_1px_0_rgb(10_50_59/0.06),0_6px_20px_rgb(10_50_59/0.04)] backdrop-blur">
@@ -171,30 +232,21 @@ export default function AdminShell({ admin, active, aside, children }) {
 
       <div className="mx-auto grid max-w-[1400px] gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[280px_1fr] lg:gap-10 lg:py-10">
         <nav aria-label="Menu admin" className="grid content-start gap-4 lg:sticky lg:top-28">
-          <p className="hidden text-xs font-bold tracking-[0.16em] text-teal lg:block">MENU</p>
-          <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0">
-            {MENU.map((entry) =>
-              entry.group ? (
-                <li key={entry.group} className="contents lg:grid lg:gap-1 lg:pt-3">
-                  <p className="hidden items-center gap-3 px-4 text-xs font-bold tracking-[0.12em] text-slate uppercase lg:flex">
-                    <entry.icon className="size-4" />
-                    {entry.group}
-                  </p>
-                  <ul className="contents lg:grid lg:gap-0.5">
-                    {entry.items.map((item) => (
-                      <li key={item.key} className="shrink-0">
-                        <MenuLink item={item} active={active} nested />
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ) : (
-                <li key={entry.key} className="shrink-0">
-                  <MenuLink item={entry} active={active} />
-                </li>
-              ),
-            )}
-          </ul>
+          <details className="group/menu rounded-card bg-white ring-1 ring-mist lg:hidden">
+            <summary className="flex h-12 cursor-pointer list-none items-center gap-3 px-4 font-semibold text-abyss [&::-webkit-details-marker]:hidden">
+              <MenuIcon className="size-5" />
+              Menu
+              <span className="truncate font-normal text-slate">{activeLabel(active)}</span>
+              <ChevronIcon className="ml-auto size-4 shrink-0 text-slate transition-transform duration-200 group-open/menu:rotate-90" />
+            </summary>
+            <div className="border-t border-mist bg-foam p-2">
+              <MenuList active={active} badges={badges} />
+            </div>
+          </details>
+          <div className="hidden gap-3 lg:grid">
+            <p className="text-xs font-bold tracking-[0.16em] text-teal">MENU</p>
+            <MenuList active={active} badges={badges} />
+          </div>
           {aside}
         </nav>
 

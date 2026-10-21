@@ -43,7 +43,7 @@ export default async function ContentPage({ searchParams }) {
             <ExportLink query={{ type: "konten", bulan: month }} />
           </div>
           <p className="text-xs text-slate">Chip pudar = ide atau draf. Chip tebal = terjadwal atau tayang.</p>
-          <div className="overflow-x-auto rounded-card bg-white ring-1 ring-mist">
+          <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
             <div className="grid min-w-[720px] grid-cols-7">
               {WEEKDAYS.map((d) => (
                 <div key={d} className="border-b border-mist bg-foam px-2 py-2 text-center text-xs font-bold tracking-[0.1em] text-slate uppercase">

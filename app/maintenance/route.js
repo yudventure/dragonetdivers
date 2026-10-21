@@ -1,0 +1,38 @@
+import { PREVIEW_COOKIE, retryAfter } from "@/lib/developer";
+import { localeHref } from "@/lib/i18n";
+import { maintenanceHtml } from "@/lib/maintenance-page";
+import { contact, whatsappNumber } from "@/lib/site";
+import { getDeveloper } from "@/server/developer-state";
+
+export const dynamic = "force-dynamic";
+
+// Halaman perawatan mode developer. Hanya dibuka lewat proxy.js (header x-dd-lock) untuk halaman yang
+// ditutup; status 503 dan Retry-After memberi tahu mesin pencari bahwa ini sementara.
+export async function GET(request) {
+  const kind = request.headers.get("x-dd-lock");
+  if (kind !== "site" && kind !== "page") return new Response(null, { status: 307, headers: { location: "/" } });
+  const lang = request.headers.get("x-dd-lang") === "id" ? "id" : "en";
+  const asked = request.headers.get("x-dd-path") ?? "";
+  const path = /^\/(?![/\\])/.test(asked) ? asked : "/";
+  const developer = await getDeveloper();
+  const preview = request.headers.get("cookie")?.split(/;\s*/).some((part) => part.startsWith(`${PREVIEW_COOKIE}=`));
+  const html = maintenanceHtml({
+    kind,
+    lang,
+    path,
+    message: developer.message[lang],
+    until: developer.until,
+    whatsapp: whatsappNumber(),
+    email: contact.email,
+    previewExit: preview ? `${localeHref(lang, path)}?pratinjau=admin` : "",
+  });
+  return new Response(html, {
+    status: 503,
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+      "retry-after": String(retryAfter(developer.until)),
+      "x-robots-tag": "noindex",
+    },
+  });
+}
