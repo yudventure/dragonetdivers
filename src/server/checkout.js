@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { CheckoutError, isOverdue, newOrderCode, nextStatus, paymentOutcome, paypalUsd, validateCheckout } from "@/lib/checkout";
+import { envText } from "@/lib/env";
 import { createThrottle } from "@/lib/login-throttle";
 import { localeHref } from "@/lib/i18n";
 import { serviceBySlug } from "@/lib/services";
@@ -30,7 +31,7 @@ export async function paymentOptions() {
 /** Alamat publik situs untuk link kembali dari Midtrans dan PayPal. */
 export function siteOrigin(request) {
   try {
-    const configured = new URL(process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "");
+    const configured = new URL(envText(process.env.NEXT_PUBLIC_SITE_URL));
     if (configured.protocol === "https:" || configured.protocol === "http:") return configured.origin;
   } catch {} // kosong atau bukan URL: pakai alamat permintaan
   const host = request.headers.get("x-forwarded-host")?.split(",")[0].trim() || request.headers.get("host");

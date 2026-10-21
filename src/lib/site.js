@@ -1,4 +1,6 @@
-// Data situs yang dipakai di banyak halaman. Nilai NEXT_PUBLIC_* ditanam saat build.
+// Data situs yang dipakai di banyak halaman. Nilai NEXT_PUBLIC_* ditanam saat build; "-" dari hPanel
+// berarti belum diisi (src/lib/env.js).
+import { envText } from "./env.js";
 
 const DEFAULT_URL = "https://dragonetdivers.com";
 
@@ -15,7 +17,7 @@ function parseSiteUrl(raw) {
 // URL situs dari NEXT_PUBLIC_SITE_URL. Isian yang bukan URL (mis. teks contoh)
 // tidak boleh menggagalkan build: pakai URL bawaan dan beri peringatan di log.
 export function siteUrl(value = process.env.NEXT_PUBLIC_SITE_URL) {
-  const raw = value?.trim();
+  const raw = envText(value);
   if (!raw) return DEFAULT_URL;
   const parsed = parseSiteUrl(raw);
   if (parsed) return parsed;
@@ -49,7 +51,7 @@ const NETWORKS = [
 ];
 
 export function socialUrl(network, value) {
-  const raw = value?.trim();
+  const raw = envText(value);
   const net = NETWORKS.find((n) => n.id === network);
   if (!raw || !net) return null;
   const handle = raw.replace(/^@/, "");
@@ -80,7 +82,7 @@ export function socialLinks(values = SOCIAL_ENV) {
 
 // Nomor WhatsApp hanya angka dengan kode negara (mis. 6281234567890). Nilai lain diabaikan.
 export function whatsappNumber(value = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) {
-  const digits = value?.trim();
+  const digits = envText(value);
   return digits && /^[1-9]\d{7,14}$/.test(digits) ? digits : null;
 }
 
@@ -92,16 +94,16 @@ export function whatsappLink(text, number = whatsappNumber()) {
 // Peringatan isian variabel publik untuk /api/health (nilai publik, aman ditampilkan).
 export function siteConfigWarnings(env = process.env) {
   const warnings = [];
-  const url = env.NEXT_PUBLIC_SITE_URL?.trim();
+  const url = envText(env.NEXT_PUBLIC_SITE_URL);
   if (url && !parseSiteUrl(url)) {
     warnings.push(`NEXT_PUBLIC_SITE_URL bukan URL yang valid; memakai ${DEFAULT_URL}.`);
   }
-  const wa = env.NEXT_PUBLIC_WHATSAPP_NUMBER?.trim();
+  const wa = envText(env.NEXT_PUBLIC_WHATSAPP_NUMBER);
   if (wa && !whatsappNumber(wa)) {
     warnings.push("NEXT_PUBLIC_WHATSAPP_NUMBER tidak valid; tombol WhatsApp disembunyikan. Format: 6281234567890.");
   }
   for (const n of NETWORKS) {
-    const value = env[`NEXT_PUBLIC_${n.id.toUpperCase()}`]?.trim();
+    const value = envText(env[`NEXT_PUBLIC_${n.id.toUpperCase()}`]);
     if (value && !socialUrl(n.id, value)) {
       warnings.push(`NEXT_PUBLIC_${n.id.toUpperCase()} tidak valid; ikon ${n.label} disembunyikan. Isi handle (@dragonetdivers) atau URL ${n.host}.`);
     }

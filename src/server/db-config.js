@@ -1,19 +1,20 @@
 // Konfigurasi MySQL dari environment. Murni (tanpa koneksi) agar bisa dipakai
-// oleh Next.js, skrip CLI, dan test.
+// oleh Next.js, skrip CLI, dan test. "-" dari hPanel berarti belum diisi (src/lib/env.js).
+import { envText } from "../lib/env.js";
 
 const REQUIRED = ["MYSQL_HOST", "MYSQL_DATABASE", "MYSQL_USER", "MYSQL_PASSWORD"];
 
 export function mysqlSettings(env = process.env) {
-  const host = env.MYSQL_HOST?.trim();
-  const socketPath = env.MYSQL_SOCKET?.trim();
+  const host = envText(env.MYSQL_HOST);
+  const socketPath = envText(env.MYSQL_SOCKET);
   return {
     // localhost bisa terselesaikan ke ::1 yang punya grant berbeda di MySQL; paksa IPv4.
     host: !socketPath && host?.toLowerCase() === "localhost" ? "127.0.0.1" : host,
-    port: Number(env.MYSQL_PORT?.trim() || 3306),
-    database: env.MYSQL_DATABASE?.trim(),
-    user: env.MYSQL_USER?.trim(),
+    port: Number(envText(env.MYSQL_PORT) || 3306),
+    database: envText(env.MYSQL_DATABASE),
+    user: envText(env.MYSQL_USER),
     // Password dipakai apa adanya; spasi dan simbol bisa jadi bagian password.
-    password: env.MYSQL_PASSWORD,
+    password: envText(env.MYSQL_PASSWORD) ? env.MYSQL_PASSWORD : "",
     ...(socketPath ? { socketPath } : {}),
     connectTimeout: 10000,
     // Charset bawaan mysql2 sudah utf8mb4_unicode_ci, sama dengan collation tabel.
@@ -24,11 +25,11 @@ export function mysqlSettings(env = process.env) {
 
 // Daftar masalah konfigurasi tanpa menampilkan nilai rahasia.
 export function databaseIssues(env = process.env) {
-  const issues = REQUIRED.filter((name) => !env[name]?.trim()).map((name) => ({
+  const issues = REQUIRED.filter((name) => !envText(env[name])).map((name) => ({
     name,
     reason: "Belum diisi atau belum terbaca oleh aplikasi.",
   }));
-  const host = env.MYSQL_HOST?.trim();
+  const host = envText(env.MYSQL_HOST);
   if (host && (host.includes("://") || host.includes("/") || /\s/.test(host) || /^["']|["']$/.test(host))) {
     issues.push({ name: "MYSQL_HOST", reason: "Isi hostname saja, tanpa URL, path, spasi, atau tanda kutip." });
   }

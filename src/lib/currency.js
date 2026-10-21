@@ -2,6 +2,7 @@
 // dikonversi dengan kurs harian. Kurs referensi Bank Sentral Eropa (ECB) lewat Frankfurter (gratis,
 // tanpa API key, diperbarui tiap hari kerja), atau angka tetap dari variabel server USD_IDR_RATE.
 // File ini murni (tanpa Next.js) supaya bisa diuji; pengambilan dengan cache di src/server/exchange-rate.js.
+import { envText } from "./env.js";
 import { intlLocale } from "./i18n.js";
 
 export const currencies = ["USD", "IDR"];
@@ -26,7 +27,7 @@ export function parseRate(body) {
 
 /** USD_IDR_RATE dari hPanel (mis. "16250" atau "16.250"), atau null bila kosong atau tidak masuk akal. */
 export function rateFromEnv(value) {
-  const raw = value?.trim().replace(/[.,\s](?=\d{3}\b)/g, "");
+  const raw = envText(value).replace(/[.,\s](?=\d{3}\b)/g, "");
   if (!raw) return null;
   const idrPerUsd = Number(raw.replace(",", "."));
   return sensible(idrPerUsd) ? { idrPerUsd, date: null, source: "manual" } : null;
