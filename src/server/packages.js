@@ -1,5 +1,5 @@
 import "server-only";
-import { packageFromRow } from "@/lib/packages";
+import { missingPackages, packageFromRow } from "@/lib/packages";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
 
@@ -75,4 +75,14 @@ export async function savePackage(id, pkg) {
 export async function deletePackage(id) {
   const result = await query("DELETE FROM packages WHERE id = ?", [id]);
   return result.affectedRows > 0;
+}
+
+/**
+ * Tambahkan paket dari daftar harga (src/content/price-list.js, sudah lolos validatePackage) yang belum ada.
+ * Paket yang sudah ada, termasuk yang harganya sudah diubah tim, tidak disentuh. { added, skipped }.
+ */
+export async function importPackages(list) {
+  const missing = missingPackages(list, await allPackages());
+  for (const pkg of missing) await savePackage(null, pkg);
+  return { added: missing.length, skipped: list.length - missing.length };
 }
