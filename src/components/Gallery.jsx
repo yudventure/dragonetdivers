@@ -2,17 +2,20 @@ import { gallery } from "@/content/gallery";
 import { uiText } from "@/content/ui";
 import { socialLinks } from "@/lib/site";
 import { parseVideoUrl } from "@/lib/video-embed";
+import { siteGallery } from "@/server/site-gallery";
 import GalleryGrid from "./GalleryGrid";
 import { FacebookIcon, InstagramIcon, TikTokIcon, Wave, YouTubeIcon } from "./icons";
 
 const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: FacebookIcon, youtube: YouTubeIcon };
 
-// Galeri foto dan video di bawah peta titik selam. Isinya di src/content/gallery.js; tautan video
-// YouTube, Shorts, TikTok, Instagram, dan Facebook dibaca saat build (src/lib/video-embed.js), tautan
-// yang tidak dikenali dilewati dengan peringatan di log build. Teks alt dan judul dalam bahasa halaman.
-export default function Gallery({ lang }) {
+// Galeri foto dan video di bawah peta titik selam. Isinya dari /admin/situs (database); selama belum ada
+// item aktif dipakai src/content/gallery.js. Tautan video YouTube, Shorts, TikTok, Instagram, dan Facebook
+// dibaca src/lib/video-embed.js, tautan yang tidak dikenali dilewati dengan peringatan di log.
+// Teks alt dan judul dalam bahasa halaman.
+export default async function Gallery({ lang }) {
   const t = uiText(lang).gallery;
-  const items = gallery.flatMap((entry) => {
+  const source = (await siteGallery()) ?? gallery;
+  const items = source.flatMap((entry) => {
     const item = { ...entry, alt: entry.alt?.[lang] ?? entry.alt?.en, title: entry.title?.[lang] ?? entry.title?.en };
     if (item.type !== "embed") return [item];
     const video = parseVideoUrl(item.url);

@@ -41,7 +41,7 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
       id: "gallery",
       label: "Foto dan video asli di galeri",
       done: galleryIllustrations === 0,
-      hint: `${galleryIllustrations} item galeri masih ilustrasi AI. Kirim foto, klip, atau tautan video ke tim web untuk menggantinya.`,
+      hint: `${galleryIllustrations} item galeri masih ilustrasi AI. Unggah foto asli atau tempel tautan video di Situs web → Galeri foto & video.`,
     },
   ];
 }

@@ -3,8 +3,11 @@ import { randomBytes } from "node:crypto";
 import { CheckoutError, isOverdue, newOrderCode, nextStatus, paymentOutcome, paypalUsd, validateCheckout } from "@/lib/checkout";
 import { envText } from "@/lib/env";
 import { createThrottle } from "@/lib/login-throttle";
+import { availability } from "@/lib/modules/calendar";
 import { localeHref } from "@/lib/i18n";
 import { serviceBySlug } from "@/lib/services";
+import { dayBookings } from "./admin-data";
+import { isDatabaseConfigured } from "./db-config.js";
 import { getUsdIdrRate } from "./exchange-rate";
 import { createTransaction, transactionStatus, validSignature } from "./midtrans";
 import { later, scheduleReminder, sendOrderMail } from "./order-mail";
@@ -54,6 +57,7 @@ export async function startCheckout(request, input, { lang }) {
   const pkg = Number.isSafeInteger(id) ? await packageById(id, { activeOnly: true }) : null;
   const { settings, rate, methods } = await paymentOptions();
   const value = validateCheckout(input, { pkg, methods });
+  await checkAvailability(pkg.service, value.date, value.guests);
   state.throttle.fail(key); // setiap pesanan dihitung, bukan hanya yang gagal
   const origin = siteOrigin(request);
   const now = new Date();
@@ -112,6 +116,14 @@ async function setStatus(order, to, details) {
   const changed = await changeStatus(order.code, order.status, to, details);
   if (changed && to === "paid") later(() => sendOrderMail(order.code, "paid"));
   return changed;
+}
+
+/** Tanggal tutup dan kapasitas harian dari /admin/kalender: CheckoutError "closed" atau "full". */
+async function checkAvailability(service, date, guests) {
+  if (!isDatabaseConfigured()) return;
+  const a = availability({ date, service, ...(await dayBookings(date)) });
+  if (a.closed) throw new CheckoutError("closed", 409);
+  if (a.left !== null && guests > a.left) throw new CheckoutError("full", 409);
 }
 
 /** Simpan pesanan dengan kode baru; kode kembar (sangat jarang) dicoba ulang dengan kode lain. */

@@ -124,6 +124,14 @@ Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagi
 4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdivers.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
 5. Setelah uji coba lancar, ganti ke key production/live dan tambahkan `MIDTRANS_PRODUCTION=true` / `PAYPAL_MODE=live`. Di checkout, label "Mode uji" hilang begitu mode sungguhan aktif.
 
+### Modul tim di /admin
+
+Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pegawai, Absensi, Slip gaji, Buku kas, Laba rugi & pajak, Barang & stok, dan Keluar masuk menyimpan datanya di MySQL (tabel `admin_records`, `media`, dan `settings`, dibuat otomatis oleh migrasi 006). Tidak ada environment variable baru. Setiap modul punya tombol **Unduh Excel**.
+
+- **Kalender reservasi**: pesanan website tampil otomatis. Tanggal yang ditutup (**Tutup tanggal ini**) dan **Kapasitas harian** juga ditolak oleh checkout website.
+- **Galeri foto & video**: foto yang diunggah disimpan di database (diperkecil otomatis), jadi tidak hilang saat situs dibangun ulang. Begitu ada satu item yang tampil, galeri bawaan di beranda diganti.
+- **Buku kas**: pesanan website yang lunas masuk otomatis sebagai pemasukan. Pengeluaran dan pemasukan lain dicatat tim.
+
 ### Email ke tamu dan lupa password admin
 
 Isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, dan `SMTP_PASS` (tabel di atas), lalu deploy ulang. Di `/admin/pembayaran` bagian **Email ke tamu**, tekan **Kirim email uji ke operator** dan buka pratinjau tiap email. Setelah aktif:
