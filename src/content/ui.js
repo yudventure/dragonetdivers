@@ -112,19 +112,6 @@ const en = {
     play: "Play video: {title}",
     watchOn: "Watch on {platform} (opens in a new tab)",
   },
-  learn: {
-    eyebrow: "Dive courses",
-    title: "Ready for your first breath underwater?",
-    text: "Whether it is your very first dive or your next course, we take it one calm step at a time, at your pace and in small groups.",
-    steps: [
-      { title: "New to diving", text: "Start with the basics in a small group, guided every step of the way." },
-      { title: "Ready for more", text: "Build skills and confidence on the reefs of the Dampier Strait." },
-    ],
-    photoAlt: "Scuba diver giving the OK sign in clear blue water",
-    ask: "Ask about courses",
-    topic: "dive courses",
-    fallback: "How to get here",
-  },
   gettingHere: {
     eyebrow: "Getting here",
     title: "How to get to Dragonet Divers",
@@ -276,7 +263,6 @@ const en = {
     planLinks: [
       { href: "/#conditions", label: "Live sea conditions" },
       { href: "/#dive-sites", label: "Dive site map" },
-      { href: "/#learn", label: "Learn to dive" },
       { href: "/#getting-here", label: "How to get here" },
       { href: "/#faq", label: "FAQ" },
     ],
@@ -396,19 +382,6 @@ const id = {
     next: "Foto berikutnya",
     play: "Putar video: {title}",
     watchOn: "Tonton di {platform} (membuka tab baru)",
-  },
-  learn: {
-    eyebrow: "Kursus selam",
-    title: "Siap menarik napas pertamamu di bawah air?",
-    text: "Entah ini penyelaman pertamamu atau kursus berikutnya, kami melangkah pelan dan tenang, mengikuti ritmemu, dalam grup kecil.",
-    steps: [
-      { title: "Baru mulai menyelam", text: "Mulai dari dasar dalam grup kecil, didampingi di setiap langkah." },
-      { title: "Siap naik level", text: "Asah keterampilan dan rasa percaya diri di karang Selat Dampier." },
-    ],
-    photoAlt: "Penyelam memberi tanda OK di air biru yang jernih",
-    ask: "Tanya soal kursus",
-    topic: "kursus selam",
-    fallback: "Cara ke sini",
   },
   gettingHere: {
     eyebrow: "Cara ke sini",
@@ -561,7 +534,6 @@ const id = {
     planLinks: [
       { href: "/#conditions", label: "Kondisi laut terkini" },
       { href: "/#dive-sites", label: "Peta titik selam" },
-      { href: "/#learn", label: "Belajar menyelam" },
       { href: "/#getting-here", label: "Cara ke sini" },
       { href: "/#faq", label: "FAQ" },
     ],
