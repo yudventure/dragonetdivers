@@ -279,8 +279,6 @@ const en = {
   },
   footer: {
     contactLinks: "Contact and social media",
-    emailLabel: "Email {email}",
-    mapsLabel: "Find us on Google Maps",
     services: "Services",
     plan: "Plan your trip",
     planLinks: [
@@ -573,8 +571,6 @@ const id = {
   },
   footer: {
     contactLinks: "Kontak dan media sosial",
-    emailLabel: "Email {email}",
-    mapsLabel: "Lihat lokasi kami di Google Maps",
     services: "Layanan",
     plan: "Rencanakan perjalanan",
     planLinks: [
