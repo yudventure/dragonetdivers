@@ -4,6 +4,8 @@ import OrderList from "@/admin/OrderList";
 import { STATUSES } from "@/lib/checkout";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
+import { mailConfigured, mailIssues } from "@/server/mailer";
+import { mailLog } from "@/server/order-mail";
 import { expireOverdue, listOrders, orderCounts } from "@/server/orders";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +21,8 @@ const FILTERS = [
 ];
 
 // /admin/pesanan: pesanan dari checkout website. Transfer bank ditandai lunas di sini setelah dana
-// masuk; Midtrans dan PayPal berubah sendiri lewat notifikasi atau tombol "Cek status".
+// masuk; Midtrans dan PayPal berubah sendiri lewat notifikasi atau tombol "Cek status". Setiap kartu
+// menampilkan email yang sudah dikirim ke tamu (src/server/order-mail.js).
 export default async function OrdersPage({ searchParams }) {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
@@ -28,10 +31,12 @@ export default async function OrdersPage({ searchParams }) {
   const database = await databaseStatus();
   let orders = [];
   let counts = {};
+  let mails = {};
   if (database.ok) {
     try {
       await expireOverdue();
       [orders, counts] = await Promise.all([listOrders({ status }), orderCounts()]);
+      mails = await mailLog(orders.map((o) => o.code));
     } catch (error) {
       console.error(`[admin/pesanan] ${error.code ?? error.message}`);
     }
@@ -64,7 +69,13 @@ export default async function OrdersPage({ searchParams }) {
               );
             })}
           </nav>
-          <OrderList orders={orders} />
+          {!mailConfigured() && (
+            <p className="rounded-card bg-sunrise-wash p-4 text-sm text-abyss ring-1 ring-sunrise">
+              Email ke tamu belum aktif. Isi <code className="font-bold text-ember">{mailIssues().join(", ")}</code> di hPanel lalu deploy ulang. Setelah itu
+              tamu menerima email pesanan diterima, pengingat bayar, dan pembayaran diterima.
+            </p>
+          )}
+          <OrderList orders={orders} mails={mails} />
         </>
       )}
     </AdminShell>

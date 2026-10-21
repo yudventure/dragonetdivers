@@ -1,10 +1,12 @@
 import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
+import GuestMailPanel from "@/admin/GuestMailPanel";
 import PaymentSettings from "@/admin/PaymentSettings";
 import { site } from "@/lib/site";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { getUsdIdrRate } from "@/server/exchange-rate";
+import { mailConfigured, mailIssues, mailSender } from "@/server/mailer";
 import { lastMidtransError, midtransConfigured, midtransIssues, midtransKeyEnding, midtransProduction } from "@/server/midtrans";
 import { getPayments, methodStatus } from "@/server/payment-settings";
 import { lastPaypalError, paypalConfigured, paypalKeyEnding, paypalLive } from "@/server/paypal";
@@ -13,7 +15,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Pembayaran" };
 
 // /admin/pembayaran: cara bayar yang ditawarkan di checkout, rekening transfer, batas waktu bayar, dan
-// status key Midtrans/PayPal dari hPanel (key-nya sendiri tidak pernah ditampilkan).
+// status key Midtrans/PayPal dari hPanel (key-nya sendiri tidak pernah ditampilkan), dan email ke tamu.
 export default async function PaymentsPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
@@ -38,6 +40,7 @@ export default async function PaymentsPage() {
       </ModuleTitle>
       <DatabaseNotice database={database} />
       {settings && <PaymentSettings initial={settings} status={methodStatus(settings, rate)} providers={providers} rate={rate} />}
+      <GuestMailPanel configured={mailConfigured()} issues={mailIssues()} sender={mailSender()} />
     </AdminShell>
   );
 }
