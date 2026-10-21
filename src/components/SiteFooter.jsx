@@ -3,7 +3,7 @@ import Link from "next/link";
 import plate from "../../brand/logo/dragonet-divers-logo-plate.png";
 import { services } from "@/lib/services";
 import { contact, mapsLink, site, socialLinks, whatsappLink } from "@/lib/site";
-import { ChatIcon, FacebookIcon, InstagramIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "./icons";
+import { ChatIcon, FacebookIcon, InstagramIcon, LockIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "./icons";
 
 const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: FacebookIcon, youtube: YouTubeIcon };
 
@@ -12,6 +12,7 @@ const PLAN_LINKS = [
   { href: "/#dive-sites", label: "Dive site map" },
   { href: "/#learn", label: "Learn to dive" },
   { href: "/#getting-here", label: "How to get here" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 function Column({ id, title, children }) {
@@ -30,7 +31,8 @@ const linkClass = "text-[15px] text-white/90 transition-colors duration-200 ease
 // Area gelap utama: Abyss + pita garis mandarin (BRANDING.md §9.10). Empat kolom: brand + ikon kontak
 // dan media sosial, layanan, rencana perjalanan, kontak. Ikon media sosial muncul hanya bila akunnya
 // diisi (NEXT_PUBLIC_INSTAGRAM dst., src/lib/site.js). Logo versi plate karena pita tulisan asli transparan.
-// Bagian bawah dipisah dengan latar sedikit lebih terang, tanpa garis pemisah.
+// Bagian bawah dipisah dengan latar sedikit lebih terang, tanpa garis pemisah; kanan bawah tautan
+// "Operator sign in" ke dashboard tim.
 export default function SiteFooter() {
   const chat = whatsappLink("Hi Dragonet Divers, I'd like to ask about diving in Raja Ampat.");
   const icons = [
@@ -138,9 +140,15 @@ export default function SiteFooter() {
           <p>
             © {new Date().getFullYear()} {site.name}
           </p>
-          <p>Raja Ampat · Papua Barat Daya · Indonesia</p>
-          <a href="#top" className="font-semibold text-white/90 transition-colors duration-200 ease-brand hover:text-sunrise">
-            Back to top ↑
+          {/* Masuk ke dashboard tim (/admin) di tab baru, seperti di situs Zanclus. */}
+          <a
+            href="/admin"
+            target="_blank"
+            rel="noopener"
+            className="inline-flex items-center gap-2 font-semibold text-white/90 transition-colors duration-200 ease-brand hover:text-sunrise"
+          >
+            <LockIcon className="size-4" />
+            Operator sign in
           </a>
         </div>
       </div>
