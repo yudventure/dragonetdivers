@@ -225,14 +225,9 @@ function ServicesMenu({ t, services, allHref, active }) {
   );
 }
 
+/** Tombol oranye ke WhatsApp; tanpa nomor WhatsApp (NEXT_PUBLIC_WHATSAPP_NUMBER) tidak ditampilkan. */
 function BookButton({ booking, t, className = "" }) {
-  if (!booking) {
-    return (
-      <span className={`inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] whitespace-nowrap text-teal uppercase ${className}`}>
-        {t.comingSoon}
-      </span>
-    );
-  }
+  if (!booking) return null;
   return (
     <a
       href={booking}
