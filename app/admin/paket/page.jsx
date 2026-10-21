@@ -1,6 +1,9 @@
 import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import PackageManager from "@/admin/PackageManager";
+import PriceListImport from "@/admin/PriceListImport";
+import { PRICE_LIST } from "@/content/price-list";
+import { missingPackages } from "@/lib/packages";
 import { servicesIn } from "@/lib/services";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
@@ -16,6 +19,17 @@ export default async function PackagesPage() {
   const database = await databaseStatus();
   const packages = database.ok ? await allPackages().catch(() => []) : [];
   const services = servicesIn("id").map(({ slug, title }) => ({ slug, title }));
+  // Daftar harga pemilik: paket yang belum ada bisa ditambahkan sekali klik (src/content/price-list.js).
+  const missing = new Set(missingPackages(PRICE_LIST.packages, packages));
+  const priceGroups = services
+    .map(({ slug, title }) => ({
+      slug,
+      title,
+      items: PRICE_LIST.packages
+        .filter((p) => p.service === slug)
+        .map((p) => ({ name: p.nameId, price: p.price, unit: p.unit, minGuests: p.minGuests, maxGuests: p.maxGuests, isNew: missing.has(p) })),
+    }))
+    .filter((group) => group.items.length);
   return (
     <AdminShell admin={admin} active="paket">
       <ModuleTitle title="Paket & harga">
@@ -23,6 +37,7 @@ export default async function PackagesPage() {
         dolar melihat perkiraannya, dan PayPal menagih dalam dolar dengan kurs hari itu.
       </ModuleTitle>
       <DatabaseNotice database={database} />
+      {database.ok && <PriceListImport title={PRICE_LIST.title} source={PRICE_LIST.source} groups={priceGroups} />}
       {database.ok && <PackageManager packages={packages} services={services} />}
     </AdminShell>
   );

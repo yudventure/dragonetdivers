@@ -34,3 +34,9 @@ export const localizePackage = (pkg, lang) => {
     maxGuests: pkg.maxGuests,
   };
 };
+
+const sameName = (a, b) => String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
+
+/** Paket daftar harga yang belum ada (layanan sama dan nama English atau Indonesia sama dianggap sudah ada). */
+export const missingPackages = (list, existing) =>
+  list.filter((item) => !existing.some((pkg) => pkg.service === item.service && (sameName(pkg.nameEn, item.nameEn) || sameName(pkg.nameId, item.nameId))));
