@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { siteConfigWarnings, siteUrl, whatsappLink, whatsappNumber } from "../src/lib/site.js";
+import { contact, mapsLink, siteConfigWarnings, siteUrl, socialLinks, socialUrl, whatsappLink, whatsappNumber } from "../src/lib/site.js";
 
 test("nomor WhatsApp hanya diterima dalam format kode negara + angka", () => {
   assert.equal(whatsappNumber("6281234567890"), "6281234567890");
@@ -32,4 +32,28 @@ test("peringatan konfigurasi publik untuk /api/health", () => {
   assert.equal(warnings.length, 2);
   assert.match(warnings[0], /NEXT_PUBLIC_SITE_URL/);
   assert.match(warnings[1], /NEXT_PUBLIC_WHATSAPP_NUMBER/);
+});
+
+test("akun media sosial: handle atau URL di domain jaringannya, selain itu disembunyikan", () => {
+  assert.equal(socialUrl("instagram", "@dragonetdivers"), "https://www.instagram.com/dragonetdivers/");
+  assert.equal(socialUrl("tiktok", "dragonetdivers"), "https://www.tiktok.com/@dragonetdivers");
+  assert.equal(socialUrl("facebook", "https://www.facebook.com/dragonetdivers"), "https://www.facebook.com/dragonetdivers");
+  assert.equal(socialUrl("youtube", "https://m.youtube.com/@dragonetdivers"), "https://m.youtube.com/@dragonetdivers");
+  for (const bad of ["", undefined, "masih uji coba", "http://instagram.com/x", "https://evil.example/instagram.com"]) {
+    assert.equal(socialUrl("instagram", bad), null, String(bad));
+  }
+  assert.deepEqual(socialLinks({}), []);
+  assert.deepEqual(
+    socialLinks({ instagram: "@dragonetdivers", tiktok: "salah isi!" }).map((s) => s.id),
+    ["instagram"],
+  );
+  const warnings = siteConfigWarnings({ NEXT_PUBLIC_TIKTOK: "salah isi!" });
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /NEXT_PUBLIC_TIKTOK/);
+});
+
+test("kontak dan base dari pemilik", () => {
+  assert.equal(contact.email, "halo@dragonetdivers.com");
+  assert.match(contact.address.join(" "), /Kurkapa/);
+  assert.equal(mapsLink({ lat: -0.5, lng: 130.6 }), "https://www.google.com/maps/search/?api=1&query=-0.5,130.6");
 });

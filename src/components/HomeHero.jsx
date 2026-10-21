@@ -84,9 +84,9 @@ export default function HomeHero() {
 
         {/* Penanda scroll di atas badan penyelam: warna dibalik (putih di atas hitam, hitam di atas putih) */}
         <a
-          href="#story"
+          href="#conditions"
           className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white mix-blend-difference lg:flex"
-          aria-label="Scroll down to our story"
+          aria-label="Scroll down to live sea conditions"
         >
           <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">Scroll down</span>
           <span className="h-12 w-px bg-white/60" aria-hidden="true" />

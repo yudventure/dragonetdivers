@@ -15,7 +15,7 @@ const steps = [
 export default function LearnToDive() {
   const ask = whatsappLink("Hi Dragonet Divers, I'd like to ask about dive courses.");
   return (
-    <section aria-labelledby="learn-title" className="overflow-hidden bg-white">
+    <section id="learn" aria-labelledby="learn-title" className="scroll-mt-24 overflow-hidden bg-white">
       <div className="gutter mx-auto grid max-w-[1200px] items-center gap-12 py-20 md:py-28 lg:grid-cols-2 lg:gap-16">
         <div className="relative mx-auto w-full max-w-[520px]">
           {/* Lingkaran gelembung di belakang foto */}
@@ -59,10 +59,10 @@ export default function LearnToDive() {
           </ul>
 
           <a
-            href={ask ?? "#story"}
+            href={ask ?? "#getting-here"}
             className="mt-4 inline-flex h-12 w-fit items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
           >
-            {ask ? "Ask about courses" : "Get to know us"}
+            {ask ? "Ask about courses" : "How to get here"}
             <ArrowIcon className="size-[18px]" />
           </a>
         </div>
