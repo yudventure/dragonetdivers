@@ -6,12 +6,19 @@ import { BOAT_ROUTE, CROP, PLACES, ferryEntry, percentIn, steps } from "../src/l
 const inCrop = ([x, y], [x0, y0, w, h] = CROP) => x >= x0 && x <= x0 + w && y >= y0 && y <= y0 + h;
 
 test("langkah perjalanan lengkap, tanpa harga dan jam keberangkatan", () => {
-  assert.equal(steps.length, 4);
-  for (const step of steps) {
-    assert.ok(step.title && step.text, step.title);
-    assert.doesNotMatch(step.text, /\$|USD|IDR|Rp\b|\d{1,2}[:.]\d{2}\s?(am|pm)?|\d+\s?(am|pm)\b/i, step.title);
+  for (const lang of ["en", "id"]) {
+    assert.equal(steps[lang].length, 4, lang);
+    for (const step of steps[lang]) {
+      assert.ok(step.title && step.text, step.title);
+      assert.doesNotMatch(step.text, /\$|USD|IDR|Rp\b|\d{1,2}[:.]\d{2}\s?(am|pm)?|\d+\s?(am|pm)\b/i, step.title);
+    }
+    assert.match(steps[lang].at(-1).text, /Kurkapa/, lang);
   }
-  assert.match(steps.at(-1).text, /Kurkapa/);
+  assert.deepEqual(
+    steps.id.map((s) => s.link?.href),
+    steps.en.map((s) => s.link?.href),
+    "tautan sama di kedua bahasa",
+  );
 });
 
 test("Waisai, base Kurkapa, dan jalur perahu ada di dalam potongan peta", () => {

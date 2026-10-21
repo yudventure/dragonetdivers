@@ -1,4 +1,5 @@
 import { gallery } from "@/content/gallery";
+import { uiText } from "@/content/ui";
 import { socialLinks } from "@/lib/site";
 import { parseVideoUrl } from "@/lib/video-embed";
 import GalleryGrid from "./GalleryGrid";
@@ -8,13 +9,15 @@ const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: F
 
 // Galeri foto dan video di bawah peta titik selam. Isinya di src/content/gallery.js; tautan video
 // YouTube, Shorts, TikTok, Instagram, dan Facebook dibaca saat build (src/lib/video-embed.js), tautan
-// yang tidak dikenali dilewati dengan peringatan di log build.
-export default function Gallery() {
-  const items = gallery.flatMap((item) => {
+// yang tidak dikenali dilewati dengan peringatan di log build. Teks alt dan judul dalam bahasa halaman.
+export default function Gallery({ lang }) {
+  const t = uiText(lang).gallery;
+  const items = gallery.flatMap((entry) => {
+    const item = { ...entry, alt: entry.alt?.[lang] ?? entry.alt?.en, title: entry.title?.[lang] ?? entry.title?.en };
     if (item.type !== "embed") return [item];
     const video = parseVideoUrl(item.url);
     if (!video) {
-      console.warn(`Galeri: tautan video tidak dikenali, dilewati (${item.url}).`);
+      if (lang === "en") console.warn(`Galeri: tautan video tidak dikenali, dilewati (${item.url}).`);
       return [];
     }
     return [{ ...item, video, size: item.size ?? (video.vertical ? "tall" : "wide") }];
@@ -28,15 +31,15 @@ export default function Gallery() {
       <div className="gutter mx-auto grid max-w-[1200px] gap-8 pt-16 md:pt-24">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="grid content-start gap-3">
-            <p className="eyebrow">Gallery</p>
+            <p className="eyebrow">{t.eyebrow}</p>
             <h2 id="gallery-title" className="text-[1.75rem] leading-[1.15] text-abyss sm:text-[2.125rem]">
-              Moments from the Dampier Strait
+              {t.title}
             </h2>
             <Wave />
           </div>
           {socials.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold text-slate">Follow our dives</span>
+              <span className="text-sm font-semibold text-slate">{t.follow}</span>
               {socials.map(({ id, label, href }) => {
                 const Icon = SOCIAL_ICONS[id];
                 return (
@@ -57,12 +60,10 @@ export default function Gallery() {
           )}
         </div>
 
-        <GalleryGrid items={items} />
+        <GalleryGrid items={items} t={t} />
 
         {illustrations && (
-          <p className="text-sm text-slate">
-            The images and clips here are AI illustrations for now. Our own photos and videos from the Dampier Strait are coming soon.
-          </p>
+          <p className="text-sm text-slate">{t.illustrations}</p>
         )}
       </div>
     </section>

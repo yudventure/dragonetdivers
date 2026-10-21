@@ -23,11 +23,10 @@ export function siteUrl(value = process.env.NEXT_PUBLIC_SITE_URL) {
   return DEFAULT_URL;
 }
 
+// Tagline dan deskripsi dalam dua bahasa ada di src/content/ui.js (meta).
 export const site = {
   name: "Dragonet Divers Raja Ampat",
   shortName: "Dragonet Divers",
-  tagline: "Dive into colour.",
-  description: "Small-group diving, courses and snorkeling trips in Raja Ampat and the Dampier Strait, with local guides.",
   url: siteUrl(),
 };
 

@@ -4,11 +4,6 @@ import { adminConfig, currentAdmin } from "@/server/admin-auth";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Admin",
-  robots: { index: false, follow: false },
-};
-
 // Dashboard tim Dragonet (dibuka dari "Operator sign in" di footer). Tanpa sesi yang sah, tampil form
 // masuk; bila akun operator belum diatur di hPanel, form diganti petunjuk pengaturan.
 export default async function AdminPage() {

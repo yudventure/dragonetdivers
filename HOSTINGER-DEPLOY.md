@@ -94,6 +94,7 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
 | `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. |
 | `SESSION_SECRET` | Teks acak panjang untuk menandatangani sesi (mis. hasil `openssl rand -base64 48`). Tanpa ini operator harus masuk lagi setiap aplikasi dimulai ulang. |
+| `USD_IDR_RATE` | Opsional. Kurs tetap Rupiah per 1 US$ (mis. `16250`) untuk pilihan mata uang di header. Kosong = kurs harian Bank Sentral Eropa (Frankfurter), diperbarui otomatis. |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |
 | `MYSQL_DATABASE` | Nama database lengkap, mis. `u123456789_dragonet` |

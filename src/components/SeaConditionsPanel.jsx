@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 // Latar laut dalam dengan manta yang berenang bolak-balik (Higgsfield: GPT Image 2.5 + Kling 3.0).
 // Cara membuat: brand/ocean/README.md.
 import oceanPoster from "../assets/ocean-manta-loop.webp";
+import { format, intlLocale } from "@/lib/i18n";
+import { arah, translateLabel } from "@/lib/sea-conditions";
 import LoopVideo from "./LoopVideo";
 import {
   ArrowNorthIcon,
@@ -51,7 +53,8 @@ const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 // keterbacaan. object-[center_35%]: di panel desktop yang pendek, pita video yang terlihat sedikit di
 // atas tengah, jalur yang dilewati manta.
 // Data awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka.
-export default function SeaConditionsPanel({ initial }) {
+// Label dan satuan dari src/content/ui.js (t); arah dalam Bahasa Indonesia memakai delapan penjuru.
+export default function SeaConditionsPanel({ initial, lang, t }) {
   const [data, setData] = useState(initial);
   const [failed, setFailed] = useState(false);
 
@@ -81,7 +84,12 @@ export default function SeaConditionsPanel({ initial }) {
   const w = data?.weather;
   const s = data?.sea;
   const WeatherIcon = w?.kind === "clear" ? (w.isDay ? SunIcon : MoonIcon) : (WEATHER_ICONS[w?.kind] ?? CloudIcon);
-  const updated = data?.time?.split("T")[1]?.slice(0, 5);
+  const clock = data?.time?.split("T")[1]?.slice(0, 5);
+  const updated = clock && (lang === "id" ? clock.replace(":", ".") : clock);
+  const sunset = data?.sunset && (lang === "id" ? data.sunset.replace(":", ".") : data.sunset);
+  const label = (value) => translateLabel(value, lang);
+  const n = (value) => (typeof value === "number" ? value.toLocaleString(intlLocale[lang]) : value);
+  const dir = (short, degrees) => (lang === "id" ? arah(degrees) : short);
 
   return (
     <section id="conditions" aria-labelledby="sea-title" className="scroll-mt-24 bg-white">
@@ -103,52 +111,52 @@ export default function SeaConditionsPanel({ initial }) {
                 <span className="relative inline-flex size-2.5 rounded-full bg-sunrise" />
               </span>
               <span>
-                Live sea conditions
+                {t.title}
                 <span className="hidden sm:inline"> · </span>
-                <span className="block sm:inline">{data?.place ?? "Dampier Strait"}</span>
+                <span className="block sm:inline">{t.place}</span>
               </span>
             </h2>
             <p className="text-sm text-white/80" aria-live="polite">
-              {updated ? `Updated ${updated} WIT` : failed ? "Live data unavailable right now" : "Loading live data…"}
+              {updated ? format(t.updated, { time: updated }) : failed ? t.failed : t.loading}
             </p>
           </div>
 
           <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
-            <Tile icon={WeatherIcon} label="Weather" value={w?.tempC} unit="°C" detail={w?.label} />
+            <Tile icon={WeatherIcon} label={t.weather} value={n(w?.tempC)} unit="°C" detail={label(w?.label)} />
             <Tile
               icon={WindIcon}
-              label="Wind"
-              value={w?.windKmh}
-              unit="km/h"
-              detail={join(w?.windFrom && `from ${w.windFrom}`, w?.gustKmh != null && `gusts ${w.gustKmh}`)}
+              label={t.wind}
+              value={n(w?.windKmh)}
+              unit={t.kmh}
+              detail={join(w?.windFrom && format(t.from, { dir: dir(w.windFrom, w.windFromDeg) }), w?.gustKmh != null && format(t.gusts, { n: n(w.gustKmh) }))}
               arrow={plus180(w?.windFromDeg)}
             />
             <Tile
               icon={WavesIcon}
-              label="Waves"
-              value={s?.waveM}
+              label={t.waves}
+              value={n(s?.waveM)}
               unit="m"
-              detail={join(s?.seaState, s?.waveFrom && `from ${s.waveFrom}`)}
+              detail={join(label(s?.seaState), s?.waveFrom && format(t.from, { dir: dir(s.waveFrom, s.waveFromDeg) }))}
               arrow={plus180(s?.waveFromDeg)}
             />
             <Tile
               icon={ArrowNorthIcon}
-              label="Current"
-              value={s?.currentKn}
-              unit="kn"
-              detail={s?.currentTo && `flowing ${s.currentTo}`}
+              label={t.current}
+              value={n(s?.currentKn)}
+              unit={t.knots}
+              detail={s?.currentTo && format(t.flowing, { dir: dir(s.currentTo, s.currentToDeg) })}
               arrow={s?.currentToDeg}
             />
-            <Tile icon={ThermometerIcon} label="Water" value={s?.waterC} unit="°C" detail="Sea surface" />
-            <Tile icon={SunsetIcon} label="Sunset" value={data?.sunset} detail="WIT · mandarin hour" />
+            <Tile icon={ThermometerIcon} label={t.water} value={n(s?.waterC)} unit="°C" detail={t.seaSurface} />
+            <Tile icon={SunsetIcon} label={t.sunset} value={sunset} detail={t.sunsetDetail} />
           </dl>
 
           <p className="mt-6 text-xs text-white/75">
-            Forecast model data from{" "}
+            {t.sourceBefore}{" "}
             <a href="https://open-meteo.com/" className="font-semibold text-white underline underline-offset-2" rel="noopener" target="_blank">
               Open-Meteo
             </a>
-            , refreshed every 15 minutes. Conditions at each dive site can differ.
+            {t.sourceAfter}
           </p>
         </div>
       </div>

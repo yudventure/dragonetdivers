@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { format } from "@/lib/i18n";
 import { FacebookIcon, InstagramIcon, PlayIcon, TikTokIcon, YouTubeIcon } from "./icons";
 
 const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: InstagramIcon, facebook: FacebookIcon };
@@ -11,7 +12,7 @@ const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: In
 // jalan tanpa suara dan tanpa tombol, seperti latar bergerak; tombol platform di pojok membuka video
 // aslinya dengan suara. Instagram, atau saat "kurangi animasi"/hemat data aktif, diputar saat diketuk.
 // Ukuran player menutupi petak seperti object-cover (satuan cq dari petak).
-export default function EmbedVideo({ video, title }) {
+export default function EmbedVideo({ video, title, t }) {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
   const [auto, setAuto] = useState(false);
@@ -66,7 +67,7 @@ export default function EmbedVideo({ video, title }) {
           type="button"
           onClick={() => setTapped(true)}
           className="group absolute inset-0 grid place-items-center text-white"
-          aria-label={`Play video: ${title}`}
+          aria-label={format(t.play, { title })}
         >
           <span className="grid size-14 place-items-center rounded-full bg-abyss/60 ring-1 ring-white/40 transition-transform duration-200 ease-brand group-hover:scale-110">
             <PlayIcon className="ml-0.5 size-6" />
@@ -80,7 +81,7 @@ export default function EmbedVideo({ video, title }) {
         target="_blank"
         rel="noopener"
         className="absolute top-2.5 left-2.5 inline-flex h-8 items-center gap-1.5 rounded-full bg-abyss/70 px-3 text-xs font-bold text-white ring-1 ring-white/25 transition-colors duration-200 ease-brand hover:bg-white hover:text-abyss"
-        aria-label={`Watch on ${video.label} (opens in a new tab)`}
+        aria-label={format(t.watchOn, { platform: video.label })}
       >
         {Icon && <Icon className="size-4" />}
         {video.label}

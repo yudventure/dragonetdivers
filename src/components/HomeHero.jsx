@@ -4,22 +4,23 @@ import { preload } from "react-dom";
 // dokumentasi lokasi (BRANDING.md §7). Video loop di public/media/hero-diver.*,
 // poster = frame pertamanya. Cara membuat ulang: brand/hero/README.md.
 import poster from "../assets/hero-diver.webp";
+import { uiText } from "@/content/ui";
+import { format } from "@/lib/i18n";
 import { site, whatsappLink } from "@/lib/site";
 import LoopVideo from "./LoopVideo";
 import { ArrowIcon, CapIcon, FishIcon, WavesIcon } from "./icons";
 
-// Layanan dari BRANDING.md §1 (yang dijual). Tanpa harga atau jadwal.
-const services = [
-  { icon: FishIcon, title: "Fun dives", text: "Guided dives on the reefs of the Dampier Strait.", ask: "fun dives" },
-  { icon: CapIcon, title: "Dive courses", text: "From your first breath underwater to the next level.", ask: "dive courses" },
-  { icon: WavesIcon, title: "Snorkeling & trips", text: "Reef snorkeling and island days for the whole family.", ask: "snorkeling and trips" },
-];
+// Ikon tiga layanan utama dari BRANDING.md §1 (yang dijual); teksnya di src/content/ui.js (hero.services).
+// Tanpa harga atau jadwal.
+const ICONS = [FishIcon, CapIcon, WavesIcon];
 
 // Hero beranda: judul besar huruf kecil di kiri menimpa sebagian gambar,
 // penyelam di tengah di atas putih, daftar layanan bernomor di kanan.
 // Desktop: hero ditarik 72 px ke belakang header yang transparan, jadi gelembung naik di belakangnya.
-export default function HomeHero() {
+export default function HomeHero({ lang }) {
   preload(poster.src, { as: "image", fetchPriority: "high" });
+  const t = uiText(lang);
+  const [titleLead, titleAccent] = t.hero.title;
   return (
     <section className="relative isolate overflow-hidden bg-white lg:-mt-[72px]" aria-labelledby="hero-title">
       <div className="gutter relative mx-auto flex max-w-[1200px] flex-col lg:block lg:h-[clamp(712px,100svh,952px)]">
@@ -41,17 +42,18 @@ export default function HomeHero() {
             id="hero-title"
             className="font-display text-[clamp(3.25rem,8.2vw,7.75rem)] leading-[0.88] font-semibold tracking-[-0.02em] text-abyss lowercase [text-shadow:0_0_28px_rgb(255_255_255/0.9)]"
           >
-            dive into
+            {titleLead}
             <br />
-            <span className="text-teal">colour.</span>
+            <span className="text-teal">{titleAccent}</span>
           </h1>
           <p className="mt-5 pl-1 text-lg text-slate lg:mt-6 lg:pl-[0.35em] lg:text-xl">{site.name}</p>
         </div>
 
         {/* Daftar layanan bernomor */}
         <ol className="relative z-10 order-3 grid gap-2 py-8 lg:absolute lg:top-[calc(50%+36px)] lg:right-[max(32px,env(safe-area-inset-right,0px))] lg:w-[300px] lg:-translate-y-1/2 lg:py-0">
-          {services.map(({ icon: Icon, title, text, ask }, index) => {
-            const link = whatsappLink(`Hi Dragonet Divers, I'd like to ask about ${ask}.`);
+          {t.hero.services.map(({ title, text, topic }, index) => {
+            const Icon = ICONS[index];
+            const link = whatsappLink(format(t.whatsapp.about, { topic }));
             return (
               <li
                 key={title}
@@ -66,7 +68,7 @@ export default function HomeHero() {
                   <span className="text-sm leading-snug text-slate">{text}</span>
                   {link && (
                     <a href={link} className="mt-1 inline-flex w-fit items-center gap-1.5 text-sm font-bold text-teal underline-offset-4 hover:underline">
-                      Ask on WhatsApp
+                      {t.hero.ask}
                       <ArrowIcon className="size-4" />
                     </a>
                   )}
@@ -86,9 +88,9 @@ export default function HomeHero() {
         <a
           href="#conditions"
           className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white mix-blend-difference lg:flex"
-          aria-label="Scroll down to live sea conditions"
+          aria-label={t.hero.scrollLabel}
         >
-          <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">Scroll down</span>
+          <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">{t.hero.scroll}</span>
           <span className="h-12 w-px bg-white/60" aria-hidden="true" />
         </a>
       </div>
