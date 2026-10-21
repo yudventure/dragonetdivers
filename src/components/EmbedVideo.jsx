@@ -1,0 +1,90 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { FacebookIcon, InstagramIcon, PlayIcon, TikTokIcon, YouTubeIcon } from "./icons";
+
+const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: InstagramIcon, facebook: FacebookIcon };
+
+// Video YouTube, TikTok, Instagram, atau Facebook di galeri. Supaya halaman tetap ringan, player pihak
+// ketiga baru dimuat saat petaknya setidaknya separuh terlihat, lalu dilepas lagi begitu keluar layar
+// (videonya berhenti dan memori dibebaskan). Yang bisa diputar otomatis (YouTube, TikTok, Facebook)
+// jalan tanpa suara dan tanpa tombol, seperti latar bergerak; tombol platform di pojok membuka video
+// aslinya dengan suara. Instagram, atau saat "kurangi animasi"/hemat data aktif, diputar saat diketuk.
+// Ukuran player menutupi petak seperti object-cover (satuan cq dari petak).
+export default function EmbedVideo({ video, title }) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  const [auto, setAuto] = useState(false);
+  const [tapped, setTapped] = useState(false);
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = navigator.connection?.saveData === true;
+    setAuto(video.autoplay && !reduce && !saveData);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= 0.5) setInView(true);
+        else if (!entry.isIntersecting) {
+          setInView(false);
+          setTapped(false);
+        }
+      },
+      { threshold: [0, 0.5] },
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [video.autoplay]);
+
+  const live = (inView && auto) || tapped;
+  const interactive = tapped || !video.autoplay;
+  const Icon = PLATFORM_ICONS[video.platform];
+  const ratio = video.vertical ? 9 / 16 : 16 / 9;
+
+  return (
+    <div ref={ref} className="relative size-full overflow-hidden bg-abyss [container-type:size]">
+      {video.thumbnail ? (
+        // Gambar mini dari platform (YouTube), tanpa optimasi next/image.
+        <img src={video.thumbnail} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
+      ) : (
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,var(--color-lagoon)_0%,var(--color-teal)_45%,var(--color-abyss)_100%)]" />
+      )}
+
+      {live && (
+        <iframe
+          src={video.embed}
+          title={title}
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          className={`absolute top-1/2 left-1/2 -translate-1/2 border-0 ${interactive ? "" : "pointer-events-none"}`}
+          style={{ width: `max(100%, calc(100cqh * ${ratio}))`, height: `max(100%, calc(100cqw / ${ratio}))` }}
+        />
+      )}
+
+      {!live && (
+        <button
+          type="button"
+          onClick={() => setTapped(true)}
+          className="group absolute inset-0 grid place-items-center text-white"
+          aria-label={`Play video: ${title}`}
+        >
+          <span className="grid size-14 place-items-center rounded-full bg-abyss/60 ring-1 ring-white/40 transition-transform duration-200 ease-brand group-hover:scale-110">
+            <PlayIcon className="ml-0.5 size-6" />
+          </span>
+          {!video.thumbnail && <span className="absolute inset-x-4 bottom-4 text-left text-sm font-semibold text-white/90">{title}</span>}
+        </button>
+      )}
+
+      <a
+        href={video.href}
+        target="_blank"
+        rel="noopener"
+        className="absolute top-2.5 left-2.5 inline-flex h-8 items-center gap-1.5 rounded-full bg-abyss/70 px-3 text-xs font-bold text-white ring-1 ring-white/25 transition-colors duration-200 ease-brand hover:bg-white hover:text-abyss"
+        aria-label={`Watch on ${video.label} (opens in a new tab)`}
+      >
+        {Icon && <Icon className="size-4" />}
+        {video.label}
+      </a>
+    </div>
+  );
+}
