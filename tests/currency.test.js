@@ -39,6 +39,8 @@ test("format uang mengikuti bahasa halaman", () => {
   assert.equal(formatMoney(93.75, "USD", "en"), "US$94");
   assert.equal(formatMoney(1234, "USD", "id"), "US$ 1.234");
   assert.equal(formatMoney(6.25, "USD", "en"), "US$6.25");
+  assert.equal(formatMoney(184.62, "USD", "en", { cents: true }), "US$184.62");
+  assert.equal(formatMoney(184.6, "USD", "id", { cents: true }), "US$ 184,60");
   assert.equal(formatRateDate("2026-10-20", "en"), "Oct 20, 2026");
   assert.equal(formatRateDate("2026-10-20", "id"), "20 Okt 2026");
   assert.equal(formatRateDate(null, "en"), null);

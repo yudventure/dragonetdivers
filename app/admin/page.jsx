@@ -1,6 +1,6 @@
 import AdminDashboard from "@/admin/AdminDashboard";
-import AdminLogin from "@/admin/AdminLogin";
-import { adminConfig, currentAdmin } from "@/server/admin-auth";
+import AdminGate from "@/admin/AdminGate";
+import { currentAdmin } from "@/server/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,9 +8,5 @@ export const dynamic = "force-dynamic";
 // masuk; bila akun operator belum diatur di hPanel, form diganti petunjuk pengaturan.
 export default async function AdminPage() {
   const admin = await currentAdmin();
-  if (!admin) {
-    const { issues } = adminConfig();
-    return <AdminLogin configured={issues.length === 0} issues={issues} />;
-  }
-  return <AdminDashboard admin={admin} />;
+  return admin ? <AdminDashboard admin={admin} /> : <AdminGate />;
 }

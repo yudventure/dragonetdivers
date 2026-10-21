@@ -41,7 +41,7 @@ export default function AdminLogin({ configured, issues }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Login gagal.");
-      window.location.assign("/admin");
+      window.location.reload(); // tetap di modul yang sedang dibuka
     } catch (e) {
       setError(e.message || "Login gagal.");
       setBusy(false);

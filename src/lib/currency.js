@@ -38,13 +38,16 @@ export function convert(idr, currency, rate) {
   return rate?.idrPerUsd ? idr / rate.idrPerUsd : null;
 }
 
-/** "Rp 1.500.000" / "IDR 1,500,000" atau "US$92" / "US$ 92", mengikuti bahasa halaman. */
-export function formatMoney(amount, currency, lang = "en") {
+/**
+ * "Rp 1.500.000" / "IDR 1,500,000" atau "US$92" / "US$ 92", mengikuti bahasa halaman. cents: true untuk
+ * jumlah dolar yang benar-benar ditagih (PayPal), mis. "US$184.62"; tanpanya dolar dibulatkan sebagai perkiraan.
+ */
+export function formatMoney(amount, currency, lang = "en", { cents = false } = {}) {
   const locale = intlLocale[lang] ?? intlLocale.en;
   if (currency === "IDR") {
     return new Intl.NumberFormat(locale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(amount);
   }
-  const digits = amount < 10 ? 2 : 0;
+  const digits = cents || amount < 10 ? 2 : 0;
   const number = new Intl.NumberFormat(locale, { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(amount);
   return lang === "id" ? `US$ ${number}` : `US$${number}`;
 }

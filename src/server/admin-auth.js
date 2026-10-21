@@ -95,3 +95,22 @@ export async function login(request, { email, password }) {
 export async function logout() {
   (await cookies()).set(COOKIE, "", cookieOptions(0));
 }
+
+/** Penjaga API admin: asal permintaan harus situs ini dan operator harus masuk. { admin } atau { error: Response }. */
+export async function guardAdmin(request) {
+  if (!sameOrigin(request)) return { error: Response.json({ error: "Asal permintaan tidak valid." }, { status: 403 }) };
+  const admin = await currentAdmin();
+  if (!admin) return { error: Response.json({ error: "Sesi berakhir. Muat ulang halaman lalu masuk lagi." }, { status: 401 }) };
+  return { admin };
+}
+
+/** Badan JSON permintaan dengan batas ukuran; null bila bukan JSON atau terlalu besar. */
+export async function readJson(request, limit = 16_000) {
+  const text = await request.text().catch(() => "");
+  if (!text || text.length > limit) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
