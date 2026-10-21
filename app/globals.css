@@ -44,34 +44,6 @@
   --shadow-float: 0 10px 30px rgb(10 50 59 / 0.1);
 
   --ease-brand: cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  /* Siluet manta di panel kondisi laut: berenang bolak-balik, berbelok di tepi, sayap mengepak.
-     Satu putaran (kanan lalu kembali ke kiri) 44 detik; cruise dan turn harus berdurasi sama. */
-  --animate-manta-cruise: manta-cruise 44s ease-in-out infinite;
-  --animate-manta-turn: manta-turn 44s ease-in-out infinite;
-  --animate-manta-bob: manta-bob 9s ease-in-out infinite alternate;
-  --animate-manta-flap: manta-flap 2.6s ease-in-out infinite alternate;
-
-  @keyframes manta-cruise {
-    0% { transform: translateX(4cqw); }
-    46% { transform: translateX(78cqw); }
-    50% { transform: translateX(80cqw); }
-    96% { transform: translateX(6cqw); }
-    100% { transform: translateX(4cqw); }
-  }
-  @keyframes manta-turn {
-    0%, 44% { transform: scaleX(1); }
-    50%, 94% { transform: scaleX(-1); }
-    100% { transform: scaleX(1); }
-  }
-  @keyframes manta-bob {
-    from { transform: translateY(-6px) rotate(-2deg); }
-    to { transform: translateY(10px) rotate(3deg); }
-  }
-  @keyframes manta-flap {
-    from { transform: scaleY(1); }
-    to { transform: scaleY(0.8); }
-  }
 }
 
 @layer base {
