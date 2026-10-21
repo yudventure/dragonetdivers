@@ -384,7 +384,7 @@ Saat website dibangun, salin `brand/fonts/` ke folder aset publik dan sesuaikan 
 
 - [ ] Logo resolusi tinggi atau vektor (SVG/AI/PDF), plus versi satu warna dari desainer.
 - [ ] Pilihan tagline (§1).
-- [ ] Handle media sosial yang sudah aktif/terdaftar dan domain website.
-- [ ] Nomor WhatsApp booking, email, alamat base/dive center.
+- [ ] Handle media sosial yang sudah aktif/terdaftar (slot ikon footer sudah siap, isi lewat `NEXT_PUBLIC_INSTAGRAM` dst.). Domain website: dragonetdivers.com.
+- [ ] Nomor WhatsApp booking. Email (halo@dragonetdivers.com) dan alamat base (Jl. Mayor, Kurkapa, Meos Mansar) sudah diberikan Oktober 2026.
 - [ ] Foto & video asli (makro, luas, tim, kapal, senja).
 - [ ] Data nyata untuk konten: daftar dive site, harga paket, jumlah tamu per pemandu, sertifikasi tim.

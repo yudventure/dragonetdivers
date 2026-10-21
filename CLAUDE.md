@@ -9,7 +9,8 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik ber
 
 ## Struktur
 - `app/` halaman & route API; `app/api/health` untuk cek deploy + database; `app/api/conditions` kondisi laut live Selat Dampier (Open-Meteo, logika di `src/lib/sea-conditions.js`, cache 15 menit).
-- `src/components/` komponen UI; `src/lib/site.js` data situs & WhatsApp; `src/lib/services.js` daftar layanan (grid beranda + halaman `app/services/[slug]`, ilustrasi di `src/assets/services/<slug>.webp`).
+- `src/components/` komponen UI; `src/lib/site.js` data situs, kontak (email, alamat & titik base di Kurkapa, Mansuar), WhatsApp, dan media sosial (`NEXT_PUBLIC_INSTAGRAM` dst.); `src/lib/services.js` daftar layanan (grid beranda + halaman `app/services/[slug]`, ilustrasi di `src/assets/services/<slug>.webp`).
+- `src/lib/getting-here.js` + `GettingHere.jsx`: seksi "How to get here" (Sorong → Waisai → Kurkapa); peta rutenya `public/media/getting-here-map.svg` dibuat `node scripts/getting-here-map.mjs`.
 - `src/components/peta-raja-ampat/`: peta Raja Ampat bersama (skill peta-raja-ampat, sama dengan DAMPIER & Zanclus); di beranda hanya titik selam & snorkel (`DiveSiteMap.jsx`, `src/lib/dive-map.js`, tema `.peta-dragonet`). Baca README di folder itu sebelum mengubah datanya.
 - `src/server/db.js` → pakai `query(sql, params)` untuk semua akses database (server saja).
 - `database/migrations/NNN_nama.sql`: skema, idempoten (`CREATE TABLE IF NOT EXISTS`), dijalankan otomatis. Jangan ubah file migrasi yang sudah di-merge; buat nomor baru.

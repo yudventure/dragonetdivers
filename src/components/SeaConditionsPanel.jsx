@@ -84,7 +84,7 @@ export default function SeaConditionsPanel({ initial }) {
   const updated = data?.time?.split("T")[1]?.slice(0, 5);
 
   return (
-    <section aria-labelledby="sea-title" className="bg-white">
+    <section id="conditions" aria-labelledby="sea-title" className="scroll-mt-24 bg-white">
       <div className="gutter mx-auto max-w-[1200px] pt-10 md:pt-14">
         <div className="relative isolate overflow-hidden rounded-card bg-abyss p-6 sm:p-8 lg:py-10 [text-shadow:0_1px_2px_rgb(10_50_59/0.65),0_0_18px_rgb(10_50_59/0.6)]">
           <LoopVideo
