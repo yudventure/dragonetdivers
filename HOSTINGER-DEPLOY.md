@@ -94,7 +94,11 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
 | `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. |
 | `SESSION_SECRET` | Teks acak panjang untuk menandatangani sesi (mis. hasil `openssl rand -base64 48`). Tanpa ini operator harus masuk lagi setiap aplikasi dimulai ulang. |
-| `USD_IDR_RATE` | Opsional. Kurs tetap Rupiah per 1 US$ (mis. `16250`) untuk pilihan mata uang di header. Kosong = kurs harian Bank Sentral Eropa (Frankfurter), diperbarui otomatis. |
+| `USD_IDR_RATE` | Opsional. Kurs tetap Rupiah per 1 US$ (mis. `16250`) untuk pilihan mata uang di header dan tagihan PayPal. Kosong = kurs harian Bank Sentral Eropa (Frankfurter), diperbarui otomatis. |
+| `MIDTRANS_SERVER_KEY` | Server Key dari dashboard Midtrans (Settings → Access Keys). Awalan `SB-Mid-server-` untuk uji coba, `Mid-server-` untuk pembayaran sungguhan. Rahasia, hanya di hPanel. |
+| `MIDTRANS_PRODUCTION` | `true` untuk pembayaran sungguhan. Hapus barisnya selama uji coba (sandbox). |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | Dari developer.paypal.com → Apps & Credentials (pilih Sandbox atau Live). Rahasia, hanya di hPanel. |
+| `PAYPAL_MODE` | `live` untuk pembayaran sungguhan. Hapus barisnya selama uji coba (sandbox). |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |
 | `MYSQL_DATABASE` | Nama database lengkap, mis. `u123456789_dragonet` |
@@ -104,6 +108,18 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 Jangan isi dengan teks contoh (mis. `masih uji coba`): variabel yang belum punya nilai **hapus barisnya**. Isian yang salah tidak lagi menggagalkan build, tetapi diabaikan dan dilaporkan di `warnings` / `database.issues` pada `/api/health`.
 
 Variabel `NEXT_PUBLIC_*` ditanam saat build; setelah diubah, deploy ulang. Daftar lengkap ada di `.env.example`.
+
+### Pembayaran paket (Midtrans, PayPal, transfer bank)
+
+Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagian 5) wajib terhubung.
+
+1. Isi key Midtrans dan/atau PayPal di tabel di atas, lalu deploy ulang. Mulai dengan key **sandbox** untuk uji coba.
+2. Buka `/admin/pembayaran`: tekan **Uji koneksi** untuk tiap penyedia, centang cara bayar yang ditawarkan, isi rekening untuk transfer bank, lalu **Simpan pengaturan**.
+3. Buka `/admin/paket` dan tambahkan paket (nama dan isi dalam English dan Indonesia, harga Rupiah). Paket aktif langsung tampil di halaman layanannya.
+4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdivers.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
+5. Setelah uji coba lancar, ganti ke key production/live dan tambahkan `MIDTRANS_PRODUCTION=true` / `PAYPAL_MODE=live`. Di checkout, label "Mode uji" hilang begitu mode sungguhan aktif.
+
+Midtrans menagih dalam Rupiah. PayPal tidak menerima Rupiah, jadi menagih dalam dolar AS dengan kurs hari itu (dibulatkan ke atas per sen) yang dikunci saat tamu memesan. Transfer bank ditandai lunas oleh tim di `/admin/pesanan` setelah dana masuk.
 
 ## 5. Database MySQL
 

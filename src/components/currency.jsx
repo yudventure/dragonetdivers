@@ -56,6 +56,13 @@ export function Price({ idr, className }) {
   );
 }
 
+/** Harga Rupiah aslinya, hanya saat tamu memilih dolar (di bawah <Price> pada kartu paket). */
+export function RupiahNote({ idr, className }) {
+  const { currency, rate, lang } = useCurrency();
+  if (currency === "IDR" || !rate) return null;
+  return <span className={className}>{formatMoney(idr, "IDR", lang)}</span>;
+}
+
 /** Baris kurs untuk menu: "US$1 ≈ Rp 16.312" dan sumbernya, atau null tanpa kurs. */
 export function useRateText(text) {
   const { rate, lang } = useCurrency();

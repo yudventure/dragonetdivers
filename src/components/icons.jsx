@@ -285,6 +285,24 @@ export function MenuIcon(props) {
   );
 }
 
+export function ReceiptIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M5 3h14v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21Z" />
+      <path d="M9 8h6M9 12h6M9 16h3" />
+    </Icon>
+  );
+}
+
+export function TagIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4Z" />
+      <circle cx="7.5" cy="7.5" r="1.5" />
+    </Icon>
+  );
+}
+
 export function BanknoteIcon(props) {
   return (
     <Icon {...props}>

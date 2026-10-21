@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SeaConditions from "@/components/SeaConditions";
+import ServicePackages from "@/components/ServicePackages";
 import ServiceCard, { ServiceVisual } from "@/components/ServiceCard";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
-import { CheckIcon, ChatIcon, Wave } from "@/components/icons";
+import { ArrowIcon, CheckIcon, ChatIcon, Wave } from "@/components/icons";
 import { uiText } from "@/content/ui";
 import { alternates, format, localeHref, locales } from "@/lib/i18n";
+import { localizePackage } from "@/lib/packages";
 import { serviceBySlug, services, servicesIn } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
+import { activePackages } from "@/server/packages";
 
 // Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
-// Dibangun saat build; kondisi laut di dalamnya diperbarui paling lama tiap 15 menit.
+// Dibangun saat build; kondisi laut dan paket (dari /admin/paket) diperbarui paling lama tiap 15 menit,
+// dan langsung setelah tim menyimpan paket (revalidatePath di app/api/admin/packages).
 export const dynamicParams = false;
 export const revalidate = 900;
 
@@ -40,6 +44,7 @@ export default async function ServicePage({ params }) {
   const text = t.servicePage;
   const ask = whatsappLink(format(t.whatsapp.about, { topic: service.ask }));
   const others = servicesIn(lang).filter((other) => other.slug !== service.slug);
+  const packages = (await activePackages(service.slug)).map((pkg) => localizePackage(pkg, lang));
 
   return (
     <>
@@ -79,25 +84,40 @@ export default async function ServicePage({ params }) {
                   </li>
                 ))}
               </ul>
-              <div className="mt-2">
+              <div className="mt-2 flex flex-wrap gap-3">
+                {packages.length > 0 && (
+                  <a
+                    href="#packages"
+                    className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
+                  >
+                    {t.packages.see}
+                    <ArrowIcon className="size-[18px] rotate-90" />
+                  </a>
+                )}
                 {ask ? (
                   <a
                     href={ask}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
+                    className={`inline-flex h-12 items-center gap-2 rounded-full px-6 font-bold transition-colors duration-200 ease-brand ${
+                      packages.length > 0 ? "border-[1.5px] border-teal text-teal hover:bg-teal-soft" : "bg-teal text-white hover:bg-teal-dark"
+                    }`}
                   >
                     <ChatIcon className="size-[18px]" />
                     {format(text.ask, { topic: service.title.toLowerCase() })}
                   </a>
                 ) : (
-                  <span className="inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] text-teal uppercase">
-                    {text.bookingsSoon}
-                  </span>
+                  packages.length === 0 && (
+                    <span className="inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] text-teal uppercase">
+                      {text.bookingsSoon}
+                    </span>
+                  )
                 )}
               </div>
             </div>
             <ServiceVisual service={service} className="aspect-[4/3] rounded-frame" sizes="(min-width: 1024px) 600px, 90vw" priority />
           </div>
         </section>
+
+        <ServicePackages lang={lang} service={service} packages={packages} />
 
         <SeaConditions lang={lang} />
 
@@ -131,7 +151,7 @@ export default async function ServicePage({ params }) {
                   </li>
                 ))}
               </ul>
-              <p className="border-t border-mist pt-4 text-sm text-slate">{text.pricesSoon}</p>
+              {packages.length === 0 && <p className="border-t border-mist pt-4 text-sm text-slate">{text.pricesSoon}</p>}
             </div>
           </div>
         </section>
