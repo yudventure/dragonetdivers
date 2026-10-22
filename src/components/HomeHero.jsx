@@ -66,17 +66,17 @@ function ServiceList({ t, tone, className }) {
 
 // Hero beranda (permintaan pemilik, Oktober 2026): video laut dalam dengan manta selebar layar, judul besar
 // huruf kecil putih di kiri bawah, daftar layanan bernomor di kanan bawah. Teks di atas gradasi Abyss
-// (BRANDING.md §9.2). Desktop: hero ditarik 72 px ke belakang header yang transparan (header berganti ke
-// warna untuk latar gelap, SiteHeader overlay) dan selalu setinggi layar. Ponsel dan tablet: video di bawah
-// header, daftar layanan di bawah video. "\n" di teks judul (src/content/ui.js) = pindah baris.
+// (BRANDING.md §9.2). Hero ditarik ke belakang header yang transparan (64 px di ponsel, 72 px dari 640 px,
+// ditambah garis bawah header 1 px); header berganti ke warna untuk latar gelap (SiteHeader overlay).
+// Desktop: selalu setinggi layar. Ponsel dan tablet: daftar layanan di bawah video. "\n" di teks judul (src/content/ui.js) = pindah baris.
 export default function HomeHero({ lang }) {
   preload(poster.src, { as: "image", fetchPriority: "high" });
   const t = uiText(lang);
   const [titleLead, titleAccent] = t.hero.title;
   const leadLines = titleLead.split("\n");
   return (
-    <section className="relative isolate bg-white lg:-mt-[72px]" aria-labelledby="hero-title">
-      <div className="relative isolate h-[min(74svh,640px)] min-h-[460px] overflow-hidden bg-abyss lg:h-[max(640px,100svh)]">
+    <section className="relative isolate -mt-[65px] bg-white sm:-mt-[73px]" aria-labelledby="hero-title">
+      <div className="relative isolate h-[min(84svh,720px)] min-h-[520px] overflow-hidden bg-abyss lg:h-[max(640px,100svh)]">
         {/* Manta mulai kecil di kiri; di layar tegak potongan video digeser ke kiri supaya manta tetap terlihat. */}
         <LoopVideo
           sources={[

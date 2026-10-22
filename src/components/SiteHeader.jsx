@@ -36,14 +36,14 @@ export default function SiteHeader({ lang, path = "/", overlay = false }) {
       {/* Selebar hero beranda: 85% layar, minimal 1200 px. */}
       <div className="gutter mx-auto flex h-16 max-w-[max(1200px,85%)] items-center gap-4 sm:h-[72px] xl:gap-6">
         <Link href={home} className="flex shrink-0 items-center gap-3" aria-label={homeLabel}>
-          <Image src={logo} alt="" width={44} height={44} priority className="size-11 lg:group-data-[tone=dark]/header:hidden" />
-          {overlay && <Image src={logoPlate} alt="" width={44} height={44} className="hidden size-11 lg:group-data-[tone=dark]/header:block" />}
+          <Image src={logo} alt="" width={44} height={44} priority className="size-11 group-data-[tone=dark]/header:hidden" />
+          {overlay && <Image src={logoPlate} alt="" width={44} height={44} priority className="hidden size-11 group-data-[tone=dark]/header:block" />}
           {/* Nama disembunyikan di 1024–1279 px agar menu desktop muat di satu baris. */}
           <span className="hidden leading-none whitespace-nowrap min-[360px]:grid lg:hidden xl:grid">
-            <span className="font-display text-lg font-semibold text-teal transition-colors duration-300 ease-brand sm:text-xl lg:group-data-[tone=dark]/header:text-white">
+            <span className="font-display text-lg font-semibold text-teal transition-colors duration-300 ease-brand sm:text-xl group-data-[tone=dark]/header:text-white">
               {site.shortName}
             </span>
-            <span className="mt-1.5 text-[10px] font-bold tracking-[0.2em] text-slate transition-colors duration-300 ease-brand lg:group-data-[tone=dark]/header:text-white/80">
+            <span className="mt-1.5 text-[10px] font-bold tracking-[0.2em] text-slate transition-colors duration-300 ease-brand group-data-[tone=dark]/header:text-white/80">
               RAJA AMPAT
             </span>
           </span>

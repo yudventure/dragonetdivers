@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
-// Latar laut dalam dengan manta yang berenang bolak-balik (Higgsfield: GPT Image 2.5 + Kling 3.0).
-// Cara membuat: brand/ocean/README.md.
-import oceanPoster from "../assets/ocean-manta-loop.webp";
+// Latar: penyelam bersiap turun ke air dari perahu kayu di Raja Ampat (permintaan pemilik, Oktober 2026).
+// Ilustrasi AI buatan Higgsfield (GPT Image 2.5), bukan dokumentasi lokasi. Cara membuat: brand/boat/README.md.
+import boatPhoto from "../assets/boat-divers.webp";
 import { format, intlLocale } from "@/lib/i18n";
 import { arah, translateLabel } from "@/lib/sea-conditions";
-import LoopVideo from "./LoopVideo";
 import {
   ArrowNorthIcon,
   CloudFogIcon,
@@ -47,11 +47,8 @@ function Tile({ icon: Icon, label, value, unit, detail, arrow }) {
 const join = (...parts) => parts.filter(Boolean).join(", ") || null;
 const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 
-// Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak gelap dengan video laut dalam
-// (sinar matahari, partikel) dan manta yang dari kejauhan tampak sebagai siluet, mendekat sampai perut
-// putihnya terlihat, lalu kembali ke tempat awal, di belakang teks putih; lapisan Abyss menjaga
-// keterbacaan. object-[center_35%]: di panel desktop yang pendek, pita video yang terlihat sedikit di
-// atas tengah, jalur yang dilewati manta.
+// Strip kondisi laut di bawah hero (BRANDING.md §9.2, §9.7): kotak gelap dengan foto penyelam yang
+// bersiap turun dari perahu di belakang teks putih; lapisan Abyss menjaga keterbacaan.
 // Data awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka.
 // Label dan satuan dari src/content/ui.js (t); arah dalam Bahasa Indonesia memakai delapan penjuru.
 export default function SeaConditionsPanel({ initial, lang, t }) {
@@ -95,15 +92,16 @@ export default function SeaConditionsPanel({ initial, lang, t }) {
     <section id="conditions" aria-labelledby="sea-title" className="scroll-mt-24 bg-white">
       <div className="gutter mx-auto max-w-[1200px] pt-10 md:pt-14">
         <div className="relative isolate overflow-hidden rounded-card bg-abyss p-6 sm:p-8 lg:py-10 [text-shadow:0_1px_2px_rgb(10_50_59/0.65),0_0_18px_rgb(10_50_59/0.6)]">
-          <LoopVideo
-            sources={[
-              { src: "/media/ocean-manta-loop.webm", type: "video/webm" },
-              { src: "/media/ocean-manta-loop.mp4", type: "video/mp4" },
-            ]}
-            poster={oceanPoster.src}
-            className="absolute inset-0 -z-10 size-full object-cover object-[center_35%]"
+          {/* Di layar lebar terlihat penyelam di tepi perahu dan pulau karst; di ponsel potongan foto digeser ke penyelam. */}
+          <Image
+            src={boatPhoto}
+            alt=""
+            fill
+            sizes="(min-width: 1232px) 1200px, 100vw"
+            placeholder="blur"
+            className="-z-10 object-cover object-[32%_center] sm:object-[center_40%]"
           />
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.6)_0%,rgb(10_50_59/0.5)_45%,rgb(10_50_59/0.7)_100%)]" />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.62)_0%,rgb(10_50_59/0.5)_45%,rgb(10_50_59/0.72)_100%)]" />
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h2 id="sea-title" className="flex items-center gap-2.5 text-xl text-white">
               <span className="relative flex size-2.5" aria-hidden="true">
