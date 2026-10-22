@@ -198,8 +198,9 @@ export default function SeaConditionsPanel({ initial, lang, t }) {
 
 /**
  * Kondisi laut live di hero beranda (permintaan pemilik, Oktober 2026: menggantikan daftar layanan di kanan
- * hero). Foto penyelam di perahu sebagai kepala kartu, lalu enam ukuran dalam dua kolom. Desktop: kaca gelap
- * di atas video manta; ponsel dan tablet: kartu Abyss di bawah video. id "conditions" untuk tautan footer.
+ * hero). Desktop: kartu transparan (lapisan Abyss tipis, garis putih, bayangan teks) di atas video manta,
+ * tanpa foto. Ponsel dan tablet: kartu Abyss di bawah video, karena latar di sana putih. Enam ukuran dalam
+ * dua kolom (tiga di tablet). id "conditions" untuk tautan footer.
  */
 export function HeroConditions({ initial, lang, t, className = "" }) {
   const { data, failed } = useSeaConditions(initial);
@@ -208,30 +209,24 @@ export function HeroConditions({ initial, lang, t, className = "" }) {
     <section
       id="conditions"
       aria-labelledby="hero-sea-title"
-      className={`scroll-mt-24 overflow-hidden rounded-card bg-abyss text-white lg:border lg:border-white/20 lg:bg-abyss/55 lg:backdrop-blur-md ${className}`}
+      className={`grid scroll-mt-24 gap-4 rounded-card bg-abyss p-4 text-white sm:p-5 lg:border lg:border-white/25 lg:bg-abyss/15 lg:backdrop-blur-[2px] lg:[text-shadow:0_1px_2px_rgb(10_50_59/0.7),0_0_14px_rgb(10_50_59/0.55)] ${className}`}
     >
-      <div className="relative isolate h-28 lg:h-24">
-        <Image src={boatPhoto} alt="" fill sizes="(min-width: 1024px) 360px, 100vw" placeholder="blur" className="-z-10 object-cover object-[center_40%]" />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(10_50_59/0.2)_0%,rgb(10_50_59/0.85)_100%)]" />
-        <div className="absolute inset-x-4 bottom-3 [text-shadow:0_1px_2px_rgb(10_50_59/0.65)] sm:inset-x-5">
-          <h2 id="hero-sea-title" className="flex items-center gap-2.5 text-lg leading-tight text-white">
-            <LiveDot />
-            <span>
-              {t.title}
-              <span className="block text-sm font-semibold text-white/85">{t.place}</span>
-            </span>
-          </h2>
-        </div>
-      </div>
-      <div className="grid gap-4 p-4 sm:p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="hero-sea-title" className="flex items-center gap-2.5 text-lg leading-tight text-white">
+          <LiveDot />
+          <span>
+            {t.title}
+            <span className="block text-sm font-semibold text-white/85">{t.place}</span>
+          </span>
+        </h2>
         <p className="text-xs text-white/80" aria-live="polite">
           {statusText(data, failed, lang, t)}
         </p>
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-2">
-          <Tiles data={data} lang={lang} t={t} compact />
-        </dl>
-        <SourceNote t={t} className="text-[11px] leading-snug" />
       </div>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-2">
+        <Tiles data={data} lang={lang} t={t} compact />
+      </dl>
+      <SourceNote t={t} className="text-[11px] leading-snug" />
     </section>
   );
 }
