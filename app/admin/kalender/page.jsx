@@ -5,6 +5,7 @@ import RecordManager, { QuickAdd } from "@/admin/RecordManager";
 import SettingsForm from "@/admin/SettingsForm";
 import { availability, covers, monthGrid, orderHoldsPlaces, POOL_LABEL, SERVICE_OPTIONS } from "@/lib/modules/calendar";
 import { isDate, shortDay, witDate } from "@/lib/records";
+import { lowAt } from "@/lib/slots";
 import { currentAdmin } from "@/server/admin-auth";
 import { calendarMonth, refOptions } from "@/server/admin-data";
 import { databaseStatus } from "@/server/db";
@@ -30,18 +31,50 @@ const LEGEND = [
   ["closed", "Tutup"],
 ];
 
+// Pemakaian tempat per kelompok kapasitas (layanan wakilnya untuk availability()).
+const POOLS = [
+  ["diving", "fun-dives", "Selam"],
+  ["snorkeling", "snorkeling", "Snorkel"],
+];
+
+/** Orang terisi dan kapasitas tiap kelompok di satu tanggal; kelompok tanpa batas dan tanpa tamu tidak ditampilkan. */
+function usage(date, data) {
+  return POOLS.map(([pool, service, label]) => ({ pool, label, ...availability({ date, service, capacity: data.capacity, orders: data.orders, reservations: data.reservations }) })).filter(
+    (u) => u.capacity || u.used,
+  );
+}
+
+const meterTone = (u) => (u.left === 0 ? "bg-danger" : u.left <= lowAt(u.capacity) ? "bg-sunrise" : "bg-teal");
+
+/** Baris "Selam 12/30" dengan bilah terisi di sel kalender. */
+function Meter({ u }) {
+  return (
+    <span className="grid gap-0.5" title={u.capacity ? `${u.label}: ${u.used} dari ${u.capacity} orang, sisa ${u.left}` : `${u.label}: ${u.used} orang`}>
+      <span className="flex items-baseline justify-between gap-1 text-[11px] leading-none font-semibold text-slate">
+        <span>{u.closed ? `${u.label} tutup` : u.label}</span>
+        <span className={`tabular-nums ${u.capacity && u.left === 0 ? "text-danger" : "text-abyss"}`}>{u.capacity ? `${u.used}/${u.capacity}` : `${u.used} org`}</span>
+      </span>
+      {u.capacity > 0 && (
+        <span className="h-1.5 overflow-hidden rounded-full bg-mist">
+          <span className={`block h-full rounded-full ${meterTone(u)}`} style={{ width: `${Math.min(100, (u.used / u.capacity) * 100)}%` }} />
+        </span>
+      )}
+    </span>
+  );
+}
+
 /** Kegiatan satu hari: pesanan website dan reservasi tim, dengan warna chip. */
 function agenda(date, { orders, reservations }) {
   const items = [];
   for (const r of reservations.filter((r) => covers(r, date) && r.status !== "cancelled")) {
     items.push(
       r.status === "closed"
-        ? { tone: "closed", text: `Tutup · ${service(r.service)}`, people: 0, reservation: r }
-        : { tone: r.status, text: `${r.guestName} · ${service(r.service)}`, people: r.participants || 1, reservation: r },
+        ? { tone: "closed", text: `Tutup · ${service(r.service)}`, reservation: r }
+        : { tone: r.status, text: `${r.guestName} · ${service(r.service)}`, reservation: r },
     );
   }
   for (const o of orders.filter((o) => o.date === date && orderHoldsPlaces(o))) {
-    items.push({ tone: o.status === "paid" ? "paid" : "waiting", text: `${o.name} · ${o.packageName}`, people: o.guests, order: o });
+    items.push({ tone: o.status === "paid" ? "paid" : "waiting", text: `${o.name} · ${o.packageName}`, order: o });
   }
   return items;
 }
@@ -85,6 +118,21 @@ export default async function CalendarPage({ searchParams }) {
               </li>
             ))}
           </ul>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate">
+            <span>
+              <span className="font-semibold text-abyss">Selam 12/30</span> berarti 12 tamu sudah terisi dari kapasitas harian.
+            </span>
+            {[
+              ["bg-teal", "Masih longgar"],
+              ["bg-sunrise", "Hampir penuh"],
+              ["bg-danger", "Penuh"],
+            ].map(([tone, label]) => (
+              <span key={label} className="flex items-center gap-1.5">
+                <i aria-hidden="true" className={`h-1.5 w-5 rounded-full ${tone}`} />
+                {label}
+              </span>
+            ))}
+          </p>
 
           <div className="relative overflow-x-auto rounded-card bg-white ring-1 ring-mist">
             <div className="grid min-w-[720px] grid-cols-7">
@@ -96,19 +144,19 @@ export default async function CalendarPage({ searchParams }) {
               {monthGrid(month).map((date, i) => {
                 if (!date) return <div key={`x${i}`} className="min-h-28 border-b border-r border-mist bg-foam/50" />;
                 const items = agenda(date, data);
-                const people = items.reduce((s, it) => s + it.people, 0);
+                const pools = usage(date, data);
                 const selected = date === day;
                 return (
                   <a
                     key={date}
                     href={`/admin/kalender?bulan=${month}&hari=${date}#hari`}
                     aria-current={selected ? "date" : undefined}
-                    className={`grid min-h-28 content-start gap-1 border-b border-r border-mist p-1.5 transition-colors hover:bg-teal-wash ${selected ? "bg-teal-wash ring-2 ring-teal ring-inset" : ""}`}
+                    className={`grid min-h-32 content-start gap-1 border-b border-r border-mist p-1.5 transition-colors hover:bg-teal-wash ${selected ? "bg-teal-wash ring-2 ring-teal ring-inset" : ""}`}
                   >
-                    <span className="flex items-center justify-between text-sm">
-                      <span className={`grid size-7 place-items-center rounded-full font-bold ${date === today ? "bg-abyss text-white" : "text-abyss"}`}>{Number(date.slice(8))}</span>
-                      {people > 0 && <span className="text-xs font-bold text-slate tabular-nums">{people} org</span>}
-                    </span>
+                    <span className={`grid size-7 place-items-center rounded-full text-sm font-bold ${date === today ? "bg-abyss text-white" : "text-abyss"}`}>{Number(date.slice(8))}</span>
+                    {pools.map((u) => (
+                      <Meter key={u.pool} u={u} />
+                    ))}
                     {items.slice(0, 3).map((it, j) => (
                       <span key={j} className={`truncate rounded px-1.5 py-0.5 text-[11px] leading-tight font-semibold ${CHIP[it.tone]}`}>
                         {it.text}
@@ -133,7 +181,10 @@ export default async function CalendarPage({ searchParams }) {
                     <span className="font-display text-xl font-semibold text-abyss">
                       {a.closed ? "Tutup" : a.capacity ? `${a.used} / ${a.capacity} orang` : `${a.used} orang`}
                     </span>
-                    {!a.closed && a.capacity > 0 && a.left === 0 && <span className="ml-2 font-bold text-danger">Penuh</span>}
+                    {!a.closed && a.capacity > 0 && (
+                      <span className={`ml-2 font-bold ${a.left === 0 ? "text-danger" : "text-teal"}`}>{a.left === 0 ? "Penuh" : `Sisa ${a.left} tempat`}</span>
+                    )}
+                    {!a.closed && !a.capacity && <span className="ml-2 text-slate">tanpa batas</span>}
                   </p>
                 );
               })}
@@ -195,8 +246,9 @@ export default async function CalendarPage({ searchParams }) {
 
           <Card title="Kapasitas harian">
             <p className="text-sm text-slate">
-              Jumlah tamu paling banyak per hari. Pesanan lunas, pesanan yang masih menunggu bayar, dan reservasi yang belum dibatalkan ikut dihitung. Isi 0
-              bila tidak dibatasi. Checkout website menolak tanggal yang sudah penuh.
+              Jumlah tamu paling banyak per hari (bawaan 30 untuk menyelam). Pesanan lunas, pesanan yang masih menunggu bayar, dan reservasi yang belum
+              dibatalkan ikut dihitung; paket-paket satu pesanan di tanggal yang sama dihitung satu rombongan. Sisa tempat tampil di kalender halaman
+              layanan, dan checkout website menolak tanggal yang sudah penuh. Isi 0 bila tidak dibatasi.
             </p>
             <SettingsForm
               endpoint="/api/admin/calendar"

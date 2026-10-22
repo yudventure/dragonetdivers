@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { localeHref } from "@/lib/i18n";
 
-// Tautan lama checkout satu paket (/checkout/12): paketnya dimasukkan ke keranjang di halaman checkout.
+// Tautan lama checkout satu paket (/checkout/12): diteruskan ke /checkout?add=12, lalu ke halaman layanannya.
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
 
