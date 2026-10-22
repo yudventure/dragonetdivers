@@ -1,6 +1,6 @@
-# Hero beranda dan latar panel kondisi laut: laut dalam + manta bolak-balik
+# Hero beranda: laut dalam + manta bolak-balik
 
-Hero beranda (`src/components/HomeHero.jsx`, sejak 22 Oktober 2026 atas permintaan pemilik) dan panel "Live sea conditions" (`src/components/SeaConditionsPanel.jsx`) memakai satu video loop 15 detik: laut dalam dengan sinar matahari, cahaya permukaan, dan partikel, plus satu manta karang. Video diputar oleh `LoopVideo.jsx` hanya saat terlihat di layar.
+Hero beranda (`src/components/HomeHero.jsx`, sejak 22 Oktober 2026 atas permintaan pemilik) memakai satu video loop 15 detik: laut dalam dengan sinar matahari, cahaya permukaan, dan partikel, plus satu manta karang. Video diputar oleh `LoopVideo.jsx` hanya saat terlihat di layar. Video yang sama juga satu petak di galeri bawaan (`src/content/gallery.js`). Dulu video ini latar panel kondisi laut; panel itu sekarang memakai foto penyelam di perahu (`brand/boat/README.md`).
 
 Manta tidak pernah hilang dari cerita:
 1. Di awal video, manta tampak kecil di kejauhan di kiri, berupa siluet gelap dengan ekor panjang yang tipis seperti cambuk.

@@ -400,7 +400,7 @@ export default function SiteNav({ lang, t, brand, home, homeLabel, services, all
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={t.openMenu}
-          className="grid size-10 place-items-center rounded-full text-abyss ring-1 ring-mist transition-colors duration-200 ease-brand hover:bg-foam lg:hidden"
+          className="grid size-10 place-items-center rounded-full text-abyss ring-1 ring-mist transition-colors duration-200 ease-brand group-data-[tone=dark]/header:text-white group-data-[tone=dark]/header:ring-white/50 hover:bg-foam group-data-[tone=dark]/header:hover:bg-white/15 lg:hidden"
         >
           <MenuIcon className="size-5" />
         </button>

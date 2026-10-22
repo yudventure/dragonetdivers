@@ -231,7 +231,7 @@ Semua komponen memakai token di `brand/tokens.css`. Contoh visual lengkap ada di
 - Foto besar dalam bingkai radius 28 px di sisi kanan (desktop) atau di bawah teks (mobile). Tidak memakai hero 100vh.
 - Di bawah hero: **strip kondisi laut** (suhu air, visibilitas, arus, waktu matahari terbenam) dalam kotak Laguna Tipis.
 
-Pengecualian (permintaan pemilik, Oktober 2026): hero beranda memakai video laut dalam dengan manta yang sama dengan panel kondisi laut (§9.7), selebar layar dan setinggi layar di desktop, di belakang header yang transparan. Judul huruf kecil putih dengan kata kunci Kuning Fajar, daftar layanan berlatar kaca Abyss, gradasi Abyss di atas (untuk header) dan di bawah (untuk teks), sesuai aturan teks di atas foto (§7). Selama header berada di atas video, logo memakai versi *plate* dan nama situs putih. Di ponsel dan tablet video ada di bawah header dan daftar layanan di bawah video.
+Pengecualian (permintaan pemilik, Oktober 2026): hero beranda memakai video laut dalam dengan manta (`public/media/ocean-manta-loop.*`, `brand/ocean/README.md`), selebar layar dan setinggi layar di desktop, di belakang header yang transparan. Judul huruf kecil putih dengan kata kunci Kuning Fajar, daftar layanan berlatar kaca Abyss, gradasi Abyss di atas (untuk header) dan di bawah (untuk teks), sesuai aturan teks di atas foto (§7). Header di atas video tanpa latar di semua ukuran layar; selama itu logo memakai versi *plate*, nama situs putih, dan tombol menu ponsel bergaris putih. Di ponsel dan tablet daftar layanan ada di bawah video.
 
 ### 9.3 Tombol
 
@@ -263,7 +263,7 @@ Input tinggi 48 px, radius 10 px, border 1 px Garis Tegas, label di atas (14 px 
 ### 9.7 Kotak info & kondisi laut
 Latar Laguna Tipis, ikon Teal, teks Abyss, radius 16 px. Peringatan cuaca: Fajar Tipis + teks Bara.
 
-Pengecualian (permintaan pemilik, Oktober 2026): panel **kondisi laut live** di beranda dan halaman layanan memakai latar video laut dalam (`public/media/ocean-manta-loop.*`) dengan manta karang realistis yang berenang bolak-balik: dari jauh berupa siluet, dari dekat perut putihnya terlihat, lalu kembali ke tempat awal; cara membuat di `brand/ocean/README.md`. Teks putih, ikon putih, panah arah Kuning Fajar, lapisan gradasi Abyss 50–70% dan bayangan teks di atas video agar teks tetap terbaca.
+Pengecualian (permintaan pemilik, Oktober 2026): panel **kondisi laut live** di beranda dan halaman layanan memakai latar foto penyelam yang bersiap turun ke air dari perahu kayu (`src/assets/boat-divers.webp`, ilustrasi AI, cara membuat di `brand/boat/README.md`). Video laut dalam dengan manta yang dulu dipakai di sini sekarang menjadi hero beranda (§9.2, `brand/ocean/README.md`). Teks putih, ikon putih, panah arah Kuning Fajar, lapisan gradasi Abyss 50–72% dan bayangan teks di atas foto agar teks tetap terbaca.
 
 ### 9.8 Judul section
 Eyebrow (Bara) → H2 (Abyss) → garis ombak (Teal, 96 px) → paragraf Slate maks. 60 karakter. Rata kiri di desktop.

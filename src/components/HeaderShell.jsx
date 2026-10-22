@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 // dan garis bawah Mist begitu halaman di-scroll. data-scrolled dipakai isi header (group/header),
 // mis. menu desktop yang berlatar pil putih selama header masih transparan. overlay (beranda): header
 // berada di atas video gelap hero selama belum di-scroll, jadi data-tone="dark" (isi header memakai
-// warna terang, hanya di desktop karena di ponsel hero mulai di bawah header).
+// warna terang, di semua ukuran layar).
 export default function HeaderShell({ children, overlay = false }) {
   const [scrolled, setScrolled] = useState(false);
 
