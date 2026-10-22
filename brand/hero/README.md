@@ -1,4 +1,6 @@
-# Hero beranda: penyelam menghembuskan gelembung
+# Hero beranda lama: penyelam menghembuskan gelembung
+
+> **Tidak dipakai lagi sejak 22 Oktober 2026.** Atas permintaan pemilik, hero beranda sekarang memakai video laut dalam dengan manta (`public/media/ocean-manta-loop.*`, cara membuat di `brand/ocean/README.md`). File video dan poster penyelam di bawah sudah dihapus dari repo dan masih ada di riwayat git (commit sebelum hero manta). Catatan ini disimpan untuk membuat ulang bila diperlukan.
 
 Video loop 10 detik di atas latar putih (`src/components/HomeHero.jsx`, `LoopVideo.jsx`). Ilustrasi AI, bukan dokumentasi lokasi (BRANDING.md §7). Dibuat 20 Oktober 2026 di akun Higgsfield pemilik.
 
