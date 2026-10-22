@@ -3,7 +3,6 @@
 import { reservation } from "./calendar.js";
 import { transaction } from "./finance.js";
 import { employee } from "./hr.js";
-import { item, movement } from "./inventory.js";
 import { partner, post } from "./pr.js";
 import { galleryItem } from "./site.js";
 
@@ -12,7 +11,7 @@ const attendance = { kind: "attendance", prefix: "abs", noun: "absensi", interna
 const payslip = { kind: "payslip", prefix: "slp", noun: "slip gaji", internal: true, fields: [] };
 
 export const SCHEMAS = Object.fromEntries(
-  [reservation, transaction, employee, attendance, payslip, item, movement, partner, post, galleryItem].map((s) => [s.kind, s]),
+  [reservation, transaction, employee, attendance, payslip, partner, post, galleryItem].map((s) => [s.kind, s]),
 );
 
 /** Skema yang bisa diubah lewat form umum, atau null. */

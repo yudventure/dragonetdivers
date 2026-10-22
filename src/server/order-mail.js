@@ -7,6 +7,7 @@ import { query } from "./db";
 import { mailConfigured, mailFailure, mailIssues, sendMail } from "./mailer";
 import { orderByCode } from "./orders";
 import { getPayments } from "./payment-settings";
+import { getSiteSettings } from "./site-settings";
 
 // Email pesanan ke tamu (template di src/lib/order-mail.js), dicatat di tabel order_emails:
 //   order     saat pesanan dibuat (menunggu pembayaran)
@@ -42,6 +43,7 @@ const finish = (code, kind, result) =>
 
 /** Isi email untuk pesanan ini (juga dipakai pratinjau di admin, dengan rekening contoh bila perlu). */
 export async function buildOrderMail(order, kind, { accounts } = {}) {
+  await getSiteSettings();
   accounts ??= order.method === "transfer" ? (await getPayments()).accounts : [];
   return orderMail(kind, {
     order,

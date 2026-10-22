@@ -10,6 +10,13 @@ export async function register() {
   } catch (error) {
     console.error(`[developer] pengaturan tidak bisa dimuat: ${error?.message}`);
   }
+  // Kontak dan media sosial dari /admin/kontak (src/server/site-settings.js), paling lama 1,5 detik.
+  try {
+    const { getSiteSettings } = await import("./src/server/site-settings.js");
+    await getSiteSettings();
+  } catch (error) {
+    console.error(`[situs] pengaturan kontak tidak bisa dimuat: ${error?.message}`);
+  }
   // Daftar harga pemilik masuk ke tabel packages sekali (tidak ditunggu, galatnya dicatat sendiri).
   import("./src/server/packages.js").then(({ ensurePriceList }) => ensurePriceList()).catch(() => {});
   try {

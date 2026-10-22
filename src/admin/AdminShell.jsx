@@ -2,7 +2,6 @@ import Image from "next/image";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import {
   BanknoteIcon,
-  BoxIcon,
   CalendarIcon,
   ChevronIcon,
   GlobeIcon,
@@ -20,7 +19,7 @@ import { getDeveloper } from "../server/developer-state";
 import LogoutButton from "./LogoutButton";
 
 // Menu mengikuti dashboard Zanclus: modul utama di atas, lalu kelompok Situs web, PR & mitra, HRD,
-// Keuangan, Gudang, dan Sistem. Kelompok tertutup (hanya judulnya yang terlihat) kecuali kelompok
+// Keuangan, dan Sistem. Kelompok tertutup (hanya judulnya yang terlihat) kecuali kelompok
 // halaman yang sedang dibuka; di ponsel seluruh menu dilipat di balik tombol Menu.
 const MENU = [
   { key: "ringkasan", label: "Ringkasan cepat", icon: GridIcon, href: "/admin" },
@@ -33,6 +32,7 @@ const MENU = [
     items: [
       { key: "paket", label: "Paket & harga", icon: TagIcon, href: "/admin/paket" },
       { key: "situs", label: "Galeri foto & video", icon: GlobeIcon, href: "/admin/situs" },
+      { key: "kontak", label: "Kontak & media sosial", icon: GlobeIcon, href: "/admin/kontak" },
     ],
   },
   {
@@ -59,14 +59,6 @@ const MENU = [
       { key: "pembayaran", label: "Pembayaran online", icon: BanknoteIcon, href: "/admin/pembayaran" },
       { key: "kas", label: "Buku kas", icon: WalletIcon, href: "/admin/kas" },
       { key: "laporan", label: "Laba rugi & pajak", icon: ReceiptIcon, href: "/admin/laporan" },
-    ],
-  },
-  {
-    group: "Gudang",
-    icon: BoxIcon,
-    items: [
-      { key: "stok", label: "Barang & stok", icon: BoxIcon, href: "/admin/stok" },
-      { key: "mutasi", label: "Keluar masuk", icon: TagIcon, href: "/admin/mutasi" },
     ],
   },
   {

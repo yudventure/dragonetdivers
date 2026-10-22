@@ -5,6 +5,7 @@ import { adminConfig, isAdminEmail, readJson, replacePassword, sameOrigin } from
 import { isDatabaseConfigured } from "@/server/db-config";
 import { mailConfigured, mailFailure, mailIssues, otpRecipient, sendMail } from "@/server/mailer";
 import { otpMail } from "@/lib/otp-mail";
+import { getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ const clientKey = (request) => request.headers.get("x-forwarded-for")?.split(","
 const SENT = "Kalau email itu email operator, kode 6 angka sudah dikirim ke kotak masuk pemulihannya. Periksa juga folder spam.";
 
 export async function POST(request) {
+  await getSiteSettings(); // email dan kontak dari /admin/kontak
   if (!sameOrigin(request)) return reply({ error: "Asal permintaan tidak valid." }, 403);
   if (adminConfig().issues.length) return reply({ error: "Login operator belum diatur. Isi ADMIN_EMAIL dan ADMIN_PASSWORD di hPanel." }, 503);
   const data = await readJson(request, 4000);

@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { availability, monthGrid, reservation, reservationDays, validateCapacity } from "../src/lib/modules/calendar.js";
 import { orderIncome, totals, transaction, validateTax, yearReport } from "../src/lib/modules/finance.js";
 import { attendanceRecap, computePayslip, employee, validateAttendance } from "../src/lib/modules/hr.js";
-import { item, movement, stockLevels, stockStatus } from "../src/lib/modules/inventory.js";
 import { SCHEMAS, schemaFor } from "../src/lib/modules/index.js";
 import { contentSummary, partner, post } from "../src/lib/modules/pr.js";
 import { activeGallery, galleryItem } from "../src/lib/modules/site.js";
@@ -113,25 +112,6 @@ test("keuangan: pesanan lunas jadi pemasukan otomatis, laporan tahunan dan pajak
   );
   assert.deepEqual(validateTax({ taxRate: "0,5", taxLabel: "PPh final" }), { taxRate: 0.5, taxLabel: "PPh final" });
   throwsOn(() => validateTax({ taxRate: "200", taxLabel: "x" }));
-});
-
-test("gudang: stok dari gerakan, status menipis dan habis", () => {
-  const it = cleanRecord(item, { name: "Regulator", category: "alat", minStock: "2", sku: "reg-01", active: true });
-  assert.equal(it.sku, "REG-01");
-  assert.equal(it.unit, "pcs");
-  const moves = [
-    cleanRecord(movement, { date: "2026-10-01", itemId: "brg:0123456789ab", flow: "in", qty: "5", reason: "beli" }),
-    cleanRecord(movement, { date: "2026-10-02", itemId: "brg:0123456789ab", flow: "out", qty: "2", reason: "rusak" }),
-    cleanRecord(movement, { date: "2026-10-03", itemId: "brg:0123456789ab", flow: "adjust", qty: "-1", reason: "opname" }),
-  ];
-  assert.equal(stockLevels(moves)["brg:0123456789ab"], 2);
-  assert.equal(stockStatus(it, 2).key, "low");
-  assert.equal(stockStatus(it, 3).key, "ok");
-  assert.equal(stockStatus(it, 0).key, "empty");
-  assert.equal(stockStatus({ ...it, active: false }, 9).key, "inactive");
-  throwsOn(() => cleanRecord(movement, { date: "2026-10-01", itemId: "brg:0123456789ab", flow: "out", qty: "-2", reason: "pakai" }), "qty");
-  throwsOn(() => cleanRecord(movement, { date: "2026-10-01", itemId: "brg:0123456789ab", flow: "in", qty: "2", reason: "jual" }), "reason");
-  throwsOn(() => cleanRecord(movement, { date: "2026-10-01", itemId: "bukan-id", flow: "in", qty: "2", reason: "beli" }), "itemId");
 });
 
 test("HRD: absensi dan slip gaji", () => {

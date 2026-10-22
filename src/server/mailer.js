@@ -2,6 +2,7 @@ import "server-only";
 import nodemailer from "nodemailer";
 import { envText } from "@/lib/env";
 import { contact, site } from "@/lib/site";
+import { getSiteSettings } from "./site-settings";
 
 // Email dari website (kode OTP admin, email pesanan ke tamu) lewat akun SMTP di hPanel, sama dengan
 // Zanclus. Email Hostinger: SMTP_HOST=smtp.hostinger.com, SMTP_PORT=465. Port 465 memakai SSL,
@@ -27,7 +28,9 @@ export const mailSender = () => env("SMTP_FROM") || (env("SMTP_USER") ? `"${site
 /** Ke mana kode OTP admin dikirim: ADMIN_OTP_EMAIL, atau email operator itu sendiri. */
 export const otpRecipient = (adminEmail) => env("ADMIN_OTP_EMAIL") || adminEmail;
 
-export async function sendMail({ to, subject, text, html, replyTo = contact.email }) {
+export async function sendMail({ to, subject, text, html, replyTo }) {
+  await getSiteSettings();
+  replyTo ??= contact.email; // email publik dari /admin/kontak
   const port = Number(env("SMTP_PORT")) || 465;
   const transport = nodemailer.createTransport({
     host: env("SMTP_HOST"),
