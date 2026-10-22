@@ -2,13 +2,12 @@ import "server-only";
 import { covers, DEFAULT_CAPACITY, holdsPlaces } from "@/lib/modules/calendar";
 import { DEFAULT_TAX, orderIncome } from "@/lib/modules/finance";
 import { attendanceRecap, computePayslip } from "@/lib/modules/hr";
-import { stockLevels, stockStatus } from "@/lib/modules/inventory";
 import { monthRange, shiftMonth } from "@/lib/records";
 import { allOrders, ordersForDates, paidOrdersBetween } from "./orders";
 import { listRecords } from "./records";
 import { getSetting } from "./settings";
 
-// Data gabungan untuk halaman modul admin (kalender, tamu, keuangan, gudang, HRD).
+// Data gabungan untuk halaman modul admin (kalender, tamu, keuangan, HRD).
 
 /** Pilihan [id, label] untuk kolom rujukan di form. */
 export const refOptions = (records, label = (r) => r.name) =>
@@ -93,31 +92,16 @@ export async function financeRows(from, to) {
   return [...stored, ...orderIncome(orders)].sort((a, b) => b.date.localeCompare(a.date));
 }
 
-// --- Gudang -----------------------------------------------------------------------------------------
-
-/** Barang dengan stok dan statusnya. */
-export async function stockList() {
-  const [items, moves] = await Promise.all([listRecords("item"), listRecords("movement")]);
-  const levels = stockLevels(moves);
-  return items
-    .map((it) => {
-      const stock = levels[it.id] ?? 0;
-      return { ...it, stock, status: stockStatus(it, stock), value: stock * (it.cost ?? 0) };
-    })
-    .sort((a, b) => a.name.localeCompare(b.name, "id"));
-}
-
 // --- Ringkasan --------------------------------------------------------------------------------------
 
-/** Angka singkat untuk "Ringkasan cepat": tamu hari ini, stok menipis, pegawai aktif. */
+/** Angka singkat untuk "Ringkasan cepat": tamu hari ini dan tanggal tutup. */
 export async function todaySummary(today) {
-  const [{ orders, reservations }, stock] = await Promise.all([dayBookings(today), stockList()]);
+  const { orders, reservations } = await dayBookings(today);
   const guests =
     orders.filter((o) => o.status === "paid" || o.status === "pending").reduce((s, o) => s + o.guests, 0) +
     reservations.filter(holdsPlaces).reduce((s, r) => s + (r.participants || 1), 0);
   const closed = reservations.some((r) => r.status === "closed");
-  const low = stock.filter((it) => it.status.key === "low" || it.status.key === "empty");
-  return { guests, closed, low };
+  return { guests, closed };
 }
 
 // --- HRD --------------------------------------------------------------------------------------------

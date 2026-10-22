@@ -89,8 +89,8 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 | Nama | Isi |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | `https://dragonetdivers.com` (boleh dihapus: nilai bawaan sama) |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Nomor booking, mis. `6281234567890` (tanpa `+`, spasi, atau `0` di depan). Kosong = tombol WhatsApp disembunyikan. |
-| `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Akun media sosial untuk ikon di footer: handle (`@dragonetdivers`) atau URL lengkap di domain jaringan itu. Kosong = ikon tidak ditampilkan. Perlu build ulang setelah diubah. |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Opsional. Lebih mudah diisi di `/admin/kontak` (langsung berlaku tanpa deploy ulang); nilai di sini hanya dipakai selama kolom di admin kosong. Nomor booking, mis. `6281234567890`. |
+| `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Opsional. Lebih mudah diisi di `/admin/kontak`; nilai di sini (handle `@dragonetdivers` atau URL lengkap) hanya dipakai selama kolom di admin kosong, dan perlu build ulang setelah diubah. |
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
 | `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. Spasi atau tanda kutip yang ikut tersalin ke kolom Value diabaikan. Lupa password: tekan **Lupa password?** di halaman masuk (perlu SMTP dan database). |
 | `SESSION_SECRET` | Teks acak panjang untuk menandatangani sesi (mis. hasil `openssl rand -base64 48`). Tanpa ini operator harus masuk lagi setiap aplikasi dimulai ulang. |
@@ -126,11 +126,12 @@ Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagi
 
 ### Modul tim di /admin
 
-Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pegawai, Absensi, Slip gaji, Buku kas, Laba rugi & pajak, Barang & stok, dan Keluar masuk menyimpan datanya di MySQL (tabel `admin_records`, `media`, dan `settings`, dibuat otomatis oleh migrasi 006). Tidak ada environment variable baru. Setiap modul punya tombol **Unduh Excel**.
+Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pegawai, Absensi, Slip gaji, Buku kas, dan Laba rugi & pajak menyimpan datanya di MySQL (tabel `admin_records`, `media`, dan `settings`, dibuat otomatis oleh migrasi 006). Tidak ada environment variable baru. Setiap modul punya tombol **Unduh Excel**.
 
 - **Paket & harga**: 34 paket dari daftar harga pemilik 2026 masuk otomatis sekali saat aplikasi pertama kali terhubung ke database (paket yang namanya sudah ada dilewati, paket yang kemudian dihapus tim tidak kembali). Panel **Daftar harga 2026** menampilkan isinya, dengan tombol **Tambahkan paket** untuk memasukkan lagi yang belum ada. Harga dan isi paket diubah di daftar paket yang sama dan langsung tampil di halaman layanan.
 - **Kalender reservasi**: pesanan website tampil otomatis. Tanggal yang ditutup (**Tutup tanggal ini**) dan **Kapasitas harian** juga ditolak oleh checkout website.
-- **Galeri foto & video**: foto yang diunggah disimpan di database (diperkecil otomatis), jadi tidak hilang saat situs dibangun ulang. Begitu ada satu item yang tampil, galeri bawaan di beranda diganti.
+- **Galeri foto & video**: foto yang diunggah disimpan di database (diperkecil otomatis), jadi tidak hilang saat situs dibangun ulang. Begitu ada satu item yang tampil, galeri bawaan di beranda diganti. Halamannya memuat panduan ukuran foto dan video, pratinjau petak, dan peringatan bila foto terlalu kecil.
+- **Kontak & media sosial**: nomor WhatsApp, email publik, alamat, tautan Google Maps, dan akun Instagram, TikTok, Facebook, YouTube diisi tim di `/admin/kontak` dan langsung berlaku tanpa deploy ulang.
 - **Buku kas**: pesanan website yang lunas masuk otomatis sebagai pemasukan. Pengeluaran dan pemasukan lain dicatat tim.
 - **Mode developer** (menu Sistem): tutup seluruh website, halaman tertentu, atau bagian beranda selama sedang diperbaiki. Pengunjung mendapat halaman perawatan (status 503, jadi Google kembali lagi nanti) atau kartu "sedang diperbarui" di bagian itu, dan checkout menolak pesanan baru bila ikut ditutup. Operator yang masuk di `/admin` tetap melihat semuanya dengan bilah kecil di bawah layar, dan bisa memakai **Lihat seperti pengunjung** selama 30 menit. Halaman status pesanan tamu dan pembayaran yang sedang berjalan tidak pernah ditutup. Disimpan di tabel `settings`, tanpa environment variable baru.
 

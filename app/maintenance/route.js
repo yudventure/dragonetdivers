@@ -3,12 +3,14 @@ import { localeHref } from "@/lib/i18n";
 import { maintenanceHtml } from "@/lib/maintenance-page";
 import { contact, whatsappNumber } from "@/lib/site";
 import { getDeveloper } from "@/server/developer-state";
+import { getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 
 // Halaman perawatan mode developer. Hanya dibuka lewat proxy.js (header x-dd-lock) untuk halaman yang
 // ditutup; status 503 dan Retry-After memberi tahu mesin pencari bahwa ini sementara.
 export async function GET(request) {
+  await getSiteSettings(); // email dan kontak dari /admin/kontak
   const kind = request.headers.get("x-dd-lock");
   if (kind !== "site" && kind !== "page") return new Response(null, { status: 307, headers: { location: "/" } });
   const lang = request.headers.get("x-dd-lang") === "id" ? "id" : "en";

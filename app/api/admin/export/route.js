@@ -1,12 +1,11 @@
 import { reservation } from "@/lib/modules/calendar";
 import { categoryLabel, PAY_METHODS, yearReport } from "@/lib/modules/finance";
 import { ATTENDANCE, EMPLOYMENT } from "@/lib/modules/hr";
-import { ITEM_CATEGORIES, movement, REASONS } from "@/lib/modules/inventory";
 import { METRICS, partner, post } from "@/lib/modules/pr";
 import { isMonth, monthLabel, monthRange, optionLabel } from "@/lib/records";
 import { workbook } from "@/lib/xlsx";
 import { currentAdmin } from "@/server/admin-auth";
-import { attendanceMonth, calendarMonth, financeRows, financeSettings, guestList, payrollMonth, refOptions, stockList } from "@/server/admin-data";
+import { attendanceMonth, calendarMonth, financeRows, financeSettings, guestList, payrollMonth, refOptions } from "@/server/admin-data";
 import { listRecords } from "@/server/records";
 
 export const dynamic = "force-dynamic";
@@ -90,29 +89,6 @@ const TYPES = {
           [],
           [tax.taxLabel, r.tax],
         ],
-      },
-    ];
-  },
-  async stok() {
-    const items = await stockList();
-    return [
-      {
-        name: "Stok",
-        widths: [28, 14, 22, 10, 10, 10, 14, 14, 18],
-        rows: [["Barang", "Kode", "Kategori", "Stok", "Satuan", "Minimum", "Status", "Nilai", "Lokasi"], ...items.map((i) => [i.name, i.sku, label(ITEM_CATEGORIES, i.category), i.stock, i.unit, i.minStock ?? 0, i.status.label, i.value, i.location])],
-      },
-    ];
-  },
-  async mutasi({ month }) {
-    const { from, to } = monthRange(month);
-    const [items, moves] = await Promise.all([listRecords("item"), listRecords("movement", { from, to })]);
-    const names = Object.fromEntries(refOptions(items));
-    const reasons = [...REASONS.in, ...REASONS.out, ...REASONS.adjust];
-    return [
-      {
-        name: "Mutasi",
-        widths: [12, 28, 14, 10, 24, 30],
-        rows: [["Tanggal", "Barang", "Jenis", "Jumlah", "Alasan", "Catatan"], ...moves.map((m) => [m.date, names[m.itemId] ?? "", optionLabel(field(movement, "flow"), m.flow), m.qty, label(reasons, m.reason), m.note])],
       },
     ];
   },

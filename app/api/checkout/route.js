@@ -6,6 +6,7 @@ import { contact } from "@/lib/site";
 import { readJson, sameOrigin } from "@/server/admin-auth";
 import { startCheckout } from "@/server/checkout";
 import { developerView } from "@/server/developer";
+import { getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 const noStore = { "Cache-Control": "no-store" };
@@ -16,6 +17,7 @@ const FIELD = { closed: "date", full: "date" };
 // pesanan berisi satu atau beberapa paket, lalu kembalikan alamat pembayaran (Midtrans/PayPal) atau
 // halaman pesanan (transfer bank). Salah isian satu paket dikembalikan dengan urutannya (index).
 export async function POST(request) {
+  await getSiteSettings(); // email dan kontak dari /admin/kontak
   const lang = new URL(request.url).searchParams.get("lang") === "id" ? "id" : "en";
   const errors = uiText(lang).checkout.errors;
   const fail = (field, status, index = null) =>

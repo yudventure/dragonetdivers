@@ -1,4 +1,5 @@
 import { site } from "@/lib/site";
+import { getSiteSettings } from "@/server/site-settings";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
@@ -12,7 +13,8 @@ export const metadata = {
 
 export const viewport = { themeColor: "#FFFFFF", viewportFit: "cover" };
 
-export default function AdminLayout({ children }) {
+export default async function AdminLayout({ children }) {
+  await getSiteSettings(); // kontak dari /admin/kontak untuk pratinjau email dan ringkasan
   return (
     <html lang="id" className={fontVariables}>
       <body className="min-h-dvh font-sans">{children}</body>

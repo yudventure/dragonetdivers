@@ -17,7 +17,8 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
       id: "whatsapp",
       label: "Nomor WhatsApp booking",
       done: whatsapp,
-      hint: "Isi NEXT_PUBLIC_WHATSAPP_NUMBER di hPanel (mis. 6281234567890), lalu deploy ulang. Tombol Book a dive dan WhatsApp ikut muncul.",
+      hint: "Isi di Situs web, Kontak & media sosial. Tombol Book a dive dan WhatsApp langsung muncul.",
+      href: "/admin/kontak",
     },
     {
       id: "database",
@@ -35,13 +36,28 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
       id: "social",
       label: "Akun media sosial di footer",
       done: socials > 0,
-      hint: "Isi NEXT_PUBLIC_INSTAGRAM, NEXT_PUBLIC_TIKTOK, NEXT_PUBLIC_FACEBOOK, atau NEXT_PUBLIC_YOUTUBE dengan handle atau URL.",
+      hint: "Isi akun Instagram, TikTok, Facebook, atau YouTube di Situs web, Kontak & media sosial.",
+      href: "/admin/kontak",
     },
     {
       id: "gallery",
       label: "Foto dan video asli di galeri",
       done: galleryIllustrations === 0,
-      hint: `${galleryIllustrations} item galeri masih ilustrasi AI. Unggah foto asli atau tempel tautan video di Situs web → Galeri foto & video.`,
+      hint: `${galleryIllustrations} item galeri masih ilustrasi AI. Unggah foto asli atau tempel tautan video di Situs web, Galeri foto & video.`,
+      href: "/admin/situs",
     },
   ];
 }
+
+/**
+ * Hal yang bisa diatur sendiri lewat admin, tanpa hPanel (kartu "Kelola website sendiri" di Ringkasan
+ * cepat). Yang tetap di hPanel hanya kunci rahasia (database, Midtrans, PayPal, SMTP, password awal).
+ */
+export const SELF_SERVICE = [
+  { href: "/admin/paket", label: "Paket & harga", text: "Tambah paket, ubah harga, atau sembunyikan paket di halaman layanan." },
+  { href: "/admin/situs", label: "Galeri foto & video", text: "Unggah foto dan tempel tautan video untuk galeri beranda." },
+  { href: "/admin/kontak", label: "Kontak & media sosial", text: "Nomor WhatsApp, email, alamat, Google Maps, dan akun media sosial." },
+  { href: "/admin/kalender", label: "Kalender reservasi", text: "Tutup tanggal tertentu dan atur kapasitas tamu per hari." },
+  { href: "/admin/pembayaran", label: "Pembayaran online", text: "Cara bayar yang ditawarkan, rekening bank, dan batas waktu bayar." },
+  { href: "/admin/developer", label: "Mode developer", text: "Tutup sementara seluruh website atau sebagian saat sedang diperbaiki." },
+];

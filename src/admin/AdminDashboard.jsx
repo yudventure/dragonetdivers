@@ -1,7 +1,7 @@
 import Image from "next/image";
 import heroPhoto from "../assets/ocean-manta-loop.webp";
 import { gallery } from "@/content/gallery";
-import { greeting, setupChecklist } from "@/lib/admin-overview";
+import { greeting, SELF_SERVICE, setupChecklist } from "@/lib/admin-overview";
 import { socialLinks, whatsappNumber } from "@/lib/site";
 import { witDate } from "@/lib/records";
 import { adminWarnings } from "@/server/admin-auth";
@@ -37,7 +37,7 @@ async function orderSummary(databaseOk) {
 }
 
 // "Ringkasan cepat": kartu sambutan berjam WIT dan ringkasan berisi data nyata (pesanan, tamu hari ini dari
-// kalender, stok gudang, kondisi laut Open-Meteo, status pengaturan situs). Kerangka di AdminShell.
+// kalender, kondisi laut Open-Meteo, status pengaturan situs). Kerangka di AdminShell.
 export default async function AdminDashboard({ admin }) {
   const [sea, database] = await Promise.all([getSeaConditions().catch(() => null), databaseStatus()]);
   const today = witDate();
@@ -146,57 +146,63 @@ export default async function AdminDashboard({ admin }) {
         </Card>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.2fr_1fr]">
-        <Card title={`Yang perlu dilengkapi · ${checklist.length - todo.length} dari ${checklist.length} beres`}>
-          <ul className="mt-1 grid gap-3">
-            {checklist.map((item) => (
-              <li key={item.id} className="flex gap-3">
-                <span
-                  className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full ${item.done ? "bg-success text-white" : "bg-sunrise-wash text-ember ring-1 ring-sunrise"}`}
-                  aria-hidden="true"
-                >
-                  {item.done ? <CheckIcon className="size-4" /> : <span className="text-xs font-bold">!</span>}
-                </span>
-                <span className="grid gap-0.5">
-                  <span className={`font-semibold ${item.done ? "text-slate line-through decoration-slate/40" : "text-abyss"}`}>{item.label}</span>
-                  {!item.done && <span className="text-sm text-slate">{item.hint}</span>}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+      <div className="grid items-start gap-4 xl:grid-cols-[1.2fr_1fr]">
+        <div className="grid content-start gap-4">
+          <Card title={`Yang perlu dilengkapi · ${checklist.length - todo.length} dari ${checklist.length} beres`}>
+            <ul className="mt-1 grid gap-3">
+              {checklist.map((item) => (
+                <li key={item.id} className="flex gap-3">
+                  <span
+                    className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full ${item.done ? "bg-success text-white" : "bg-sunrise-wash text-ember ring-1 ring-sunrise"}`}
+                    aria-hidden="true"
+                  >
+                    {item.done ? <CheckIcon className="size-4" /> : <span className="text-xs font-bold">!</span>}
+                  </span>
+                  <span className="grid gap-0.5">
+                    <span className={`font-semibold ${item.done ? "text-slate line-through decoration-slate/40" : "text-abyss"}`}>{item.label}</span>
+                    {!item.done && <span className="text-sm text-slate">{item.hint}</span>}
+                    {!item.done && item.href && (
+                      <a href={item.href} className="inline-flex w-fit items-center gap-1 text-sm font-bold text-teal hover:underline">
+                        Atur sekarang
+                        <ArrowIcon className="size-4" />
+                      </a>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card title="Kelola website sendiri">
+            <p className="text-sm text-slate">Semua ini bisa diubah langsung dari admin dan langsung tampil di website, tanpa membuka hPanel.</p>
+            <ul className="mt-1 grid gap-1 sm:grid-cols-2">
+              {SELF_SERVICE.map((item) => (
+                <li key={item.href}>
+                  <a href={item.href} className="group grid gap-0.5 rounded-input p-2.5 hover:bg-foam">
+                    <span className="flex items-center gap-1.5 font-semibold text-abyss group-hover:text-teal">
+                      {item.label}
+                      <ArrowIcon className="size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </span>
+                    <span className="text-sm text-slate">{item.text}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p className="border-t border-mist pt-3 text-xs text-slate">
+              Yang tetap di hPanel hanya kunci rahasia, yaitu database, Midtrans, PayPal, email SMTP, dan password admin awal.
+            </p>
+          </Card>
+        </div>
 
         <div className="grid content-start gap-4">
           <Card title="Perlu perhatian">
             {day == null ? (
-              <p className="text-sm text-slate">Hubungkan database untuk melihat pesanan dan stok yang perlu ditindaklanjuti.</p>
-            ) : waiting === 0 && day.low.length === 0 ? (
-              <p className="text-sm text-slate">Tidak ada pesanan yang menunggu dan semua stok di atas batas minimum.</p>
+              <p className="text-sm text-slate">Hubungkan database untuk melihat pesanan yang perlu ditindaklanjuti.</p>
+            ) : waiting === 0 ? (
+              <p className="text-sm text-slate">Tidak ada pesanan yang menunggu pembayaran.</p>
             ) : (
-              <ul className="grid gap-2 text-sm">
-                {waiting > 0 && (
-                  <li>
-                    <a href="/admin/pesanan?status=pending" className="font-semibold text-teal hover:underline">
-                      {number(waiting)} pesanan menunggu pembayaran
-                    </a>
-                  </li>
-                )}
-                {day.low.slice(0, 5).map((it) => (
-                  <li key={it.id} className="flex items-center justify-between gap-3">
-                    <span className="text-abyss">{it.name}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${it.status.key === "empty" ? "bg-danger/10 text-danger" : "bg-sunrise-wash text-ember"}`}>
-                      {it.status.label} · {number(it.stock)} {it.unit}
-                    </span>
-                  </li>
-                ))}
-                {day.low.length > 0 && (
-                  <li>
-                    <a href="/admin/stok" className="font-semibold text-teal hover:underline">
-                      Lihat barang & stok
-                    </a>
-                  </li>
-                )}
-              </ul>
+              <a href="/admin/pesanan?status=pending" className="text-sm font-semibold text-teal hover:underline">
+                {number(waiting)} pesanan menunggu pembayaran
+              </a>
             )}
           </Card>
           <Card title="Tautan cepat">
