@@ -41,14 +41,8 @@ const en = {
   },
   hero: {
     title: ["dive into", "colour."],
-    services: [
-      { title: "Fun dives", text: "Guided dives on the reefs of the Dampier Strait.", topic: "fun dives" },
-      { title: "Dive courses", text: "From your first breath underwater to the next level.", topic: "dive courses" },
-      { title: "Snorkeling & trips", text: "Reef snorkeling and island days for the whole family.", topic: "snorkeling and trips" },
-    ],
-    ask: "Ask on WhatsApp",
     scroll: "Scroll down",
-    scrollLabel: "Scroll down to live sea conditions",
+    scrollLabel: "Scroll down to our services",
   },
   conditions: {
     title: "Live sea conditions",
@@ -360,16 +354,10 @@ const id = {
     pricesNote: "Harga ditetapkan dalam rupiah. Nilai dolar adalah perkiraan dengan kurs ini.",
   },
   hero: {
-    // Tiga baris (\n = pindah baris) supaya selebar judul English dan tidak menutupi wajah penyelam.
+    // Tiga baris (\n = pindah baris) supaya selebar judul English.
     title: ["menyelam\nke dalam", "warna."],
-    services: [
-      { title: "Fun dive", text: "Menyelam bersama pemandu di karang-karang Selat Dampier.", topic: "fun dive" },
-      { title: "Kursus selam", text: "Dari napas pertamamu di bawah air sampai level berikutnya.", topic: "kursus selam" },
-      { title: "Snorkeling & trip", text: "Snorkeling di karang dan jalan-jalan ke pulau untuk seluruh keluarga.", topic: "snorkeling dan trip" },
-    ],
-    ask: "Tanya lewat WhatsApp",
     scroll: "Gulir ke bawah",
-    scrollLabel: "Gulir ke kondisi laut terkini",
+    scrollLabel: "Gulir ke layanan kami",
   },
   conditions: {
     title: "Kondisi laut terkini",

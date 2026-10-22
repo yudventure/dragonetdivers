@@ -1,6 +1,6 @@
 # Latar panel kondisi laut: penyelam bersiap turun dari perahu
 
-Panel "Live sea conditions" (`src/components/SeaConditionsPanel.jsx`, di beranda dan halaman layanan) memakai satu foto latar: empat penyelam bersiap di perahu kayu biru di Raja Ampat. Dua penyelam duduk di tepi perahu dengan tabung, BCD, dan fin, siap melakukan *backward roll*, satu memeriksa tabung temannya, dan pemandu berdiri di buritan. Air pirus di atas karang dan pulau karst berhutan di latar belakang.
+Panel "Live sea conditions" di halaman layanan (`src/components/SeaConditionsPanel.jsx`) memakai satu foto latar, yang juga menjadi kepala kartu kondisi laut di hero beranda (`HeroConditions`): empat penyelam bersiap di perahu kayu biru di Raja Ampat. Dua penyelam duduk di tepi perahu dengan tabung, BCD, dan fin, siap melakukan *backward roll*, satu memeriksa tabung temannya, dan pemandu berdiri di buritan. Air pirus di atas karang dan pulau karst berhutan di latar belakang.
 
 Dibuat 22 Oktober 2026 atas permintaan pemilik ("ubah live weather dengan foto orang orang sedang bersiap turun ke air dari boat"). Sebelumnya panel memakai video manta yang sekarang menjadi hero beranda (`brand/ocean/README.md`).
 

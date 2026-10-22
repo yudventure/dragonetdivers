@@ -6,7 +6,6 @@ import GettingHere from "@/components/GettingHere";
 import HomeHero from "@/components/HomeHero";
 import HomeServices from "@/components/HomeServices";
 import LockedSection from "@/components/LockedSection";
-import SeaConditions from "@/components/SeaConditions";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { sectionLocked } from "@/lib/developer";
@@ -18,9 +17,9 @@ export async function generateMetadata({ params }) {
   return { alternates: { canonical: localeHref(lang, "/"), languages: { ...alternates("/"), "x-default": "/" } } };
 }
 
-// Bagian beranda berurutan, dengan kunci mode developer masing-masing (src/lib/developer.js).
+// Bagian beranda berurutan, dengan kunci mode developer masing-masing (src/lib/developer.js). Kondisi laut
+// live ada di dalam hero (kunci "conditions" menyembunyikan kartunya).
 const SECTIONS = [
-  ["conditions", SeaConditions],
   ["services", HomeServices],
   ["dive-sites", DiveSiteMap],
   ["gallery", Gallery],
@@ -40,7 +39,7 @@ export default async function HomePage({ params }) {
     <>
       <SiteHeader lang={lang} path="/" overlay />
       <main>
-        <HomeHero lang={lang} />
+        <HomeHero lang={lang} conditionsLocked={sectionLocked(locks, "conditions")} />
         {SECTIONS.map(([id, Section]) => (sectionLocked(locks, id) ? <LockedSection key={id} id={id} lang={lang} /> : <Section key={id} lang={lang} />))}
       </main>
       <SiteFooter lang={lang} />

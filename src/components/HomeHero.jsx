@@ -5,73 +5,22 @@ import { preload } from "react-dom";
 // kiri). Cara membuat ulang: brand/ocean/README.md.
 import poster from "../assets/ocean-manta-loop.webp";
 import { uiText } from "@/content/ui";
-import { format } from "@/lib/i18n";
-import { site, whatsappLink } from "@/lib/site";
+import { site } from "@/lib/site";
+import { getSeaConditions } from "@/server/sea-conditions";
 import LoopVideo from "./LoopVideo";
-import { ArrowIcon, CapIcon, FishIcon, WavesIcon } from "./icons";
-
-// Ikon tiga layanan utama dari BRANDING.md §1 (yang dijual); teksnya di src/content/ui.js (hero.services).
-// Tanpa harga atau jadwal.
-const ICONS = [FishIcon, CapIcon, WavesIcon];
-
-// Gaya daftar layanan: kaca gelap di atas video (desktop) atau kartu terang di bawah video (ponsel, tablet).
-const LIST = {
-  dark: {
-    item: "border-white/15 bg-abyss/35 backdrop-blur-md first:border-white/35 first:bg-abyss/55 hover:border-white/35",
-    icon: "bg-white/15 text-white",
-    number: "text-sunrise",
-    title: "text-white",
-    text: "text-white/80",
-    link: "text-white",
-  },
-  light: {
-    item: "border-transparent hover:border-mist hover:bg-foam first:border-mist first:bg-foam",
-    icon: "bg-teal-soft text-teal",
-    number: "text-ember",
-    title: "text-abyss",
-    text: "text-slate",
-    link: "text-teal",
-  },
-};
-
-function ServiceList({ t, tone, className }) {
-  const s = LIST[tone];
-  return (
-    <ol className={`grid gap-2 ${className}`}>
-      {t.hero.services.map(({ title, text, topic }, index) => {
-        const Icon = ICONS[index];
-        const link = whatsappLink(format(t.whatsapp.about, { topic }));
-        return (
-          <li key={title} className={`grid grid-cols-[48px_1fr] items-start gap-4 rounded-card border p-4 transition-colors duration-200 ease-brand ${s.item}`}>
-            <span className={`grid size-12 place-items-center rounded-full ${s.icon}`}>
-              <Icon className="size-6" />
-            </span>
-            <span className="grid gap-1">
-              <span className={`text-xs font-bold tracking-[0.14em] tabular-nums ${s.number}`}>{String(index + 1).padStart(2, "0")}</span>
-              <span className={`font-display text-xl leading-tight font-semibold ${s.title}`}>{title}</span>
-              <span className={`text-sm leading-snug ${s.text}`}>{text}</span>
-              {link && (
-                <a href={link} className={`mt-1 inline-flex w-fit items-center gap-1.5 text-sm font-bold underline-offset-4 hover:underline ${s.link}`}>
-                  {t.hero.ask}
-                  <ArrowIcon className="size-4" />
-                </a>
-              )}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
+import { HeroConditions } from "./SeaConditionsPanel";
 
 // Hero beranda (permintaan pemilik, Oktober 2026): video laut dalam dengan manta selebar layar, judul besar
-// huruf kecil putih di kiri bawah, daftar layanan bernomor di kanan bawah. Teks di atas gradasi Abyss
+// huruf kecil putih di kiri bawah, kondisi laut live di kanan bawah (menggantikan daftar layanan, yang tetap
+// ada di seksi Services; data dari Open-Meteo lewat src/server/sea-conditions.js). Teks di atas gradasi Abyss
 // (BRANDING.md §9.2). Hero ditarik ke belakang header yang transparan (64 px di ponsel, 72 px dari 640 px,
 // ditambah garis bawah header 1 px); header berganti ke warna untuk latar gelap (SiteHeader overlay).
-// Desktop: selalu setinggi layar. Ponsel dan tablet: daftar layanan di bawah video. "\n" di teks judul (src/content/ui.js) = pindah baris.
-export default function HomeHero({ lang }) {
+// Desktop: selalu setinggi layar. Ponsel dan tablet: kondisi laut di bawah video. conditionsLocked = bagian
+// "conditions" ditutup mode developer, kartunya tidak ditampilkan. "\n" di teks judul (src/content/ui.js) = pindah baris.
+export default async function HomeHero({ lang, conditionsLocked = false }) {
   preload(poster.src, { as: "image", fetchPriority: "high" });
   const t = uiText(lang);
+  const conditions = conditionsLocked ? null : await getSeaConditions();
   const [titleLead, titleAccent] = t.hero.title;
   const leadLines = titleLead.split("\n");
   return (
@@ -93,25 +42,20 @@ export default function HomeHero({ lang }) {
         <div aria-hidden="true" className="absolute inset-0 -z-10 hidden bg-[linear-gradient(90deg,rgb(10_50_59/0.45)_0%,rgb(10_50_59/0)_50%)] lg:block" />
 
         <div className="gutter relative mx-auto flex h-full max-w-[max(1200px,85%)] items-end pb-10 lg:pb-24">
-          <div className="flex w-full items-end justify-between gap-10">
-            {/* Judul */}
-            <div className="[text-shadow:0_2px_24px_rgb(10_50_59/0.55)]">
-              <h1
-                id="hero-title"
-                className="font-display text-[clamp(3.25rem,min(6.8vw,12.5svh),10rem)] leading-[0.88] font-semibold tracking-[-0.02em] text-white lowercase"
-              >
-                {leadLines.map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))}
-                <span className="block text-sunrise">{titleAccent}</span>
-              </h1>
-              <p className="mt-5 pl-1 text-lg text-white/85 lg:mt-6 lg:pl-[0.35em] lg:text-xl">{site.name}</p>
-            </div>
-
-            {/* Daftar layanan bernomor di atas video (desktop) */}
-            <ServiceList t={t} tone="dark" className="hidden w-[320px] shrink-0 lg:grid" />
+          {/* Judul */}
+          <div className="[text-shadow:0_2px_24px_rgb(10_50_59/0.55)] lg:pr-[380px]">
+            <h1
+              id="hero-title"
+              className="font-display text-[clamp(3.25rem,min(6.8vw,12.5svh),10rem)] leading-[0.88] font-semibold tracking-[-0.02em] text-white lowercase"
+            >
+              {leadLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+              <span className="block text-sunrise">{titleAccent}</span>
+            </h1>
+            <p className="mt-5 pl-1 text-lg text-white/85 lg:mt-6 lg:pl-[0.35em] lg:text-xl">{site.name}</p>
           </div>
         </div>
 
@@ -124,16 +68,19 @@ export default function HomeHero({ lang }) {
         </div>
 
         {/* Penanda scroll */}
-        <a href="#conditions" className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white lg:flex" aria-label={t.hero.scrollLabel}>
+        <a href="#services" className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-white lg:flex" aria-label={t.hero.scrollLabel}>
           <span className="[writing-mode:vertical-rl] text-[11px] font-semibold tracking-[0.2em] uppercase">{t.hero.scroll}</span>
           <span className="h-12 w-px bg-white/60" aria-hidden="true" />
         </a>
       </div>
 
-      {/* Daftar layanan bernomor di bawah video (ponsel, tablet) */}
-      <div className="gutter mx-auto max-w-[max(1200px,85%)] lg:hidden">
-        <ServiceList t={t} tone="light" className="py-8 sm:grid-cols-3" />
-      </div>
+      {/* Kondisi laut live: di atas video kanan bawah sejajar judul (desktop, tepi kanan isi = 85% layar,
+          minimal 1200 px, dikurangi gutter), di bawah video (ponsel, tablet). */}
+      {!conditionsLocked && (
+        <div className="gutter mx-auto max-w-[max(1200px,85%)] pt-8 lg:absolute lg:right-[max(32px,calc((100%-max(1200px,85%))/2+32px))] lg:bottom-24 lg:w-[340px] lg:max-w-none lg:p-0">
+          <HeroConditions initial={conditions} lang={lang} t={t.conditions} />
+        </div>
+      )}
     </section>
   );
 }
