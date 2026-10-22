@@ -1,6 +1,7 @@
 // Kalender reservasi (mengikuti Zanclus): reservasi yang dicatat tim (WhatsApp, datang langsung, agen),
 // tanggal tutup, dan kapasitas harian. Pesanan dari website (tabel orders) ikut tampil di kalender.
-// Tanggal tutup dan kapasitas juga diperiksa checkout (src/server/availability.js).
+// Tanggal tutup dan kapasitas juga diperiksa checkout (src/server/checkout.js) dan tampil di kalender tempat
+// halaman layanan (slotCalendar, src/lib/slots.js).
 import { RecordError } from "../records.js";
 
 export const SERVICE_OPTIONS = [
@@ -15,7 +16,8 @@ export const SERVICE_OPTIONS = [
 export const POOLS = { diving: ["fun-dives", "dive-courses", "dusk-dives"], snorkeling: ["snorkeling", "island-trips"] };
 export const POOL_LABEL = { diving: "Menyelam (fun dive, kursus, dusk dive)", snorkeling: "Snorkeling & trip pulau" };
 export const poolOf = (service) => Object.keys(POOLS).find((pool) => POOLS[pool].includes(service)) ?? null;
-export const DEFAULT_CAPACITY = { diving: 0, snorkeling: 0 }; // 0 = tanpa batas
+// 0 = tanpa batas. Bawaan 30 tamu selam sehari (contoh dari pemilik, sama dengan Zanclus); diubah tim di /admin/kalender.
+export const DEFAULT_CAPACITY = { diving: 30, snorkeling: 0 };
 
 export const RESERVATION_STATUS = [
   ["pending", "Belum dikonfirmasi"],
@@ -76,6 +78,23 @@ export const holdsPlaces = (r) => r.status === "confirmed" || r.status === "pend
 export const orderHoldsPlaces = (o, now = new Date()) => o.status === "paid" || (o.status === "pending" && (!o.dueAt || new Date(o.dueAt) > now));
 
 /**
+ * Orang dari pesanan website yang lolos keep(o). Baris pesanan per paket; paket-paket satu pesanan di tanggal
+ * dan kelompok yang sama dianggap satu rombongan (jumlah tamu terbesarnya), misalnya perahu ekskursi dan
+ * fun dive-nya. Hasilnya { "YYYY-MM-DD": orang }.
+ */
+function orderPeople(orders, keep) {
+  const groups = new Map();
+  orders.forEach((o, i) => {
+    if (!keep(o)) return;
+    const key = `${o.code ?? `#${i}`}|${o.date}|${poolOf(o.service)}`;
+    groups.set(key, { date: o.date, people: Math.max(groups.get(key)?.people ?? 0, Number(o.guests) || 0) });
+  });
+  const days = {};
+  for (const { date, people } of groups.values()) days[date] = (days[date] ?? 0) + people;
+  return days;
+}
+
+/**
  * Ketersediaan satu tanggal untuk satu layanan. { closed, capacity, used, left } (left null = tanpa batas).
  * orders = pesanan website pada tanggal itu, reservations = reservasi yang mencakup tanggal itu.
  */
@@ -85,9 +104,26 @@ export function availability({ date, service, capacity = DEFAULT_CAPACITY, order
   const limit = pool ? Number(capacity[pool]) || 0 : 0;
   const inPool = (s) => poolOf(s) === pool;
   const used =
-    orders.filter((o) => o.date === date && inPool(o.service) && orderHoldsPlaces(o, now)).reduce((sum, o) => sum + o.guests, 0) +
+    (orderPeople(orders, (o) => o.date === date && inPool(o.service) && orderHoldsPlaces(o, now))[date] ?? 0) +
     reservations.filter((r) => holdsPlaces(r) && covers(r, date) && inPool(r.service)).reduce((sum, r) => sum + (r.participants || 1), 0);
   return { closed, capacity: limit, used, left: limit ? Math.max(0, limit - used) : null };
+}
+
+/**
+ * Data kalender tempat untuk tamu (halaman layanan dan checkout, mengikuti Zanclus) di rentang { from, to }:
+ * { capacity, used: { "YYYY-MM-DD": orang }, closed: [[mulai, selesai]] }. Hanya angka, tanpa nama atau kontak.
+ */
+export function slotCalendar({ service, from, to, capacity = DEFAULT_CAPACITY, orders = [], reservations = [], now = new Date() }) {
+  const pool = poolOf(service);
+  const inPool = (s) => pool !== null && poolOf(s) === pool;
+  const used = orderPeople(orders, (o) => o.date >= from && o.date <= to && inPool(o.service) && orderHoldsPlaces(o, now));
+  for (const r of reservations.filter((r) => holdsPlaces(r) && inPool(r.service))) {
+    for (const day of reservationDays(r)) if (day >= from && day <= to) used[day] = (used[day] ?? 0) + (r.participants || 1);
+  }
+  const closed = reservations
+    .filter((r) => r.status === "closed" && (r.service === "all" || r.service === service) && (r.endDate || r.startDate) >= from)
+    .map((r) => [r.startDate, r.endDate || r.startDate]);
+  return { capacity: pool ? Number(capacity[pool]) || 0 : 0, used, closed };
 }
 
 /** Isian kapasitas dari /admin/kalender: angka 0–500 per kelompok. */

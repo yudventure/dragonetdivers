@@ -13,7 +13,7 @@ const noStore = { "Cache-Control": "no-store" };
 // Tanggal tutup dan tanggal penuh punya pesan sendiri, tetapi yang disorot tetap kolom tanggal.
 const FIELD = { closed: "date", full: "date" };
 
-// Bayar sekarang dari halaman checkout keranjang (src/components/checkout/CartCheckout.jsx): simpan
+// Bayar dari jendela checkout di halaman layanan (src/components/booking/CheckoutDialog.jsx): simpan
 // pesanan berisi satu atau beberapa paket, lalu kembalikan alamat pembayaran (Midtrans/PayPal) atau
 // halaman pesanan (transfer bank). Salah isian satu paket dikembalikan dengan urutannya (index).
 export async function POST(request) {

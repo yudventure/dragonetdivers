@@ -129,7 +129,8 @@ async function setStatus(order, to, details) {
 
 /**
  * Tanggal tutup dan kapasitas harian dari /admin/kalender untuk setiap paket: CheckoutError "closed" atau
- * "full" (dengan urutan paketnya). Paket di keranjang yang jatuh di tanggal dan kelompok yang sama dijumlahkan.
+ * "full" (dengan urutan paketnya). Paket pesanan ini yang jatuh di tanggal dan kelompok yang sama dianggap
+ * satu rombongan, jadi yang dihitung jumlah tamu terbesarnya (sama dengan availability()).
  */
 async function checkAvailability(items) {
   if (!isDatabaseConfigured()) return;
@@ -139,7 +140,7 @@ async function checkAvailability(items) {
     const a = availability({ date: item.date, service: item.pkg.service, ...days.get(item.date) });
     if (a.closed) throw new CheckoutError("closed", 409, index);
     const pool = poolOf(item.pkg.service);
-    const wanted = items.filter((other) => other.date === item.date && poolOf(other.pkg.service) === pool).reduce((sum, other) => sum + other.guests, 0);
+    const wanted = Math.max(...items.filter((other) => other.date === item.date && poolOf(other.pkg.service) === pool).map((other) => other.guests));
     if (a.left !== null && wanted > a.left) throw new CheckoutError("full", 409, index);
   }
 }

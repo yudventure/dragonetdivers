@@ -8,15 +8,20 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { ArrowIcon, CheckIcon, ChatIcon, Wave } from "@/components/icons";
 import { uiText } from "@/content/ui";
+import { dateRange } from "@/lib/checkout";
 import { alternates, format, localeHref, locales } from "@/lib/i18n";
+import { poolOf } from "@/lib/modules/calendar";
 import { localizePackage } from "@/lib/packages";
 import { serviceBySlug, services, servicesIn } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
+import { serviceSlots } from "@/server/admin-data";
+import { paymentOptions } from "@/server/checkout";
 import { activePackages } from "@/server/packages";
 
 // Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
 // Dirender per permintaan supaya paket dan harga dari /admin/paket langsung tampil (tidak tertahan cache
-// halaman atau CDN); kondisi laut tetap dari data cache Next.js 15 menit.
+// halaman atau CDN), begitu juga sisa tempat per tanggal di kalender pesan; kondisi laut tetap dari data
+// cache Next.js 15 menit.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -46,6 +51,7 @@ export default async function ServicePage({ params }) {
   const ask = whatsappLink(format(t.whatsapp.about, { topic: service.ask }));
   const others = servicesIn(lang).filter((other) => other.slug !== service.slug);
   const packages = (await activePackages(service.slug)).map((pkg) => ({ ...localizePackage(pkg, lang), names: { en: pkg.nameEn, id: pkg.nameId } }));
+  const booking = packages.length ? await bookingData(service.slug) : null;
 
   return (
     <>
@@ -118,7 +124,7 @@ export default async function ServicePage({ params }) {
           </div>
         </section>
 
-        <ServicePackages lang={lang} service={service} packages={packages} />
+        <ServicePackages lang={lang} service={service} packages={packages} booking={booking} />
 
         <SeaConditions lang={lang} />
 
@@ -181,4 +187,26 @@ export default async function ServicePage({ params }) {
       <SiteFooter lang={lang} />
     </>
   );
+}
+
+/** Kalender tempat dan cara bayar untuk alur pesan di halaman layanan. Tanpa data pemesanan, semua tanggal tampil terbuka. */
+async function bookingData(slug) {
+  const range = dateRange();
+  const [slots, options] = await Promise.all([
+    serviceSlots(slug, range).catch((error) => {
+      console.error(`[layanan] kalender tempat ${slug} tidak terbaca: ${error.code ?? error.message}`);
+      return { capacity: 0, used: {}, closed: [] };
+    }),
+    paymentOptions(),
+  ]);
+  return {
+    slots,
+    range,
+    pool: poolOf(slug),
+    payments: {
+      methods: options.methods.map((id) => ({ id, sandbox: Boolean(options.status[id].sandbox) })),
+      rate: options.rate?.idrPerUsd ?? null,
+      dueHours: options.settings.dueHours,
+    },
+  };
 }

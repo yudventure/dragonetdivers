@@ -1,16 +1,18 @@
 "use client";
 
-// Tombol − angka + untuk jumlah tamu (sidebar keranjang dan checkout). size "sm" untuk baris keranjang.
-export default function GuestStepper({ id, value, min, max, onChange, fewer, more, size = "md", invalid = false }) {
+// Tombol − angka + untuk jumlah tamu (kartu paket dan checkout). size "sm" untuk kartu dan baris keranjang.
+// Dengan onRemove, tombol − di jumlah minimal mengeluarkan paket dari keranjang (label remove).
+export default function GuestStepper({ id, value, min, max, onChange, fewer, more, onRemove, remove, size = "md", invalid = false }) {
   const box = size === "sm" ? "h-9" : "h-12";
   const button = size === "sm" ? "w-9 text-lg" : "w-12 text-xl";
+  const removing = Boolean(onRemove) && value <= min;
   return (
     <div className={`flex ${box} items-center rounded-input border bg-white ${invalid ? "border-danger" : "border-line-strong"}`}>
       <button
         type="button"
-        onClick={() => onChange(Math.max(min, value - 1))}
-        disabled={value <= min}
-        aria-label={fewer}
+        onClick={() => (removing ? onRemove() : onChange(Math.max(min, value - 1)))}
+        disabled={value <= min && !removing}
+        aria-label={removing ? remove : fewer}
         className={`grid h-full ${button} place-items-center font-bold text-teal disabled:text-mist`}
       >
         −

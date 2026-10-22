@@ -1,15 +1,14 @@
 import { uiText } from "@/content/ui";
 import { format } from "@/lib/i18n";
-import { servicesIn } from "@/lib/services";
 import { contact, whatsappLink } from "@/lib/site";
+import ServiceBooking from "./booking/ServiceBooking";
 import { ChatIcon, MailIcon, Wave } from "./icons";
-import PackageBooking from "./PackageBooking";
 
-// Paket sebuah layanan di halaman layanannya (isi dari /admin/paket, tabel packages). Harga ditulis
-// dalam Rupiah dan tampil sesuai mata uang pilihan tamu (<Price>). "Tambah" memasukkan paket ke
-// keranjang yang rinciannya tampil di sidebar, "Pesan sekarang" langsung ke checkout (PackageBooking).
+// Paket sebuah layanan di halaman layanannya (isi dari /admin/paket, tabel packages). Harga ditulis dalam
+// Rupiah dan tampil sesuai mata uang pilihan tamu (<Price>). Alur pesan mengikuti Zanclus (ServiceBooking):
+// keranjang, kalender tempat per tanggal di samping daftar, dan jendela checkout di atas halaman.
 // Tanpa paket aktif, seksi menampilkan ajakan bertanya lewat WhatsApp atau email.
-export default function ServicePackages({ lang, service, packages }) {
+export default function ServicePackages({ lang, service, packages, booking }) {
   const all = uiText(lang);
   const t = all.packages;
   const ask = whatsappLink(format(all.whatsapp.about, { topic: service.ask }));
@@ -41,14 +40,17 @@ export default function ServicePackages({ lang, service, packages }) {
           </div>
         ) : (
           <>
-            <PackageBooking
+            <ServiceBooking
               lang={lang}
+              service={{ slug: service.slug, title: service.title }}
               packages={packages}
-              t={t}
-              cartText={all.cart}
-              checkoutText={all.checkout}
-              serviceTitles={Object.fromEntries(servicesIn(lang).map((s) => [s.slug, s.title]))}
+              slots={booking.slots}
+              range={booking.range}
+              pool={booking.pool}
+              payments={booking.payments}
+              text={{ packages: t, cart: all.cart, slots: all.slots, checkout: all.checkout }}
               ask={ask}
+              email={contact.email}
             />
             <p className="text-xs text-slate">{t.usdNote}</p>
           </>

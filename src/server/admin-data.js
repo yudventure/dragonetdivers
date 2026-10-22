@@ -1,5 +1,6 @@
 import "server-only";
-import { covers, DEFAULT_CAPACITY, holdsPlaces } from "@/lib/modules/calendar";
+import { dateRange } from "@/lib/checkout";
+import { covers, DEFAULT_CAPACITY, holdsPlaces, slotCalendar } from "@/lib/modules/calendar";
 import { DEFAULT_TAX, orderIncome } from "@/lib/modules/finance";
 import { attendanceRecap, computePayslip } from "@/lib/modules/hr";
 import { monthRange, shiftMonth } from "@/lib/records";
@@ -42,6 +43,19 @@ export async function dayBookings(date) {
     calendarCapacity(),
   ]);
   return { orders, reservations: reservations.filter((r) => covers(r, date)), capacity };
+}
+
+/**
+ * Kalender tempat satu layanan untuk tamu (halaman layanan dan jendela checkout): kapasitas, orang terisi
+ * per tanggal, dan tanggal tutup di rentang pesan. Hanya angka, tanpa nama atau kontak.
+ */
+export async function serviceSlots(service, range = dateRange()) {
+  const [orders, reservations, capacity] = await Promise.all([
+    ordersForDates(range.min, range.max),
+    listRecords("reservation", { from: `${shiftMonth(range.min.slice(0, 7), -12)}-01`, to: range.max }),
+    calendarCapacity(),
+  ]);
+  return slotCalendar({ service, from: range.min, to: range.max, capacity, orders, reservations });
 }
 
 // --- Tamu -------------------------------------------------------------------------------------------
