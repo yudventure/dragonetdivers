@@ -231,6 +231,8 @@ Semua komponen memakai token di `brand/tokens.css`. Contoh visual lengkap ada di
 - Foto besar dalam bingkai radius 28 px di sisi kanan (desktop) atau di bawah teks (mobile). Tidak memakai hero 100vh.
 - Di bawah hero: **strip kondisi laut** (suhu air, visibilitas, arus, waktu matahari terbenam) dalam kotak Laguna Tipis.
 
+Pengecualian (permintaan pemilik, Oktober 2026): hero beranda memakai video laut dalam dengan manta yang sama dengan panel kondisi laut (§9.7), selebar layar dan setinggi layar di desktop, di belakang header yang transparan. Judul huruf kecil putih dengan kata kunci Kuning Fajar, daftar layanan berlatar kaca Abyss, gradasi Abyss di atas (untuk header) dan di bawah (untuk teks), sesuai aturan teks di atas foto (§7). Selama header berada di atas video, logo memakai versi *plate* dan nama situs putih. Di ponsel dan tablet video ada di bawah header dan daftar layanan di bawah video.
+
 ### 9.3 Tombol
 
 | Varian | Latar | Teks | Hover | Pakai untuk |

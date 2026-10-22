@@ -38,7 +38,7 @@ export default async function HomePage({ params }) {
   const { locks } = await developerView();
   return (
     <>
-      <SiteHeader lang={lang} path="/" />
+      <SiteHeader lang={lang} path="/" overlay />
       <main>
         <HomeHero lang={lang} />
         {SECTIONS.map(([id, Section]) => (sectionLocked(locks, id) ? <LockedSection key={id} id={id} lang={lang} /> : <Section key={id} lang={lang} />))}
