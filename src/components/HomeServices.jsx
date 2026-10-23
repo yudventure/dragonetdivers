@@ -1,13 +1,16 @@
 import { uiText } from "@/content/ui";
 import { servicesIn } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
+import { servicePrices } from "@/server/packages";
 import ServiceCard from "./ServiceCard";
 import { ChatIcon } from "./icons";
 
-// Grid layanan lengkap gaya "bento": dua kartu besar di atas, tiga di bawah (desktop).
+// Grid layanan lengkap gaya "bento": dua kartu besar di atas, tiga di bawah (desktop). Tiap kartu
+// menampilkan harga mulai dari paket aktif termurahnya (/admin/paket) sebagai ajakan melihat paket.
 // Tombol Teal, karena tombol oranye sudah dipakai di header.
-export default function HomeServices({ lang }) {
+export default async function HomeServices({ lang }) {
   const t = uiText(lang);
+  const prices = await servicePrices();
   const ask = whatsappLink(t.whatsapp.services);
   const [first, second, ...rest] = servicesIn(lang);
   return (
@@ -31,12 +34,12 @@ export default function HomeServices({ lang }) {
         <ul className="grid gap-5 md:grid-cols-6">
           {[first, second].map((service) => (
             <li key={service.slug} className="grid md:col-span-3">
-              <ServiceCard service={service} lang={lang} sizes="(min-width: 768px) 560px, 90vw" />
+              <ServiceCard service={service} lang={lang} from={prices[service.slug]} sizes="(min-width: 768px) 560px, 90vw" />
             </li>
           ))}
           {rest.map((service) => (
             <li key={service.slug} className="grid md:col-span-2">
-              <ServiceCard service={service} lang={lang} />
+              <ServiceCard service={service} lang={lang} from={prices[service.slug]} />
             </li>
           ))}
         </ul>

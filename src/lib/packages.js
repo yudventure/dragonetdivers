@@ -40,3 +40,18 @@ const sameName = (a, b) => String(a ?? "").trim().toLowerCase() === String(b ?? 
 /** Paket daftar harga yang belum ada (layanan sama dan nama English atau Indonesia sama dianggap sudah ada). */
 export const missingPackages = (list, existing) =>
   list.filter((item) => !existing.some((pkg) => pkg.service === item.service && (sameName(pkg.nameEn, item.nameEn) || sameName(pkg.nameId, item.nameId))));
+
+/**
+ * Harga mulai tiap layanan untuk kartu layanan di beranda: paket aktif termurah per layanan,
+ * { [service]: { price, unit } }. Harga per orang dan per grup dibandingkan apa adanya, lalu satuannya ikut
+ * ditampilkan ("per person" atau "per group").
+ */
+export function startingPrices(packages) {
+  const out = {};
+  for (const pkg of packages) {
+    if (pkg.active === false || !(pkg.price > 0)) continue;
+    const current = out[pkg.service];
+    if (!current || pkg.price < current.price) out[pkg.service] = { price: pkg.price, unit: pkg.unit === "group" ? "group" : "person" };
+  }
+  return out;
+}
