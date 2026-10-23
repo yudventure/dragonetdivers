@@ -1,7 +1,7 @@
 import "server-only";
 import { PRICE_LIST } from "@/content/price-list";
 import { validatePackage } from "@/lib/checkout";
-import { missingPackages, packageFromRow } from "@/lib/packages";
+import { missingPackages, packageFromRow, startingPrices } from "@/lib/packages";
 import { services } from "@/lib/services";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
@@ -29,6 +29,21 @@ export async function activePackages(service) {
       return [];
     }
     throw error;
+  }
+}
+
+/**
+ * Harga mulai tiap layanan untuk kartu layanan di beranda ({ [service]: { price, unit } }, dari paket aktif di
+ * /admin/paket). Tanpa database atau saat galat hasilnya kosong, jadi kartu tetap tampil tanpa harga.
+ */
+export async function servicePrices() {
+  if (!isDatabaseConfigured()) return {};
+  try {
+    await ensurePriceList();
+    return startingPrices((await query(`SELECT ${COLUMNS} FROM packages WHERE active = 1`)).map(packageFromRow));
+  } catch (error) {
+    console.error(`[paket] harga mulai tidak terbaca: ${error.code ?? error.message}`);
+    return {};
   }
 }
 

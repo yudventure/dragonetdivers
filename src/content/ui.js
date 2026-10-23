@@ -71,6 +71,7 @@ const en = {
     titleRest: "in small groups with local guides.",
     ask: "Ask on WhatsApp",
     viewDetails: "View details",
+    from: "From",
   },
   servicePage: {
     breadcrumb: "Breadcrumb",
@@ -386,6 +387,7 @@ const id = {
     titleRest: "dalam grup kecil bersama pemandu lokal.",
     ask: "Tanya lewat WhatsApp",
     viewDetails: "Lihat detail",
+    from: "Mulai dari",
   },
   servicePage: {
     breadcrumb: "Navigasi halaman",
