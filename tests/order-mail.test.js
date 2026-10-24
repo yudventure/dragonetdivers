@@ -7,7 +7,7 @@ import { otpMail } from "../src/lib/otp-mail.js";
 
 const base = "https://dragonetdivers.com";
 const contact = { email: "halo@dragonetdivers.com", address: ["Jl. Mayor, Kurkapa"] };
-const accounts = [{ bank: "BRI", number: "1234 5678 90", holder: "Dragonet Divers" }];
+const accounts = [{ bank: "Bank Rakyat Indonesia (BRI)", number: "1234 5678 90", holder: "Dragonet Divers", swift: "BRINIDJAXXX" }];
 const now = new Date("2026-10-21T02:00:00Z");
 
 function shape(value, path = "") {
@@ -43,6 +43,7 @@ test("setiap email untuk setiap cara bayar dan bahasa lengkap terisi", () => {
         assert.equal(mail.html.split(`background:${colors.mandarin};color:${colors.abyss}`).length - 1, 1, where);
         const showsAccount = mail.html.includes("1234 5678 90");
         assert.equal(showsAccount, method === "transfer" && kind !== "paid", `${where}: rekening hanya untuk transfer yang belum dibayar`);
+        assert.equal(mail.text.includes("BRINIDJAXXX"), showsAccount, `${where}: SWIFT/BIC ikut rekening`);
         assert.equal(mail.html.includes(`lang="${lang}"`), true);
       }
     }

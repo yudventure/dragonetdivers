@@ -13,7 +13,7 @@ import { createTransaction, transactionStatus, validSignature } from "./midtrans
 import { later, scheduleReminder, sendOrderMail } from "./order-mail";
 import { changeStatus, createOrder, orderByCode, setPaymentDetails } from "./orders";
 import { packagesByIds } from "./packages";
-import { getPayments, methodStatus, readyMethods } from "./payment-settings";
+import { ensureBankAccount, getPayments, methodStatus, readyMethods } from "./payment-settings";
 import { capturePaypalOrder, createPaypalOrder } from "./paypal";
 
 // Alur checkout paket (mengikuti Zanclus): pesanan disimpan dulu sebagai "pending", lalu
@@ -30,6 +30,7 @@ const state = (globalThis.__dragonetCheckout ??= { throttle: createThrottle({ li
 
 /** Cara bayar yang siap, kurs untuk PayPal, dan pengaturan (rekening, batas waktu). */
 export async function paymentOptions() {
+  await ensureBankAccount(); // rekening dari pemilik, sekali per proses
   const [settings, rate] = await Promise.all([getPayments(), getUsdIdrRate()]);
   const status = methodStatus(settings, rate);
   return { settings, rate, status, methods: readyMethods(status) };

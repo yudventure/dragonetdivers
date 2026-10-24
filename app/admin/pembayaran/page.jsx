@@ -8,7 +8,7 @@ import { databaseStatus } from "@/server/db";
 import { getUsdIdrRate } from "@/server/exchange-rate";
 import { mailConfigured, mailIssues, mailSender } from "@/server/mailer";
 import { lastMidtransError, midtransConfigured, midtransIssues, midtransKeyEnding, midtransProduction } from "@/server/midtrans";
-import { getPayments, methodStatus } from "@/server/payment-settings";
+import { ensureBankAccount, getPayments, methodStatus } from "@/server/payment-settings";
 import { lastPaypalError, paypalConfigured, paypalKeyEnding, paypalLive } from "@/server/paypal";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +20,7 @@ export default async function PaymentsPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
+  if (database.ok) await ensureBankAccount(); // rekening dari pemilik, sekali (src/content/bank-account.js)
   const [settings, rate] = await Promise.all([database.ok ? getPayments().catch(() => null) : null, getUsdIdrRate()]);
   const providers = {
     midtrans: {

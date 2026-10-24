@@ -217,6 +217,22 @@ export function validatePackage(input, services) {
   };
 }
 
+/** Kode SWIFT/BIC bank: 4 huruf bank, 2 huruf negara, 2 lokasi, dan 3 cabang (boleh tidak ada). */
+const SWIFT = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+
+/**
+ * Rekening dari pemilik dimasukkan ke pengaturan pembayaran: transfer bank dinyalakan dan rekeningnya
+ * ditambahkan bila nomornya belum ada (dan masih ada tempat). Mengembalikan pengaturan baru, atau null bila
+ * tidak ada yang berubah.
+ */
+export function withOwnerAccount(settings, account) {
+  const digits = (value) => String(value).replace(/\D/g, "");
+  const known = settings.accounts.some((a) => digits(a.number) === digits(account.number));
+  if (known && settings.transfer) return null;
+  if (!known && settings.accounts.length >= ACCOUNT_LIMIT) return null;
+  return validatePayments({ ...settings, transfer: true, accounts: known ? settings.accounts : [...settings.accounts, account] });
+}
+
 /** Pengaturan pembayaran dari /admin/pembayaran → nilai yang disimpan, atau Error berpesan Indonesia. */
 export function validatePayments(input) {
   if (input == null) return structuredClone(DEFAULT_PAYMENTS);
@@ -226,12 +242,14 @@ export function validatePayments(input) {
       bank: adminText(a?.bank, "Nama bank", 40),
       number: adminText(a?.number, "Nomor rekening", 30),
       holder: adminText(a?.holder, "Atas nama", 80),
+      swift: adminText(a?.swift, "SWIFT/BIC", 20).replace(/\s+/g, "").toUpperCase(),
     }))
-    .filter((a) => a.bank || a.number || a.holder);
+    .filter((a) => a.bank || a.number || a.holder || a.swift);
   if (accounts.length > ACCOUNT_LIMIT) throw new Error(`Maksimal ${ACCOUNT_LIMIT} rekening.`);
   for (const a of accounts) {
     if (!a.bank || !a.number || !a.holder) throw new Error("Lengkapi nama bank, nomor rekening, dan atas nama.");
     if (!/^[\d\s.-]{5,30}$/.test(a.number)) throw new Error("Nomor rekening hanya angka, spasi, titik, atau strip.");
+    if (a.swift && !SWIFT.test(a.swift)) throw new Error("SWIFT/BIC berisi 8 atau 11 huruf dan angka, mis. BRINIDJAXXX. Kosongkan bila tidak ada.");
   }
   const dueHours = DUE_HOURS.includes(Number(input.dueHours)) ? Number(input.dueHours) : DEFAULT_PAYMENTS.dueHours;
   // Simpanan lama tanpa kunci cash ikut menyalakan tunai, seperti bawaannya.

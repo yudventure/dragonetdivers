@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 // Pratinjau email di /admin/pembayaran: /api/admin/mail-preview?kind=order&lang=id&method=transfer
 // (kind: order | reminder | paid | otp). Memakai pesanan contoh, tidak mengirim apa pun.
-const SAMPLE_ACCOUNT = { bank: "Contoh Bank", number: "0000000000", holder: "Dragonet Divers" };
+const SAMPLE_ACCOUNT = { bank: "Contoh Bank", number: "0000000000", holder: "Dragonet Divers", swift: "" };
 
 export async function GET(request) {
   if (!(await currentAdmin())) return new Response("Masuk dulu di /admin.", { status: 401 });

@@ -429,13 +429,16 @@ export default function CheckoutDialog({ dialogRef, lang, service, packages, ite
                               {payments.accounts.map((account) => (
                                 <li key={account.number} className="flex flex-wrap items-center justify-between gap-3 rounded-input bg-white p-3 ring-1 ring-mist">
                                   <span className="grid gap-0.5">
-                                    <span className="text-xs font-bold tracking-[0.12em] text-slate uppercase">
-                                      {t.bank} {account.bank}
-                                    </span>
+                                    <span className="text-xs font-bold tracking-[0.12em] text-slate uppercase">{account.bank}</span>
                                     <span className="font-display text-lg font-semibold text-abyss tabular-nums">{account.number}</span>
                                     <span className="text-sm text-slate">
                                       {t.accountHolder} <span className="font-semibold text-abyss">{account.holder}</span>
                                     </span>
+                                    {account.swift && (
+                                      <span className="text-xs text-slate">
+                                        {t.swift} <span className="font-semibold text-abyss">{account.swift}</span>
+                                      </span>
+                                    )}
                                   </span>
                                   <CopyButton value={account.number} label={t.copy} done={t.copied} />
                                 </li>
