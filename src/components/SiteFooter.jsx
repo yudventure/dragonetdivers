@@ -3,8 +3,8 @@ import Link from "next/link";
 import plate from "../../brand/logo/dragonet-divers-logo-plate.png";
 import { uiText } from "@/content/ui";
 import { format, localeHref } from "@/lib/i18n";
-import { servicesIn } from "@/lib/services";
 import { contact, mapsLink, site, socialLinks, whatsappLink } from "@/lib/site";
+import { shownServices } from "@/server/site-settings";
 import { ChatIcon, FacebookIcon, InstagramIcon, LockIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "./icons";
 
 const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: FacebookIcon, youtube: YouTubeIcon };
@@ -23,14 +23,15 @@ function Column({ id, title, children }) {
 const linkClass = "text-[15px] text-white/90 transition-colors duration-200 ease-brand hover:text-sunrise";
 
 // Area gelap utama: Abyss + pita garis mandarin (BRANDING.md §9.10). Empat kolom: brand + ikon WhatsApp
-// dan media sosial (email dan peta sudah ada di kolom kontak), layanan, rencana perjalanan, kontak. Ikon
+// dan media sosial (email dan peta sudah ada di kolom kontak), layanan yang tampil, rencana perjalanan, kontak. Ikon
 // media sosial muncul hanya bila akunnya diisi (NEXT_PUBLIC_INSTAGRAM dst., src/lib/site.js). Logo versi plate karena pita tulisan asli transparan.
 // Bagian bawah dipisah dengan latar sedikit lebih terang, tanpa garis pemisah; kanan bawah tautan
 // "Operator sign in" ke dashboard tim. Teks dalam bahasa halaman (src/content/ui.js, footer).
-export default function SiteFooter({ lang }) {
+export default async function SiteFooter({ lang }) {
   const all = uiText(lang);
   const t = all.footer;
   const chat = whatsappLink(all.whatsapp.general);
+  const services = await shownServices(lang);
   const icons = [
     ...(chat ? [{ id: "whatsapp", label: "WhatsApp", href: chat, Icon: ChatIcon }] : []),
     ...socialLinks().map((s) => ({ ...s, Icon: SOCIAL_ICONS[s.id] })),
@@ -74,7 +75,7 @@ export default function SiteFooter({ lang }) {
         <Column id="footer-services" title={t.services}>
           <nav aria-labelledby="footer-services">
             <ul className="grid gap-2.5">
-              {servicesIn(lang).map((service) => (
+              {services.map((service) => (
                 <li key={service.slug}>
                   <Link href={localeHref(lang, `/services/${service.slug}`)} className={linkClass}>
                     {service.title}

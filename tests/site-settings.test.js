@@ -27,10 +27,20 @@ test("isian kontak dibersihkan", () => {
     facebook: "",
     youtube: "",
     showUsd: true,
+    hiddenServices: ["dive-courses", "snorkeling"],
   });
   assert.deepEqual(validateSiteSettings({}), DEFAULT_SITE_SETTINGS);
   assert.equal(DEFAULT_SITE_SETTINGS.showUsd, false, "dolar mati sampai tim menyalakannya");
   assert.equal(validateSiteSettings({ showUsd: "ya" }).showUsd, false, "hanya true yang menyalakan");
+});
+
+test("layanan yang disimpan: bawaan snorkeling dan kursus selam, slug asing dibuang", () => {
+  assert.deepEqual(DEFAULT_SITE_SETTINGS.hiddenServices, ["dive-courses", "snorkeling"]);
+  // Simpanan lama tanpa daftar memakai bawaan; daftar kosong berarti semua layanan tampil.
+  assert.deepEqual(normalizeSiteSettings({ email: "info@contoh.id" }).hiddenServices, ["dive-courses", "snorkeling"]);
+  assert.deepEqual(normalizeSiteSettings({ hiddenServices: [] }).hiddenServices, []);
+  assert.deepEqual(validateSiteSettings({ hiddenServices: ["snorkeling", "tidak-ada", "fun-dives", "snorkeling"] }).hiddenServices, ["fun-dives", "snorkeling"]);
+  assert.deepEqual(validateSiteSettings({ hiddenServices: "snorkeling" }).hiddenServices, ["dive-courses", "snorkeling"]);
 });
 
 test("isian kontak yang salah ditolak dengan nama kolomnya", () => {

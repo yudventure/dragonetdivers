@@ -1,4 +1,5 @@
 import "server-only";
+import { cleanHiddenServices, shownServicesIn } from "@/lib/services";
 import { SITE_STATE } from "@/lib/site";
 import { DEFAULT_SITE_SETTINGS, normalizeSiteSettings } from "@/lib/site-settings";
 import { isDatabaseConfigured } from "./db-config.js";
@@ -39,8 +40,30 @@ export async function getSiteSettings({ fresh = false } = {}) {
   return state.value ?? structuredClone(DEFAULT_SITE_SETTINGS);
 }
 
+/** Isian yang tersimpan di database (tanpa ingatan proses); galat database dilempar. */
+export async function storedSiteSettings() {
+  return normalizeSiteSettings(await getSetting("site", DEFAULT_SITE_SETTINGS));
+}
+
 export async function saveSiteSettings(value) {
   await saveSetting("site", value);
   state.value = value;
   state.at = state.savedAt = Date.now();
+}
+
+/** Layanan yang tampil di website dalam satu bahasa (yang disimpan di /admin/paket tidak ikut). */
+export async function shownServices(lang) {
+  return shownServicesIn(lang, (await getSiteSettings()).hiddenServices);
+}
+
+/** Apakah layanan ini tampil di website (bukan layanan yang disimpan). */
+export async function isServiceShown(slug) {
+  return !(await getSiteSettings()).hiddenServices.includes(slug);
+}
+
+/** Simpan daftar layanan yang disimpan (/admin/paket) tanpa mengubah isian /admin/kontak. */
+export async function saveHiddenServices(hidden) {
+  const value = { ...(await storedSiteSettings()), hiddenServices: cleanHiddenServices(hidden) };
+  await saveSiteSettings(value);
+  return value.hiddenServices;
 }

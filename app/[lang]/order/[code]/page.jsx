@@ -14,6 +14,7 @@ import { contact, whatsappLink } from "@/lib/site";
 import { refreshOrder } from "@/server/checkout";
 import { orderByCode } from "@/server/orders";
 import { getPayments } from "@/server/payment-settings";
+import { isServiceShown } from "@/server/site-settings";
 
 // Halaman status pesanan tamu: /order/DD-261021-K7Q2M?t=<token> (link dari checkout, kembali dari
 // Midtrans/PayPal). Token rahasia di alamat mencegah orang lain membuka pesanan dengan menebak kode.
@@ -51,6 +52,8 @@ export default async function OrderPage({ params, searchParams }) {
   const info = t.states[state] ?? t.states.pending;
   const accounts = transfer ? (await getPayments()).accounts : [];
   const service = serviceBySlug(order.service, lang);
+  // Pesan lagi: ke paket layanannya, atau ke daftar layanan bila layanan itu sedang disimpan tim.
+  const again = (await isServiceShown(order.service)) ? `/services/${order.service}#packages` : "/#services";
   const proof = whatsappLink(format(t.proofMessage, { code: order.code }));
   const path = `/order/${order.code}?t=${order.token}`;
 
@@ -152,7 +155,7 @@ export default async function OrderPage({ params, searchParams }) {
               )}
               {["expired", "failed", "cancelled"].includes(order.status) && (
                 <Link
-                  href={localeHref(lang, `/services/${order.service}#packages`)}
+                  href={localeHref(lang, again)}
                   className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
                 >
                   {t.again}

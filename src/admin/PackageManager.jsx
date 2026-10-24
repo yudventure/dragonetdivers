@@ -177,13 +177,18 @@ export default function PackageManager({ packages, services }) {
         return (
           <section key={service.slug} className="grid gap-3 rounded-card bg-white p-5 ring-1 ring-mist">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl text-abyss">
+              <h2 className="flex flex-wrap items-center gap-2 text-xl text-abyss">
                 {service.title} <span className="font-sans text-sm font-semibold text-slate">· {own.length} paket</span>
+                {service.hidden && (
+                  <span className="rounded-full bg-mist px-2 py-0.5 font-sans text-[10px] font-bold tracking-wide text-slate uppercase">Disimpan, tidak tampil</span>
+                )}
               </h2>
               <div className="flex flex-wrap gap-2">
-                <a href={`/id/services/${service.slug}#packages`} target="_blank" rel="noopener" className="inline-flex h-9 items-center px-2 text-sm font-semibold text-teal hover:underline">
-                  Lihat di situs ↗
-                </a>
+                {!service.hidden && (
+                  <a href={`/id/services/${service.slug}#packages`} target="_blank" rel="noopener" className="inline-flex h-9 items-center px-2 text-sm font-semibold text-teal hover:underline">
+                    Lihat di situs ↗
+                  </a>
+                )}
                 <button
                   type="button"
                   onClick={() => setEditing(blank(service.slug))}

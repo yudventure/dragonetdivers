@@ -1,8 +1,11 @@
 // Isian /admin/kontak: WhatsApp, email, alamat, tautan Google Maps, akun media sosial yang tampil di
-// website, dan showUsd (pilihan dolar AS di website; mati = semua harga hanya dalam Rupiah). Disimpan di tabel settings baris "site" (src/server/site-settings.js) dan dibaca src/lib/site.js.
+// website, showUsd (pilihan dolar AS di website; mati = semua harga hanya dalam Rupiah), dan hiddenServices
+// (layanan yang disimpan, diatur di /admin/paket). Disimpan di tabel settings baris "site"
+// (src/server/site-settings.js) dan dibaca src/lib/site.js.
 // Isian kosong berarti memakai isian lama dari hPanel atau nilai bawaan. Fungsi murni, diuji di
 // tests/site-settings.test.js.
 import { cleanEmail, cleanWhatsApp } from "./checkout.js";
+import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES } from "./services.js";
 import { NETWORKS, socialUrl } from "./site.js";
 
 export const ADDRESS_LINES = 3;
@@ -13,6 +16,7 @@ export const DEFAULT_SITE_SETTINGS = {
   mapsUrl: "",
   ...Object.fromEntries(NETWORKS.map((n) => [n.id, ""])),
   showUsd: false,
+  hiddenServices: DEFAULT_HIDDEN_SERVICES,
 };
 
 /** Isian yang salah; field = nama kolom di form. */
@@ -72,6 +76,7 @@ export function validateSiteSettings(input) {
     out[n.id] = value;
   }
   out.showUsd = input.showUsd === true;
+  out.hiddenServices = cleanHiddenServices(input.hiddenServices);
   return out;
 }
 

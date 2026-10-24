@@ -12,16 +12,17 @@ import { dateRange } from "@/lib/checkout";
 import { alternates, format, localeHref, locales } from "@/lib/i18n";
 import { poolOf } from "@/lib/modules/calendar";
 import { localizePackage } from "@/lib/packages";
-import { serviceBySlug, services, servicesIn } from "@/lib/services";
+import { serviceBySlug, services } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
 import { serviceSlots } from "@/server/admin-data";
 import { paymentOptions } from "@/server/checkout";
 import { activePackages } from "@/server/packages";
+import { isServiceShown, shownServices } from "@/server/site-settings";
 
 // Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
 // Dirender per permintaan supaya paket dan harga dari /admin/paket langsung tampil (tidak tertahan cache
 // halaman atau CDN), begitu juga sisa tempat per tanggal di kalender pesan; kondisi laut tetap dari data
-// cache Next.js 15 menit.
+// cache Next.js 15 menit. Layanan yang disimpan tim (/admin/paket) menjawab 404 sampai ditampilkan lagi.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -31,7 +32,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { lang, slug } = await params;
   const service = serviceBySlug(slug, lang);
-  if (!service) return {};
+  if (!service || !(await isServiceShown(slug))) return {};
   const path = `/services/${service.slug}`;
   return {
     title: service.title,
@@ -45,11 +46,11 @@ export default async function ServicePage({ params }) {
   await connection();
   const { lang, slug } = await params;
   const service = serviceBySlug(slug, lang);
-  if (!service) notFound();
+  if (!service || !(await isServiceShown(slug))) notFound();
   const t = uiText(lang);
   const text = t.servicePage;
   const ask = whatsappLink(format(t.whatsapp.about, { topic: service.ask }));
-  const others = servicesIn(lang).filter((other) => other.slug !== service.slug);
+  const others = (await shownServices(lang)).filter((other) => other.slug !== service.slug);
   const packages = (await activePackages(service.slug)).map((pkg) => ({ ...localizePackage(pkg, lang), names: { en: pkg.nameEn, id: pkg.nameId } }));
   const booking = packages.length ? await bookingData(service.slug) : null;
 

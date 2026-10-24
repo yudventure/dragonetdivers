@@ -54,7 +54,7 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
  * cepat). Yang tetap di hPanel hanya kunci rahasia (database, Midtrans, PayPal, SMTP, password awal).
  */
 export const SELF_SERVICE = [
-  { href: "/admin/paket", label: "Paket & harga", text: "Tambah paket, ubah harga, atau sembunyikan paket di halaman layanan." },
+  { href: "/admin/paket", label: "Paket & harga", text: "Tambah paket, ubah harga, sembunyikan paket, atau simpan seluruh layanan supaya tidak tampil di website." },
   { href: "/admin/situs", label: "Galeri foto & video", text: "Unggah foto dan tempel tautan video untuk galeri beranda." },
   { href: "/admin/kontak", label: "Kontak, sosial & mata uang", text: "Nomor WhatsApp, email, alamat, Google Maps, akun media sosial, dan pilihan dolar AS." },
   { href: "/admin/kalender", label: "Kalender reservasi", text: "Tutup tanggal tertentu dan atur kapasitas tamu per hari." },

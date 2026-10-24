@@ -192,3 +192,18 @@ export function serviceBySlug(slug, lang = "en") {
   const service = services.find((s) => s.slug === slug);
   return service ? localizeService(service, lang) : null;
 }
+
+// Layanan yang disimpan: tidak tampil di website (menu, beranda, footer, halaman layanan 404, paketnya
+// tidak bisa dipesan) tetapi isi dan paketnya tetap ada. Tim menampilkannya lagi di /admin/paket
+// (settings baris "site", hiddenServices). Permintaan pemilik Oktober 2026: yang tampil dulu fun dive,
+// dusk dive, dan trip pulau, sedangkan snorkeling dan kursus selam disimpan.
+export const DEFAULT_HIDDEN_SERVICES = ["dive-courses", "snorkeling"];
+
+/** Daftar slug layanan yang disimpan, hanya slug yang dikenal dan urut seperti services. Tanpa daftar = bawaan. */
+export function cleanHiddenServices(value) {
+  if (!Array.isArray(value)) return [...DEFAULT_HIDDEN_SERVICES];
+  return services.map((s) => s.slug).filter((slug) => value.includes(slug));
+}
+
+/** Layanan yang tampil di website dalam satu bahasa (tanpa yang disimpan). */
+export const shownServicesIn = (lang = "en", hidden = DEFAULT_HIDDEN_SERVICES) => servicesIn(lang).filter((s) => !hidden.includes(s.slug));
