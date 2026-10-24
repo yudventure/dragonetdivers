@@ -92,7 +92,9 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}
       ? `${heading(t.transferTitle)}${accounts
           .map((a) =>
             box(
-              `<p style="margin:0 0 4px;font-family:${FONT};font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${colors.slate};">${esc(t.bank)} ${esc(a.bank)}</p><p style="margin:0 0 4px;font-family:${FONT};font-size:22px;line-height:1.3;font-weight:800;letter-spacing:1px;color:${colors.abyss};">${esc(a.number)}</p><p style="margin:0;font-family:${FONT};font-size:14px;color:${colors.abyss};">${esc(t.accountHolder)} <strong>${esc(a.holder)}</strong></p>`,
+              `<p style="margin:0 0 4px;font-family:${FONT};font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${colors.slate};">${esc(a.bank)}</p><p style="margin:0 0 4px;font-family:${FONT};font-size:22px;line-height:1.3;font-weight:800;letter-spacing:1px;color:${colors.abyss};">${esc(a.number)}</p><p style="margin:0;font-family:${FONT};font-size:14px;color:${colors.abyss};">${esc(t.accountHolder)} <strong>${esc(a.holder)}</strong></p>${
+                a.swift ? `<p style="margin:4px 0 0;font-family:${FONT};font-size:13px;color:${colors.slate};">${esc(t.swift)} <strong>${esc(a.swift)}</strong></p>` : ""
+              }`,
               { bg: colors.white },
             ),
           )
@@ -153,7 +155,12 @@ ${rows(amounts)}`;
     !paid && due ? [t.dueNote] : [],
     "",
     !paid && transfer && accounts.length
-      ? [t.transferTitle, ...accounts.map((a) => `${a.bank} ${a.number}, ${t.accountHolder} ${a.holder}`), format(t.transferNote, values), ""]
+      ? [
+          t.transferTitle,
+          ...accounts.map((a) => `${a.bank} ${a.number}, ${t.accountHolder} ${a.holder}${a.swift ? `, ${t.swift} ${a.swift}` : ""}`),
+          format(t.transferNote, values),
+          "",
+        ]
       : [],
     !paid && order.method === "paypal" && usd ? [format(t.paypalNote, values), ""] : [],
     !paid && cash && address.length ? [t.findUs, ...address, ""] : [],

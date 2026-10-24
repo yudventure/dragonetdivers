@@ -1,6 +1,7 @@
 // Dijalankan Next.js sekali saat server mulai (next start di Hostinger). Memuat pengaturan mode developer
 // (supaya halaman yang ditutup sudah tertutup sejak permintaan pertama), memasukkan daftar harga pemilik
-// ke tabel packages bila belum (src/server/packages.js), dan memulai pengecekan berkala
+// ke tabel packages bila belum (src/server/packages.js), rekening transfer pemilik ke pengaturan pembayaran,
+// dan memulai pengecekan berkala
 // email pengingat bayar (src/server/reminders.js). Tidak berjalan saat build.
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs" || process.env.NEXT_PHASE === "phase-production-build") return;
@@ -19,6 +20,8 @@ export async function register() {
   }
   // Daftar harga pemilik masuk ke tabel packages sekali (tidak ditunggu, galatnya dicatat sendiri).
   import("./src/server/packages.js").then(({ ensurePriceList }) => ensurePriceList()).catch(() => {});
+  // Rekening transfer dari pemilik masuk ke /admin/pembayaran sekali (src/server/payment-settings.js).
+  import("./src/server/payment-settings.js").then(({ ensureBankAccount }) => ensureBankAccount()).catch(() => {});
   try {
     const { startReminders } = await import("./src/server/reminders.js");
     startReminders();

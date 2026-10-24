@@ -1,5 +1,6 @@
 import "server-only";
-import { DEFAULT_PAYMENTS, validatePayments } from "@/lib/checkout";
+import { OWNER_BANK } from "@/content/bank-account";
+import { DEFAULT_PAYMENTS, validatePayments, withOwnerAccount } from "@/lib/checkout";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
 import { midtransConfigured, midtransIssues, midtransProduction } from "./midtrans";
@@ -21,6 +22,38 @@ export async function getPayments() {
 
 export async function savePayments(value) {
   await query("INSERT INTO settings (name, value) VALUES ('payments', ?) ON DUPLICATE KEY UPDATE value = VALUES(value)", [JSON.stringify(value)]);
+}
+
+const seed = (globalThis.__dragonetBankAccount ??= { run: null });
+
+/**
+ * Rekening dari pemilik (src/content/bank-account.js) dimasukkan sekali ke pengaturan pembayaran dan transfer
+ * bank dinyalakan, tanpa menunggu tim mengisinya di /admin/pembayaran. Baris settings bank_account_<version>
+ * menandainya, jadi rekening yang kemudian diubah atau dihapus tim tidak kembali. Sekali per proses; bila
+ * gagal, dicoba lagi pada pemanggilan berikutnya. Tidak berjalan saat build.
+ */
+export function ensureBankAccount() {
+  if (!isDatabaseConfigured() || process.env.NEXT_PHASE === "phase-production-build") return Promise.resolve(null);
+  seed.run ??= (async () => {
+    const name = `bank_account_${OWNER_BANK.version}`;
+    const claim = await query("INSERT IGNORE INTO settings (name, value) VALUES (?, ?)", [name, JSON.stringify({ state: "adding" })]);
+    if (claim.affectedRows === 0) return null; // sudah dimasukkan (atau sedang dimasukkan proses lain)
+    try {
+      const next = withOwnerAccount(await getPayments(), OWNER_BANK.account);
+      if (next) await savePayments(next);
+      await query("UPDATE settings SET value = ? WHERE name = ?", [JSON.stringify({ state: "done", at: new Date().toISOString(), changed: Boolean(next) }), name]);
+      console.log(`[pembayaran] rekening pemilik ${OWNER_BANK.version}: ${next ? "ditambahkan, transfer bank menyala" : "sudah ada"}`);
+      return next;
+    } catch (error) {
+      await query("DELETE FROM settings WHERE name = ?", [name]).catch(() => {});
+      throw error;
+    }
+  })().catch((error) => {
+    seed.run = null;
+    console.error(`[pembayaran] rekening pemilik belum bisa dimasukkan: ${error.code ?? error.message}`);
+    return null;
+  });
+  return seed.run;
 }
 
 /**

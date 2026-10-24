@@ -124,6 +124,11 @@ export default async function OrderPage({ params, searchParams }) {
                       <span className="text-sm text-slate">
                         {t.accountHolder}: {account.holder}
                       </span>
+                      {account.swift && (
+                        <span className="text-xs text-slate">
+                          {t.swift} <span className="font-semibold text-abyss">{account.swift}</span>
+                        </span>
+                      )}
                     </div>
                     <CopyButton value={account.number} label={t.copy} done={t.copied} />
                   </li>

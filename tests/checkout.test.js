@@ -18,8 +18,10 @@ import {
   validateCart,
   validatePackage,
   validatePayments,
+  withOwnerAccount,
   witToday,
 } from "../src/lib/checkout.js";
+import { OWNER_BANK } from "../src/content/bank-account.js";
 import { keyEnding, keyIssues, productionOn } from "../src/lib/midtrans-key.js";
 
 const NOW = new Date("2026-10-21T05:00:00Z"); // 14.00 WIT
@@ -193,9 +195,32 @@ test("pengaturan pembayaran: rekening lengkap, batas waktu dari pilihan", () => 
     dueHours: 7,
     accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }, { bank: "", number: "", holder: "" }],
   });
-  assert.deepEqual(value, { midtrans: false, paypal: false, transfer: true, cash: true, accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }], dueHours: 24 });
+  assert.deepEqual(value, { midtrans: false, paypal: false, transfer: true, cash: true, accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers", swift: "" }], dueHours: 24 });
   assert.throws(() => validatePayments({ accounts: [{ bank: "BCA", number: "", holder: "X" }] }), /Lengkapi/);
   assert.throws(() => validatePayments({ accounts: [{ bank: "BCA", number: "12ab45", holder: "X" }] }), /angka/);
+  // SWIFT/BIC boleh kosong; bila diisi 8 atau 11 huruf dan angka, huruf besar.
+  assert.equal(validatePayments({ accounts: [{ bank: "BRI", number: "0310 0100", holder: "PT X", swift: " brinidja xxx " }] }).accounts[0].swift, "BRINIDJAXXX");
+  assert.throws(() => validatePayments({ accounts: [{ bank: "BRI", number: "0310 0100", holder: "PT X", swift: "BRI-ID" }] }), /SWIFT/);
+});
+
+test("rekening pemilik dimasukkan sekali: transfer menyala, rekening yang ada tidak diganti", () => {
+  const owner = OWNER_BANK.account;
+  assert.match(owner.swift, /^[A-Z]{4}ID[A-Z0-9]{2}([A-Z0-9]{3})?$/, "SWIFT bank Indonesia");
+  const fresh = withOwnerAccount(validatePayments(null), owner);
+  assert.equal(fresh.transfer, true);
+  assert.equal(fresh.cash, true, "tunai tetap menyala");
+  assert.deepEqual(fresh.accounts, [owner]);
+  // Sudah ada (nomor sama walau ditulis berbeda) dan transfer menyala: tidak berubah.
+  const same = { ...fresh, accounts: [{ ...owner, number: "0310-0100-1442-567" }] };
+  assert.equal(withOwnerAccount(same, owner), null);
+  // Tim sudah mengisi rekening lain: rekening pemilik ditambahkan, yang lama tetap.
+  const other = validatePayments({ transfer: false, accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }] });
+  const both = withOwnerAccount(other, owner);
+  assert.deepEqual(both.accounts.map((a) => a.bank), ["BCA", owner.bank]);
+  assert.equal(both.transfer, true);
+  // Rekening sudah penuh: tidak diubah.
+  const full = validatePayments({ accounts: [1, 2, 3].map((n) => ({ bank: "Bank", number: `1234${n}`, holder: "X" })) });
+  assert.equal(withOwnerAccount(full, owner), null);
 });
 
 test("server key Midtrans: salah tempel dijelaskan, mode cocok", () => {

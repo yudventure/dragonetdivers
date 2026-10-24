@@ -61,7 +61,7 @@ function TestButton({ provider }) {
 // dan batas waktu bayar. Disimpan lewat /api/admin/payments (validatePayments di src/lib/checkout.js).
 export default function PaymentSettings({ initial, status, providers, rate }) {
   const router = useRouter();
-  const [value, setValue] = useState(() => ({ ...initial, accounts: initial.accounts.length ? initial.accounts : [{ bank: "", number: "", holder: "" }] }));
+  const [value, setValue] = useState(() => ({ ...initial, accounts: initial.accounts.length ? initial.accounts : [{ bank: "", number: "", holder: "", swift: "" }] }));
   const [state, setState] = useState({ busy: false, error: "", saved: false });
   const set = (patch) => setValue((v) => ({ ...v, ...patch }));
   const setAccount = (i, key, text) => set({ accounts: value.accounts.map((a, j) => (j === i ? { ...a, [key]: text } : a)) });
@@ -130,11 +130,12 @@ export default function PaymentSettings({ initial, status, providers, rate }) {
 
       <Method title="Transfer bank" checked={value.transfer} onChange={(transfer) => set({ transfer })} ready={accounts > 0}>
         <p className="text-sm text-slate">
-          Tamu melihat rekening ini di halaman pesanannya, lalu mengirim bukti transfer. Tandai lunas di Pesanan setelah dana masuk.
+          Tamu melihat rekening ini di checkout begitu memilih transfer dan di halaman pesanannya, lalu mengirim bukti transfer. Tandai lunas di
+          Pesanan setelah dana masuk. SWIFT/BIC ditampilkan untuk tamu yang mentransfer dari luar negeri.
         </p>
         <div className="grid gap-3">
           {value.accounts.map((account, i) => (
-            <div key={i} className="grid gap-3 rounded-input bg-foam p-3 sm:grid-cols-[1fr_1.2fr_1.4fr_auto] sm:items-end">
+            <div key={i} className="grid gap-3 rounded-input bg-foam p-3 sm:grid-cols-2 sm:items-end xl:grid-cols-[1.2fr_1.2fr_1.4fr_1fr_auto]">
               <label className="grid gap-1 text-sm font-semibold text-abyss">
                 Bank
                 <input value={account.bank} onChange={(e) => setAccount(i, "bank", e.target.value)} placeholder="BCA" maxLength={40} className={INPUT} />
@@ -146,6 +147,17 @@ export default function PaymentSettings({ initial, status, providers, rate }) {
               <label className="grid gap-1 text-sm font-semibold text-abyss">
                 Atas nama
                 <input value={account.holder} onChange={(e) => setAccount(i, "holder", e.target.value)} maxLength={80} className={INPUT} />
+              </label>
+              <label className="grid gap-1 text-sm font-semibold text-abyss">
+                SWIFT/BIC (boleh kosong)
+                <input
+                  value={account.swift ?? ""}
+                  onChange={(e) => setAccount(i, "swift", e.target.value.toUpperCase())}
+                  placeholder="BRINIDJAXXX"
+                  maxLength={11}
+                  autoCapitalize="characters"
+                  className={INPUT}
+                />
               </label>
               <button
                 type="button"
@@ -159,7 +171,7 @@ export default function PaymentSettings({ initial, status, providers, rate }) {
           {value.accounts.length < ACCOUNT_LIMIT && (
             <button
               type="button"
-              onClick={() => set({ accounts: [...value.accounts, { bank: "", number: "", holder: "" }] })}
+              onClick={() => set({ accounts: [...value.accounts, { bank: "", number: "", holder: "", swift: "" }] })}
               className="w-fit text-sm font-bold text-teal hover:underline"
             >
               + Tambah rekening
