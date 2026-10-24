@@ -208,6 +208,8 @@ async function bookingData(slug) {
       methods: options.methods.map((id) => ({ id, sandbox: Boolean(options.status[id].sandbox) })),
       rate: options.rate?.idrPerUsd ?? null,
       dueHours: options.settings.dueHours,
+      // Rekening transfer tampil di checkout begitu tamu memilih transfer (juga di halaman pesanannya).
+      accounts: options.methods.includes("transfer") ? options.settings.accounts : [],
     },
   };
 }

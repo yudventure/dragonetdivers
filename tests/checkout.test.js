@@ -184,14 +184,16 @@ test("paket dari admin divalidasi dengan pesan Bahasa Indonesia", () => {
 });
 
 test("pengaturan pembayaran: rekening lengkap, batas waktu dari pilihan", () => {
-  assert.deepEqual(validatePayments(null), { midtrans: false, paypal: false, transfer: false, accounts: [], dueHours: 24 });
+  // Tunai di dive center menyala sejak awal, juga untuk simpanan lama tanpa kunci cash.
+  assert.deepEqual(validatePayments(null), { midtrans: false, paypal: false, transfer: false, cash: true, accounts: [], dueHours: 24 });
+  assert.equal(validatePayments({ cash: false }).cash, false);
   const value = validatePayments({
     transfer: true,
     paypal: "yes",
     dueHours: 7,
     accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }, { bank: "", number: "", holder: "" }],
   });
-  assert.deepEqual(value, { midtrans: false, paypal: false, transfer: true, accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }], dueHours: 24 });
+  assert.deepEqual(value, { midtrans: false, paypal: false, transfer: true, cash: true, accounts: [{ bank: "BCA", number: "123 456 7890", holder: "Dragonet Divers" }], dueHours: 24 });
   assert.throws(() => validatePayments({ accounts: [{ bank: "BCA", number: "", holder: "X" }] }), /Lengkapi/);
   assert.throws(() => validatePayments({ accounts: [{ bank: "BCA", number: "12ab45", holder: "X" }] }), /angka/);
 });

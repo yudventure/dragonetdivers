@@ -3,14 +3,14 @@ import { notFound } from "next/navigation";
 import { AutoRefresh, CopyButton } from "@/components/checkout/OrderActions";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
-import { ArrowIcon, ChatIcon, CheckIcon, Wave } from "@/components/icons";
+import { ArrowIcon, ChatIcon, CheckIcon, MapPinIcon, Wave } from "@/components/icons";
 import { uiText } from "@/content/ui";
 import { sameText } from "@/lib/admin-session";
-import { isOrderCode } from "@/lib/checkout";
+import { isOrderCode, MANUAL_METHODS } from "@/lib/checkout";
 import { formatMoney } from "@/lib/currency";
 import { format, intlLocale, localeHref } from "@/lib/i18n";
 import { serviceBySlug } from "@/lib/services";
-import { contact, whatsappLink } from "@/lib/site";
+import { contact, mapsLink, whatsappLink } from "@/lib/site";
 import { refreshOrder } from "@/server/checkout";
 import { orderByCode } from "@/server/orders";
 import { getPayments } from "@/server/payment-settings";
@@ -31,6 +31,7 @@ const TONE = {
   paid: "bg-success text-white",
   pending: "bg-sunrise-wash text-ember ring-1 ring-sunrise",
   transfer: "bg-sunrise-wash text-ember ring-1 ring-sunrise",
+  cash: "bg-sunrise-wash text-ember ring-1 ring-sunrise",
 };
 
 export default async function OrderPage({ params, searchParams }) {
@@ -48,7 +49,11 @@ export default async function OrderPage({ params, searchParams }) {
   const day = (date) =>
     new Intl.DateTimeFormat(intlLocale[lang], { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
   const transfer = order.method === "transfer" && order.status === "pending";
-  const state = transfer ? "transfer" : order.status;
+  // Tunai: tamu membayar di dive center; tim menandai lunas di /admin/pesanan.
+  const cash = order.method === "cash" && order.status === "pending";
+  const state = transfer ? "transfer" : cash ? "cash" : order.status;
+  // Midtrans dan PayPal berubah sendiri; transfer dan tunai menunggu tim.
+  const online = order.status === "pending" && !MANUAL_METHODS.includes(order.method);
   const info = t.states[state] ?? t.states.pending;
   const accounts = transfer ? (await getPayments()).accounts : [];
   const service = serviceBySlug(order.service, lang);
@@ -70,7 +75,7 @@ export default async function OrderPage({ params, searchParams }) {
     <>
       <SiteHeader lang={lang} path={path} />
       <main className="bg-foam">
-        {order.status === "pending" && order.method !== "transfer" && <AutoRefresh />}
+        {online && <AutoRefresh />}
         <div className="gutter mx-auto grid max-w-[880px] gap-6 py-10 md:py-16">
           <section className="grid gap-4 rounded-frame bg-white p-6 shadow-float ring-1 ring-mist sm:p-10">
             <div className="flex flex-wrap items-center gap-3">
@@ -126,8 +131,27 @@ export default async function OrderPage({ params, searchParams }) {
               </ul>
             )}
 
+            {cash && (
+              <div className="flex flex-wrap items-start justify-between gap-3 rounded-card p-4 ring-1 ring-mist">
+                <div className="flex gap-3">
+                  <MapPinIcon className="mt-0.5 size-5 shrink-0 text-teal" />
+                  <div className="grid gap-0.5">
+                    <span className="text-xs font-bold tracking-[0.12em] text-slate uppercase">{t.findUs}</span>
+                    {contact.address.map((line) => (
+                      <span key={line} className="text-abyss">
+                        {line}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <a href={mapsLink()} target="_blank" rel="noopener" className="h-8 rounded-full px-3 text-xs leading-8 font-bold text-teal ring-1 ring-teal hover:bg-teal-soft">
+                  Google Maps ↗
+                </a>
+              </div>
+            )}
+
             <div className="mt-2 flex flex-wrap gap-3">
-              {order.status === "pending" && order.method !== "transfer" && order.redirectUrl && (
+              {online && order.redirectUrl && (
                 <a
                   href={order.redirectUrl}
                   className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"

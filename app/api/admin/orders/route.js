@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 // Email yang boleh dikirim ulang tim, menurut status pesanan.
 const MAIL_FOR = { pending: ["order", "reminder"], paid: ["paid"] };
 
-// Tindakan tim di /admin/pesanan: tandai transfer lunas, batalkan, cek status ke Midtrans/PayPal, atau
+// Tindakan tim di /admin/pesanan: tandai transfer atau tunai lunas, batalkan, cek status ke Midtrans/PayPal, atau
 // kirim ulang email ke tamu ({ action: "mail", kind }).
 export async function POST(request) {
   const { error } = await guardAdmin(request);
@@ -21,7 +21,10 @@ export async function POST(request) {
   if (input.action === "mail") {
     const order = await orderByCode(input.code).catch(() => null);
     if (!order) return Response.json({ error: "Pesanan tidak ditemukan." }, { status: 404 });
-    if (!MAIL_FOR[order.status]?.includes(input.kind)) return Response.json({ error: "Email ini tidak cocok dengan status pesanan." }, { status: 400 });
+    // Pesanan tunai tidak punya batas waktu bayar, jadi tidak dikirimi pengingat.
+    if (!MAIL_FOR[order.status]?.includes(input.kind) || (order.method === "cash" && input.kind === "reminder")) {
+      return Response.json({ error: "Email ini tidak cocok dengan status pesanan." }, { status: 400 });
+    }
     const result = await sendOrderMail(order.code, input.kind, { force: true });
     return result.ok ? Response.json({ ok: true }) : Response.json({ error: result.error || "Email belum terkirim." }, { status: 502 });
   }

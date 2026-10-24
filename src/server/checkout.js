@@ -1,6 +1,6 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { CheckoutError, isOverdue, MAX_ITEMS, newOrderCode, nextStatus, paymentOutcome, paypalUsd, summarizeItems, validateCart } from "@/lib/checkout";
+import { CheckoutError, isOverdue, MANUAL_METHODS, MAX_ITEMS, newOrderCode, nextStatus, paymentOutcome, paypalUsd, summarizeItems, validateCart } from "@/lib/checkout";
 import { envText } from "@/lib/env";
 import { createThrottle } from "@/lib/login-throttle";
 import { availability, poolOf } from "@/lib/modules/calendar";
@@ -21,6 +21,8 @@ import { capturePaypalOrder, createPaypalOrder } from "./paypal";
 //               status saat tamu kembali menandai lunas
 //   PayPal    → tamu menyetujui di PayPal, kembali ke /api/payments/paypal/return, uang diambil
 //   Transfer  → tamu melihat rekening di halaman pesanannya; tim menandai lunas di /admin/pesanan
+//   Tunai     → tamu membayar di dive center saat tiba; tempatnya ditahan tanpa batas waktu bayar
+//               sampai tim menandai lunas (atau membatalkan) di /admin/pesanan
 // Total selalu dihitung ulang di server dari paket di database. Tamu menerima email saat pesanan dibuat,
 // pengingat bila belum membayar (src/server/reminders.js), dan email lunas (src/server/order-mail.js).
 
@@ -92,12 +94,12 @@ export async function startCheckout(request, input, { lang }) {
       certification: value.certification,
       notes: value.notes,
       lang,
-      dueAt: new Date(now.getTime() + settings.dueHours * 3600_000),
+      dueAt: value.method === "cash" ? null : new Date(now.getTime() + settings.dueHours * 3600_000),
     }),
     now,
   );
   const back = `${origin}${orderPath(order)}`;
-  if (value.method === "transfer") {
+  if (MANUAL_METHODS.includes(value.method)) {
     afterOrder(order, now);
     return { code: order.code, redirectUrl: back };
   }
@@ -272,14 +274,16 @@ export async function refreshOrder(order) {
   return current;
 }
 
-/** Tim menandai pesanan dari /admin/pesanan: "paid" (transfer masuk) atau "cancelled". */
+/** Tim menandai pesanan dari /admin/pesanan: "paid" (transfer masuk atau tunai diterima) atau "cancelled". */
 export async function adminSetStatus(code, to) {
   const order = await orderByCode(code);
   if (!order) throw new Error("Pesanan tidak ditemukan.");
-  if (to === "paid" && order.method !== "transfer") throw new Error("Hanya pesanan transfer bank yang ditandai lunas oleh tim; Midtrans dan PayPal dikonfirmasi otomatis.");
+  if (to === "paid" && !MANUAL_METHODS.includes(order.method)) {
+    throw new Error("Hanya pesanan transfer bank dan tunai yang ditandai lunas oleh tim. Midtrans dan PayPal dikonfirmasi otomatis.");
+  }
   if (to === "cancelled" && order.status === "paid") throw new Error("Pesanan lunas tidak bisa dibatalkan dari sini. Kembalikan dananya lewat penyedia pembayaran.");
   const next = nextStatus(order.status, to);
   if (!next || (to === "cancelled" && order.status !== "pending")) throw new Error("Status pesanan ini tidak bisa diubah ke sana.");
-  await setStatus(order, next, to === "paid" ? { paymentType: "bank_transfer" } : {});
+  await setStatus(order, next, to === "paid" ? { paymentType: order.method === "cash" ? "cash" : "bank_transfer" } : {});
   return orderByCode(code);
 }

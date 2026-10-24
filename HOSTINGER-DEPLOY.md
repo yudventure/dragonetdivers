@@ -114,12 +114,12 @@ Jangan isi dengan teks contoh (mis. `masih uji coba`): variabel yang belum punya
 
 Variabel `NEXT_PUBLIC_*` ditanam saat build; setelah diubah, deploy ulang. Daftar lengkap ada di `.env.example`.
 
-### Pembayaran paket (Midtrans, PayPal, transfer bank)
+### Pembayaran paket (Midtrans, PayPal, transfer bank, tunai)
 
 Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagian 5) wajib terhubung.
 
 1. Isi key Midtrans dan/atau PayPal di tabel di atas, lalu deploy ulang. Mulai dengan key **sandbox** untuk uji coba.
-2. Buka `/admin/pembayaran`: tekan **Uji koneksi** untuk tiap penyedia, centang cara bayar yang ditawarkan, isi rekening untuk transfer bank, lalu **Simpan pengaturan**.
+2. Buka `/admin/pembayaran`: tekan **Uji koneksi** untuk tiap penyedia, centang cara bayar yang ditawarkan, isi rekening untuk transfer bank, lalu **Simpan pengaturan**. **Tunai di dive center** menyala sejak awal, jadi checkout tetap bisa dipakai walau Midtrans, PayPal, dan rekening belum diisi. Transfer bank baru tampil di checkout setelah dicentang dan minimal satu rekening diisi; rekeningnya langsung terlihat begitu tamu memilih transfer.
 3. Buka `/admin/paket` dan tambahkan paket (nama dan isi dalam English dan Indonesia, harga Rupiah). Paket aktif langsung tampil di halaman layanannya.
 4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdivers.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
 5. Setelah uji coba lancar, ganti ke key production/live dan tambahkan `MIDTRANS_PRODUCTION=true` / `PAYPAL_MODE=live`. Di checkout, label "Mode uji" hilang begitu mode sungguhan aktif.
@@ -143,7 +143,7 @@ Isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, dan `SMTP_PASS` (tabel di atas), lalu
 - `/admin/pesanan` menampilkan email yang sudah terkirim per pesanan, dengan tombol **Email pengingat** dan **Kirim ulang email lunas**.
 - Halaman masuk `/admin` punya **Lupa password?**: kode 6 angka dikirim ke `ADMIN_EMAIL` (atau `ADMIN_OTP_EMAIL`), berlaku 10 menit. Password baru disimpan sebagai hash di database dan berlaku sampai `ADMIN_PASSWORD` di hPanel diganti; setelah itu password hPanel yang berlaku lagi.
 
-Midtrans menagih dalam Rupiah. PayPal tidak menerima Rupiah, jadi menagih dalam dolar AS dengan kurs hari itu (dibulatkan ke atas per sen) yang dikunci saat tamu memesan. Transfer bank ditandai lunas oleh tim di `/admin/pesanan` setelah dana masuk.
+Midtrans menagih dalam Rupiah. PayPal tidak menerima Rupiah, jadi menagih dalam dolar AS dengan kurs hari itu (dibulatkan ke atas per sen) yang dikunci saat tamu memesan. Transfer bank ditandai lunas oleh tim di `/admin/pesanan` setelah dana masuk. Pesanan tunai menahan tempat tanpa batas waktu bayar (tanpa email pengingat); setelah tamu membayar di dive center, tekan **Tunai diterima** di `/admin/pesanan` supaya pesanan lunas, tamu mendapat email pembayaran diterima, dan buku kas mencatatnya sebagai tunai. Pesanan tunai yang tidak jadi dibatalkan di halaman yang sama.
 
 ## 5. Database MySQL
 

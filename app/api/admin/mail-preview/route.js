@@ -15,7 +15,7 @@ export async function GET(request) {
   const params = new URL(request.url).searchParams;
   const kind = params.get("kind");
   const lang = params.get("lang") === "en" ? "en" : "id";
-  const method = ["midtrans", "paypal", "transfer"].includes(params.get("method")) ? params.get("method") : "midtrans";
+  const method = ["midtrans", "paypal", "transfer", "cash"].includes(params.get("method")) ? params.get("method") : "midtrans";
   let mail;
   if (kind === "otp") {
     mail = otpMail({ code: "482913", account: "operator@dragonetdivers.com", minutes: 10 });
