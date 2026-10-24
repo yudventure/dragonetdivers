@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { faqs } from "../src/content/faq.js";
 import { ui } from "../src/content/ui.js";
-import { alternates, format, isLocale, localeHref, localeRoute } from "../src/lib/i18n.js";
+import { alternates, chooseLangHref, format, isLocale, languageChoice, localeHref, localeRoute, pathIn } from "../src/lib/i18n.js";
 import { arah, describeWeather, LABELS_ID, seaState, translateLabel } from "../src/lib/sea-conditions.js";
 
 test("tautan English tetap, tautan Indonesia diberi awalan /id", () => {
@@ -29,6 +29,28 @@ test("proxy: English di akar, /id diteruskan, /en dialihkan", () => {
   // Bukan awalan bahasa: /english, /idx tetap ditulis ulang ke English (lalu 404 bila tidak ada).
   assert.deepEqual(localeRoute("/idx"), { rewrite: "/en/idx" });
   assert.deepEqual(localeRoute("/english"), { rewrite: "/en/english" });
+});
+
+test("pilihan bahasa diingat: tombol EN / ID, lalu alamat bahasa lain dialihkan", () => {
+  assert.equal(pathIn("en", "/id/services/fun-dives"), "/services/fun-dives");
+  assert.equal(pathIn("en", "/id"), "/");
+  assert.equal(pathIn("id", "/"), "/id");
+  assert.equal(pathIn("id", "/order/DD-261024-ABCDE"), "/id/order/DD-261024-ABCDE");
+  assert.equal(chooseLangHref("en", "/services/fun-dives"), "/services/fun-dives?lang=en");
+  assert.equal(chooseLangHref("id", "/"), "/id?lang=id");
+  assert.equal(chooseLangHref("id", "/order/DD-261024-ABCDE?t=abc"), "/id/order/DD-261024-ABCDE?t=abc&lang=id");
+  assert.equal(chooseLangHref("id", "/#faq"), "/id?lang=id#faq");
+  // Tombol bahasa: cookie diisi, alamat dalam bahasa itu.
+  assert.deepEqual(languageChoice("/id/services/fun-dives", { param: "en" }), { remember: "en", redirect: "/services/fun-dives" });
+  assert.deepEqual(languageChoice("/", { param: "id", cookie: "en" }), { remember: "id", redirect: "/id" });
+  // Sudah memilih English: tautan /id dibawa ke English, dan sebaliknya.
+  assert.deepEqual(languageChoice("/id/services/fun-dives", { cookie: "en" }), { redirect: "/services/fun-dives" });
+  assert.deepEqual(languageChoice("/services/fun-dives", { cookie: "id" }), { redirect: "/id/services/fun-dives" });
+  // Bahasa sudah cocok, tanpa pilihan, atau isian asing: diteruskan.
+  assert.equal(languageChoice("/services/fun-dives", { cookie: "en" }), null);
+  assert.equal(languageChoice("/id", { cookie: "id" }), null);
+  assert.equal(languageChoice("/id/services/fun-dives", {}), null);
+  assert.equal(languageChoice("/", { param: "fr", cookie: "de" }), null);
 });
 
 test("format mengisi {nama} dan membiarkan yang tidak dikenal", () => {

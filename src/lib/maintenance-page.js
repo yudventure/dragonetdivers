@@ -2,7 +2,7 @@
 // yang menjawab dengan status 503 supaya mesin pencari kembali lagi nanti. Fungsi murni.
 import { maintenanceText } from "../content/maintenance.js";
 import { colors, esc } from "./email-layout.js";
-import { format, localeHref } from "./i18n.js";
+import { chooseLangHref, format, localeHref } from "./i18n.js";
 
 const c = colors;
 const FONT = "'Plus Jakarta Sans','Segoe UI',system-ui,-apple-system,sans-serif";
@@ -54,7 +54,7 @@ ${
       }</div>`
     : ""
 }
-<p style="margin:28px 0 0;font-size:14px;">${kind === "page" ? `<a href="${esc(localeHref(lang, "/"))}" style="color:${c.teal};font-weight:700;">${esc(t.home)}</a> &nbsp;·&nbsp; ` : ""}<a href="${esc(localeHref(other, path))}" style="color:${c.teal};font-weight:700;">${esc(t.language)}</a></p>
+<p style="margin:28px 0 0;font-size:14px;">${kind === "page" ? `<a href="${esc(localeHref(lang, "/"))}" style="color:${c.teal};font-weight:700;">${esc(t.home)}</a> &nbsp;·&nbsp; ` : ""}<a href="${esc(chooseLangHref(other, path))}" style="color:${c.teal};font-weight:700;">${esc(t.language)}</a></p>
 ${previewExit ? `<p style="margin:20px 0 0;font-size:13px;color:${c.slate};">Pratinjau pengunjung · <a href="${esc(previewExit)}" style="color:${c.teal};font-weight:700;">Kembali ke tampilan admin</a></p>` : ""}
 </main>
 </body>

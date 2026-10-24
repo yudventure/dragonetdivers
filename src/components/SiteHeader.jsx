@@ -3,7 +3,7 @@ import Link from "next/link";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import logoPlate from "../../brand/logo/dragonet-divers-logo-plate.png";
 import { uiText } from "@/content/ui";
-import { format, localeHref, localeNames, locales } from "@/lib/i18n";
+import { chooseLangHref, format, localeHref, localeNames, locales } from "@/lib/i18n";
 import { site, whatsappLink } from "@/lib/site";
 import { shownServices } from "@/server/site-settings";
 import HeaderShell from "./HeaderShell";
@@ -30,7 +30,8 @@ export default async function SiteHeader({ lang, path = "/", overlay = false }) 
     { href: localeHref(lang, "/#getting-here"), label: nav.gettingHere },
     { href: localeHref(lang, "/#faq"), label: nav.faq },
   ];
-  const languages = locales.map((code) => ({ lang: code, short: code.toUpperCase(), name: localeNames[code], href: localeHref(code, path) }));
+  // Tombol bahasa membawa ?lang= supaya pilihannya diingat (proxy.js, src/lib/i18n.js languageChoice).
+  const languages = locales.map((code) => ({ lang: code, short: code.toUpperCase(), name: localeNames[code], href: chooseLangHref(code, path) }));
 
   return (
     <HeaderShell overlay={overlay}>

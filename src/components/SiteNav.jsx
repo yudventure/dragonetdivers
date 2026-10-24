@@ -43,7 +43,7 @@ function languageLink(item, current) {
     lang: item.lang,
     "aria-current": current ? "true" : undefined,
     onClick: (event) => {
-      if (window.location.hash) event.currentTarget.href = item.href + window.location.hash;
+      if (window.location.hash && !item.href.includes("#")) event.currentTarget.href = item.href + window.location.hash;
     },
   };
 }
