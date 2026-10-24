@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal, flushSync } from "react-dom";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
-import { currencies } from "@/lib/currency";
 import { useCurrency, useRateText } from "./currency";
 import { serviceArt } from "./ServiceCard";
-import { BanknoteIcon, ChatIcon, CheckIcon, ChevronIcon, CloseIcon, MenuIcon, Wave } from "./icons";
+import { BanknoteIcon, ChatIcon, CheckIcon, ChevronIcon, CloseIcon, GlobeIcon, MenuIcon, Wave } from "./icons";
 
 // Menu situs (BRANDING.md §9.1). Desktop (lg ke atas): menu di tengah (Layanan sebagai daftar turun
-// dengan kelima halaman layanan), lalu tombol EN / ID, pilihan mata uang, dan tombol Book a dive.
-// Ponsel dan tablet: tombol menu membuka panel putih layar penuh (menu Fredoka 24 px, bahasa, mata
-// uang, CTA di bawah). Panel dipasang di <body> lewat portal, karena backdrop-blur header membuat
+// dengan kelima halaman layanan), lalu satu tombol bahasa & mata uang (daftar turun) dan tombol Book a
+// dive. Ponsel dan tablet: tombol menu membuka panel putih layar penuh (Layanan sebagai daftar turun,
+// baris menu Fredoka 20 px, bahasa dan mata uang ringkas, CTA di bawah). Mata uang hanya bisa dipilih
+// bila dolar dinyalakan tim di /admin/kontak. Panel dipasang di <body> lewat portal, karena backdrop-blur header membuat
 // position: fixed di dalamnya ikut terkurung di header.
 
 /** Tutup panel saat klik di luar atau Esc (fokus kembali ke tombolnya). */
@@ -35,138 +35,129 @@ function useDismiss(open, close, area, trigger) {
   }, [open, close, area, trigger]);
 }
 
-/** Tombol EN / ID: tautan ke halaman yang sama dalam bahasa lain, bagian halaman (#faq) ikut dibawa. */
-function LanguageSwitch({ lang, languages, label, large = false }) {
-  return (
-    <div role="group" aria-label={label} className={`flex rounded-full bg-foam p-1 ring-1 ring-mist ${large ? "w-full" : ""}`}>
-      {languages.map((item) => {
-        const current = item.lang === lang;
-        return (
-          <a
-            key={item.lang}
-            href={item.href}
-            hrefLang={item.lang}
-            lang={item.lang}
-            title={item.name}
-            aria-current={current ? "true" : undefined}
-            onClick={(event) => {
-              if (window.location.hash) event.currentTarget.href = item.href + window.location.hash;
-            }}
-            className={`grid place-items-center rounded-full font-bold transition-colors duration-200 ease-brand ${
-              large ? "h-10 flex-1 text-[15px]" : "h-8 min-w-10 px-2.5 text-[13px]"
-            } ${current ? "bg-white text-teal shadow-float ring-1 ring-mist" : "text-slate hover:text-abyss"}`}
-          >
-            {large ? item.name : item.short}
-          </a>
-        );
-      })}
-    </div>
-  );
+/** Tautan ke halaman yang sama dalam bahasa lain; bagian halaman (#faq) ikut dibawa. */
+function languageLink(item, current) {
+  return {
+    href: item.href,
+    hrefLang: item.lang,
+    lang: item.lang,
+    "aria-current": current ? "true" : undefined,
+    onClick: (event) => {
+      if (window.location.hash) event.currentTarget.href = item.href + window.location.hash;
+    },
+  };
 }
 
-/** USD / IDR berdampingan (panel ponsel). USD tidak bisa dipilih bila kurs tidak tersedia. */
-function CurrencySwitch({ label, names }) {
-  const { currency, rate, setCurrency } = useCurrency();
-  return (
-    <div role="group" aria-label={label} className="flex w-full rounded-full bg-foam p-1 ring-1 ring-mist">
-      {currencies.map((code) => {
-        const current = code === currency;
-        return (
-          <button
-            key={code}
-            type="button"
-            aria-pressed={current}
-            disabled={code === "USD" && !rate}
-            onClick={() => setCurrency(code)}
-            className={`grid h-10 flex-1 place-items-center rounded-full text-[15px] font-bold transition-colors duration-200 ease-brand disabled:opacity-50 ${
-              current ? "bg-white text-teal shadow-float ring-1 ring-mist" : "text-slate hover:text-abyss"
-            }`}
-          >
-            <span>
-              {code} <span className="font-semibold text-slate">· {names[code]}</span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+// Mata uang yang bisa dipilih tamu, Rupiah lebih dulu (mata uang bawaan).
+const CURRENCY_ORDER = ["IDR", "USD"];
 
 function RateNote({ t, className = "" }) {
   const rate = useRateText(t);
+  if (!rate) return null;
   return (
-    <div className={`grid gap-1 text-[13px] leading-snug text-slate ${className}`}>
-      {rate ? (
-        <>
-          <p className="font-bold text-abyss tabular-nums">{rate.rate}</p>
-          <p>{rate.source}</p>
-          <p>{t.pricesNote}</p>
-        </>
-      ) : (
-        <p>{t.rateMissing}</p>
-      )}
+    <div className={`grid gap-0.5 text-xs leading-snug text-slate ${className}`}>
+      <p className="font-bold text-abyss tabular-nums">{rate.rate}</p>
+      <p>{rate.source}</p>
+      <p>{t.pricesNote}</p>
     </div>
   );
 }
 
-/** Pilihan mata uang di header desktop: tombol kode mata uang, panel kecil berisi pilihan dan kurs. */
-function CurrencyMenu({ t }) {
-  const { currency, rate, setCurrency } = useCurrency();
+const OPTION = "flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-[15px] transition-colors duration-200 ease-brand";
+const optionTone = (current) => (current ? "bg-teal-soft font-semibold text-teal" : "text-abyss hover:bg-foam");
+
+/**
+ * Bahasa dan mata uang di header desktop: satu tombol (bola dunia, EN, dan IDR bila dolar dinyalakan
+ * di /admin/kontak) dengan panel kecil berisi kedua pilihan dan kurs hari ini.
+ */
+function PreferencesMenu({ lang, languages, t }) {
+  const { currency, usd, setCurrency } = useCurrency();
   const [open, setOpen] = useState(false);
   const area = useRef(null);
   const trigger = useRef(null);
   const close = useRef(() => setOpen(false)).current;
   useDismiss(open, close, area, trigger);
+  const active = languages.find((item) => item.lang === lang) ?? languages[0];
   return (
     <div ref={area} className="relative">
       <button
         ref={trigger}
         type="button"
         aria-expanded={open}
-        aria-controls="currency-menu"
-        aria-label={`${t.currency}: ${t.currencyNames[currency]}`}
+        aria-controls="preferences-menu"
+        aria-label={`${usd ? t.preferences : t.language}: ${active.name}${usd ? `, ${t.currencyNames[currency]}` : ""}`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 items-center gap-1.5 rounded-full bg-white/80 px-3 text-[13px] font-bold text-abyss ring-1 ring-mist transition-colors duration-200 ease-brand hover:bg-foam hover:text-teal"
+        className="inline-flex h-10 items-center gap-1.5 rounded-full bg-white/80 px-3 text-[13px] font-bold text-abyss ring-1 ring-mist backdrop-blur-sm transition-colors duration-200 ease-brand hover:bg-foam hover:text-teal"
       >
-        <BanknoteIcon className="size-[18px] text-teal" />
-        {currency}
+        <GlobeIcon className="size-[18px] text-teal" />
+        {active.short}
+        {usd && (
+          <>
+            <span aria-hidden="true" className="h-3.5 w-px bg-mist" />
+            {currency}
+          </>
+        )}
         <ChevronIcon className={`size-3.5 transition-transform duration-200 ease-brand ${open ? "-rotate-90" : "rotate-90"}`} />
       </button>
       {open && (
-        <div id="currency-menu" className="absolute top-full right-0 mt-2 grid w-72 gap-3 rounded-card bg-white p-4 shadow-float ring-1 ring-mist">
-          <p className="text-xs font-bold tracking-[0.14em] text-slate uppercase">{t.currency}</p>
-          <ul className="grid gap-1">
-            {currencies.map((code) => {
-              const current = code === currency;
+        <div id="preferences-menu" className="absolute top-full right-0 mt-2 grid w-72 gap-4 rounded-card bg-white p-3 shadow-float ring-1 ring-mist">
+          <div className="grid gap-1">
+            <p className="px-3 pt-1 text-[11px] font-bold tracking-[0.14em] text-slate uppercase">{t.language}</p>
+            {languages.map((item) => {
+              const current = item.lang === lang;
               return (
-                <li key={code}>
+                <a key={item.lang} {...languageLink(item, current)} className={`${OPTION} ${optionTone(current)}`}>
+                  <span className="w-7 text-xs font-bold tracking-wide">{item.short}</span>
+                  <span className="flex-1">{item.name}</span>
+                  {current && <CheckIcon className="size-4" />}
+                </a>
+              );
+            })}
+          </div>
+          {usd && (
+            <div className="grid gap-1 border-t border-mist pt-3">
+              <p className="px-3 text-[11px] font-bold tracking-[0.14em] text-slate uppercase">{t.currency}</p>
+              {CURRENCY_ORDER.map((code) => {
+                const current = code === currency;
+                return (
                   <button
+                    key={code}
                     type="button"
                     aria-pressed={current}
-                    disabled={code === "USD" && !rate}
                     onClick={() => {
                       setCurrency(code);
                       setOpen(false);
                       trigger.current?.focus();
                     }}
-                    className={`flex w-full items-center gap-3 rounded-input px-3 py-2 text-left text-[15px] transition-colors duration-200 ease-brand disabled:opacity-50 ${
-                      current ? "bg-teal-soft text-teal" : "text-abyss hover:bg-foam"
-                    }`}
+                    className={`${OPTION} ${optionTone(current)}`}
                   >
-                    <span className="w-9 font-bold">{code}</span>
+                    <span className="w-7 text-xs font-bold tracking-wide">{code}</span>
                     <span className="flex-1">{t.currencyNames[code]}</span>
                     {current && <CheckIcon className="size-4" />}
                   </button>
-                </li>
-              );
-            })}
-          </ul>
-          <RateNote t={t} className="rounded-input bg-foam p-3" />
+                );
+              })}
+              <RateNote t={t} className="mx-1 mt-1 rounded-input bg-foam p-3" />
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
+
+/** Pilihan ringkas dua tombol berdampingan untuk panel ponsel (bahasa, mata uang). */
+function Segmented({ label, children }) {
+  return (
+    <div role="group" aria-label={label} className="flex shrink-0 rounded-full bg-white p-1 ring-1 ring-mist">
+      {children}
+    </div>
+  );
+}
+const segment = (current) =>
+  `grid h-9 min-w-14 place-items-center rounded-full px-3.5 text-sm font-bold transition-colors duration-200 ease-brand ${
+    current ? "bg-teal text-white" : "text-slate hover:text-abyss"
+  }`;
 
 /** Daftar turun "Services" di desktop: kelima halaman layanan dengan ilustrasinya. */
 function ServicesMenu({ t, services, allHref, active }) {
@@ -240,9 +231,19 @@ function BookButton({ booking, t, className = "" }) {
   );
 }
 
-/** Panel menu layar penuh untuk ponsel dan tablet. */
-function MobileMenu({ lang, t, brand, home, homeLabel, services, links, languages, booking, onClose }) {
+// Baris menu panel ponsel: Fredoka 20 px, dipisah garis tipis.
+const ROW =
+  "flex h-14 w-full items-center justify-between gap-3 font-display text-xl font-semibold text-abyss transition-colors duration-200 ease-brand hover:text-teal";
+
+/**
+ * Panel menu layar penuh untuk ponsel dan tablet: Layanan sebagai daftar turun (terbuka bila halaman ini
+ * halaman layanan), tautan lain, lalu bahasa dan mata uang dalam pilihan ringkas.
+ */
+function MobileMenu({ lang, t, brand, home, homeLabel, services, allServicesHref, links, languages, booking, onClose }) {
   const panel = useRef(null);
+  const { currency, usd, setCurrency } = useCurrency();
+  const servicesActive = services.some((service) => service.current);
+  const [servicesOpen, setServicesOpen] = useState(servicesActive);
 
   // Gulir halaman dikunci dengan membekukan body (Safari iPhone mengabaikan overflow: hidden).
   // useLayoutEffect: kunci dilepas serentak saat panel ditutup lewat flushSync, sebelum tautan # bergulir.
@@ -268,7 +269,6 @@ function MobileMenu({ lang, t, brand, home, homeLabel, services, links, language
   }, [onClose]);
 
   const follow = () => flushSync(onClose);
-  const big = "font-display text-2xl leading-tight font-semibold text-abyss transition-colors duration-200 ease-brand hover:text-teal";
 
   return createPortal(
     <div ref={panel} id="mobile-menu" role="dialog" aria-modal="true" aria-label={t.label} className="fixed inset-0 z-40 flex flex-col bg-white lg:hidden">
@@ -291,46 +291,87 @@ function MobileMenu({ lang, t, brand, home, homeLabel, services, links, language
         </button>
       </div>
 
-      <nav aria-label={t.label} className="gutter flex-1 overflow-y-auto overscroll-contain pt-4 pb-8">
-        <p className="text-xs font-bold tracking-[0.14em] text-slate uppercase">{t.services}</p>
-        <ul className="mt-2 grid gap-0.5">
-          {services.map((service) => (
-            <li key={service.slug}>
-              <Link
-                href={service.href}
-                onClick={follow}
-                aria-current={service.current ? "page" : undefined}
-                className="flex items-center gap-3 rounded-input py-2 text-[17px] font-semibold text-abyss transition-colors duration-200 ease-brand hover:text-teal aria-[current=page]:text-teal"
-              >
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-lagoon-wash">
-                  <Image src={serviceArt[service.slug]} alt="" sizes="32px" className="size-8 object-contain" />
-                </span>
-                {service.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <ul className="mt-6 grid gap-4">
+      <nav aria-label={t.label} className="gutter flex-1 overflow-y-auto overscroll-contain pt-2 pb-8">
+        <ul className="divide-y divide-mist border-b border-mist">
+          <li>
+            <button type="button" aria-expanded={servicesOpen} aria-controls="mobile-services" onClick={() => setServicesOpen((v) => !v)} className={ROW}>
+              <span className={servicesActive ? "text-teal" : undefined}>{t.services}</span>
+              <ChevronIcon className={`size-5 text-slate transition-transform duration-200 ease-brand ${servicesOpen ? "-rotate-90" : "rotate-90"}`} />
+            </button>
+            {servicesOpen && (
+              <ul id="mobile-services" className="grid gap-1 pb-3">
+                {services.map((service) => (
+                  <li key={service.slug}>
+                    <Link
+                      href={service.href}
+                      onClick={follow}
+                      aria-current={service.current ? "page" : undefined}
+                      className="flex items-center gap-3 rounded-input px-2 py-2 transition-colors duration-200 ease-brand hover:bg-foam aria-[current=page]:bg-teal-soft"
+                    >
+                      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-white)_0%,var(--color-lagoon-wash)_100%)]">
+                        <Image src={serviceArt[service.slug]} alt="" sizes="36px" className="size-9 object-contain" />
+                      </span>
+                      <span className="grid min-w-0">
+                        <span className="text-base font-semibold text-abyss">{service.title}</span>
+                        <span className="truncate text-[13px] text-slate">{service.summary}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <Link href={allServicesHref} onClick={follow} className="flex items-center justify-between rounded-input px-2 py-2.5 text-sm font-bold text-teal hover:bg-foam">
+                    {t.allServices}
+                    <ChevronIcon className="size-4" />
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
           {links.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} onClick={follow} className={big}>
+              <Link href={link.href} onClick={follow} className={ROW}>
                 {link.label}
+                <ChevronIcon className="size-5 text-slate" />
               </Link>
             </li>
           ))}
         </ul>
 
-        <div className="mt-8 grid gap-5 rounded-card bg-foam/60 p-4 ring-1 ring-mist">
-          <div className="grid gap-2">
-            <p className="text-xs font-bold tracking-[0.14em] text-slate uppercase">{t.language}</p>
-            <LanguageSwitch lang={lang} languages={languages} label={t.language} large />
+        <div className="mt-6 grid gap-3 rounded-card bg-foam p-4 ring-1 ring-mist">
+          <div className="flex items-center justify-between gap-3">
+            <p className="flex items-center gap-2 text-sm font-semibold text-abyss">
+              <GlobeIcon className="size-[18px] text-teal" />
+              {t.language}
+            </p>
+            <Segmented label={t.language}>
+              {languages.map((item) => {
+                const current = item.lang === lang;
+                return (
+                  <a key={item.lang} {...languageLink(item, current)} title={item.name} className={segment(current)}>
+                    {item.short}
+                  </a>
+                );
+              })}
+            </Segmented>
           </div>
-          <div className="grid gap-2">
-            <p className="text-xs font-bold tracking-[0.14em] text-slate uppercase">{t.currency}</p>
-            <CurrencySwitch label={t.currency} names={t.currencyNames} />
-            <RateNote t={t} />
-          </div>
+          {usd && (
+            <>
+              <div className="flex items-center justify-between gap-3 border-t border-mist pt-3">
+                <p className="flex items-center gap-2 text-sm font-semibold text-abyss">
+                  <BanknoteIcon className="size-[18px] text-teal" />
+                  {t.currency}
+                </p>
+                <Segmented label={t.currency}>
+                  {CURRENCY_ORDER.map((code) => (
+                    <button key={code} type="button" aria-pressed={code === currency} title={t.currencyNames[code]} onClick={() => setCurrency(code)} className={segment(code === currency)}>
+                      {code}
+                    </button>
+                  ))}
+                </Segmented>
+              </div>
+              <RateNote t={t} />
+            </>
+          )}
         </div>
       </nav>
 
@@ -388,9 +429,8 @@ export default function SiteNav({ lang, t, brand, home, homeLabel, services, all
       </nav>
 
       <div className="ml-auto flex items-center gap-2 lg:ml-0 xl:gap-3">
-        <div className="hidden items-center gap-2 lg:flex">
-          <LanguageSwitch lang={lang} languages={languages} label={t.language} />
-          <CurrencyMenu t={t} />
+        <div className="hidden lg:block">
+          <PreferencesMenu lang={lang} languages={languages} t={t} />
         </div>
         <BookButton booking={booking} t={t} />
         <button
@@ -414,6 +454,7 @@ export default function SiteNav({ lang, t, brand, home, homeLabel, services, all
           home={home}
           homeLabel={homeLabel}
           services={services}
+          allServicesHref={allServicesHref}
           links={links}
           languages={languages}
           booking={booking}

@@ -14,6 +14,7 @@ test("isian kontak dibersihkan", () => {
     instagram: "@dragonetdivers",
     tiktok: "https://www.tiktok.com/@dragonetdivers",
     facebook: "",
+    showUsd: true,
     extra: "dibuang",
   });
   assert.deepEqual(clean, {
@@ -25,8 +26,11 @@ test("isian kontak dibersihkan", () => {
     tiktok: "https://www.tiktok.com/@dragonetdivers",
     facebook: "",
     youtube: "",
+    showUsd: true,
   });
   assert.deepEqual(validateSiteSettings({}), DEFAULT_SITE_SETTINGS);
+  assert.equal(DEFAULT_SITE_SETTINGS.showUsd, false, "dolar mati sampai tim menyalakannya");
+  assert.equal(validateSiteSettings({ showUsd: "ya" }).showUsd, false, "hanya true yang menyalakan");
 });
 
 test("isian kontak yang salah ditolak dengan nama kolomnya", () => {

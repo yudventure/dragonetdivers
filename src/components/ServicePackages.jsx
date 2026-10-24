@@ -2,6 +2,7 @@ import { uiText } from "@/content/ui";
 import { format } from "@/lib/i18n";
 import { contact, whatsappLink } from "@/lib/site";
 import ServiceBooking from "./booking/ServiceBooking";
+import { UsdNote } from "./currency";
 import { ChatIcon, MailIcon, Wave } from "./icons";
 
 // Paket sebuah layanan di halaman layanannya (isi dari /admin/paket, tabel packages). Harga ditulis dalam
@@ -52,7 +53,7 @@ export default function ServicePackages({ lang, service, packages, booking }) {
               ask={ask}
               email={contact.email}
             />
-            <p className="text-xs text-slate">{t.usdNote}</p>
+            <UsdNote className="text-xs text-slate">{t.usdNote}</UsdNote>
           </>
         )}
       </div>

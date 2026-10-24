@@ -6,12 +6,13 @@ import { format } from "@/lib/i18n";
 
 const STORAGE_KEY = "dd_currency";
 
-const CurrencyContext = createContext({ currency: "IDR", preferred: "IDR", rate: null, lang: "en", setCurrency: () => {} });
+const CurrencyContext = createContext({ currency: "IDR", preferred: "IDR", rate: null, usd: false, lang: "en", setCurrency: () => {} });
 
 // Pilihan mata uang tamu (USD atau IDR) untuk seluruh situs, diingat di perangkatnya (localStorage)
-// dan ikut berubah di tab lain. Sebelum tamu memilih: halaman English → USD, Indonesia → IDR.
-// Tanpa kurs (rate null), harga tetap tampil dalam Rupiah.
-export function CurrencyProvider({ lang, rate, children }) {
+// dan ikut berubah di tab lain. Sebelum tamu memilih: Rupiah, di semua bahasa. usd = pilihan dolar
+// dinyalakan tim di /admin/kontak; bila mati atau tanpa kurs (rate null), semua harga tampil dalam
+// Rupiah dan pilihan mata uang disembunyikan (context usd false).
+export function CurrencyProvider({ lang, rate, usd = false, children }) {
   const [chosen, setChosen] = useState(null);
 
   useEffect(() => {
@@ -32,9 +33,10 @@ export function CurrencyProvider({ lang, rate, children }) {
     } catch {}
   }, []);
 
-  const preferred = chosen ?? defaultCurrency(lang);
-  const currency = preferred === "USD" && !rate ? "IDR" : preferred;
-  const value = useMemo(() => ({ currency, preferred, rate, lang, setCurrency }), [currency, preferred, rate, lang, setCurrency]);
+  const usdOn = usd && Boolean(rate);
+  const preferred = chosen ?? defaultCurrency();
+  const currency = preferred === "USD" && usdOn ? "USD" : "IDR";
+  const value = useMemo(() => ({ currency, preferred, rate, usd: usdOn, lang, setCurrency }), [currency, preferred, rate, usdOn, lang, setCurrency]);
   return <CurrencyContext value={value}>{children}</CurrencyContext>;
 }
 
@@ -54,6 +56,12 @@ export function Price({ idr, className }) {
       ≈ {formatMoney(amount, "USD", lang)}
     </span>
   );
+}
+
+/** Teks yang hanya relevan saat harga tampil dalam dolar (mis. catatan "nilai dolar adalah perkiraan"). */
+export function UsdNote({ children, className }) {
+  const { currency } = useCurrency();
+  return currency === "USD" ? <p className={className}>{children}</p> : null;
 }
 
 /** Harga Rupiah aslinya, hanya saat tamu memilih dolar (di bawah <Price> pada kartu paket). */

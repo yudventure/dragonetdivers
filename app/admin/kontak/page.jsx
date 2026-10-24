@@ -8,9 +8,10 @@ import { databaseStatus } from "@/server/db";
 import { getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Kontak & media sosial" };
+export const metadata = { title: "Kontak, sosial & mata uang" };
 
-// /admin/kontak: WhatsApp, email, alamat, Google Maps, dan akun media sosial yang tampil di website.
+// /admin/kontak: WhatsApp, email, alamat, Google Maps, akun media sosial yang tampil di website, dan
+// pilihan dolar AS (showUsd; mati = semua harga hanya dalam Rupiah).
 // Isian kosong memakai isian lama dari hPanel atau nilai bawaan (ditampilkan sebagai contoh di form).
 /** Isian form = nilai yang sedang dipakai website: isian admin, atau isian lama dan nilai bawaan. */
 const current = (settings, fallback) => ({
@@ -35,9 +36,9 @@ export default async function ContactSettingsPage() {
   };
   return (
     <AdminShell admin={admin} active="kontak">
-      <ModuleTitle title="Kontak & media sosial">
-        Nomor WhatsApp, email, alamat, dan akun media sosial yang tampil di website. Setelah disimpan, website langsung memakai isian baru, tanpa
-        perlu membuka hPanel atau membangun ulang website.
+      <ModuleTitle title="Kontak, sosial & mata uang">
+        Nomor WhatsApp, email, alamat, akun media sosial yang tampil di website, dan pilihan mata uang untuk tamu. Setelah disimpan, website
+        langsung memakai isian baru, tanpa perlu membuka hPanel atau membangun ulang website.
       </ModuleTitle>
       <DatabaseNotice database={database} />
       {settings && <SiteSettingsForm initial={current(settings, fallback)} fallback={fallback} />}

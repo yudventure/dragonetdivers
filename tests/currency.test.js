@@ -24,8 +24,8 @@ test("USD_IDR_RATE dari hPanel menerima pemisah ribuan", () => {
   for (const bad of [undefined, "", "abc", "16", "0", "1000000"]) assert.equal(rateFromEnv(bad), null, String(bad));
 });
 
-test("pilihan awal mengikuti bahasa, konversi butuh kurs", () => {
-  assert.equal(defaultCurrency("en"), "USD");
+test("pilihan awal Rupiah di semua bahasa, konversi butuh kurs", () => {
+  assert.equal(defaultCurrency("en"), "IDR");
   assert.equal(defaultCurrency("id"), "IDR");
   const rate = { idrPerUsd: 16000 };
   assert.equal(convert(1_600_000, "USD", rate), 100);

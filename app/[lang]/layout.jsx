@@ -41,12 +41,13 @@ export const viewport = { themeColor: "#FFFFFF", viewportFit: "cover" };
 export default async function SiteLayout({ children, params }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  // Kontak dan media sosial dari /admin/kontak dimuat ke memori sebelum halaman memakainya (src/lib/site.js).
-  const [rate] = await Promise.all([getUsdIdrRate(), getSiteSettings()]);
+  // Kontak dan media sosial dari /admin/kontak dimuat ke memori sebelum halaman memakainya (src/lib/site.js);
+  // showUsd dari halaman yang sama menentukan apakah tamu bisa memilih dolar.
+  const [rate, settings] = await Promise.all([getUsdIdrRate(), getSiteSettings()]);
   return (
     <html lang={lang} className={fontVariables}>
       <body className="min-h-dvh font-sans">
-        <CurrencyProvider lang={lang} rate={rate}>
+        <CurrencyProvider lang={lang} rate={rate} usd={settings.showUsd}>
           <CartProvider>{children}</CartProvider>
         </CurrencyProvider>
         <DeveloperBar />
