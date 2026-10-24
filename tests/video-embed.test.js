@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseVideoUrl } from "../src/lib/video-embed.js";
+import { isTikTokOrigin, isTikTokPlaying, parseVideoUrl, readTikTokEvent, tiktokCommand, tiktokReaction } from "../src/lib/video-embed.js";
 
 test("YouTube biasa, youtu.be, dan Shorts menjadi embed tanpa suara yang berulang", () => {
   for (const url of ["https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s", "https://youtu.be/dQw4w9WgXcQ", "https://m.youtube.com/watch?v=dQw4w9WgXcQ"]) {
@@ -19,15 +19,56 @@ test("YouTube biasa, youtu.be, dan Shorts menjadi embed tanpa suara yang berulan
   assert.equal(short.href, "https://www.youtube.com/shorts/abcDEF12345");
 });
 
-test("TikTok memakai Embed Player v1 dengan autoplay, loop, dan tanpa suara", () => {
+test("TikTok memakai Embed Player v1 dengan autoplay dan loop, cadangannya dengan tombol", () => {
   const v = parseVideoUrl("https://www.tiktok.com/@dragonetdivers/video/7312345678901234567?is_from_webapp=1");
   assert.equal(v.platform, "tiktok");
   const embed = new URL(v.embed);
   assert.equal(embed.pathname, "/player/v1/7312345678901234567");
-  for (const k of ["autoplay", "loop", "muted"]) assert.equal(embed.searchParams.get(k), "1", k);
-  assert.equal(embed.searchParams.get("controls"), "0");
+  for (const k of ["autoplay", "loop"]) assert.equal(embed.searchParams.get(k), "1", k);
+  for (const k of ["controls", "play_button", "description", "music_info", "rel"]) assert.equal(embed.searchParams.get(k), "0", k);
+  const backup = new URL(v.embedControls);
+  assert.equal(backup.pathname, embed.pathname);
+  assert.equal(backup.searchParams.get("controls"), "1");
+  for (const k of ["autoplay", "loop"]) assert.equal(backup.searchParams.get(k), "1", k);
+  assert.equal(backup.searchParams.get("description"), "0");
   assert.equal(v.href, "https://www.tiktok.com/@dragonetdivers/video/7312345678901234567");
   assert.equal(v.vertical, true);
+  assert.equal(parseVideoUrl("https://www.tiktok.com/player/v1/7312345678901234567").id, "7312345678901234567");
+});
+
+test("player TikTok dibisukan lalu diputar saat siap, diulang saat habis", () => {
+  const mute = tiktokCommand("mute");
+  const play = tiktokCommand("play");
+  assert.deepEqual(mute, { "x-tiktok-player": true, type: "mute" });
+  assert.deepEqual(tiktokCommand("seekTo", 0), { "x-tiktok-player": true, type: "seekTo", value: 0 });
+  assert.deepEqual(tiktokReaction({ type: "onPlayerReady" }), [mute, play]);
+  assert.deepEqual(tiktokReaction({ type: "onStateChange", value: 0 }), [tiktokCommand("seekTo", 0), play]);
+  // Dijeda peramban di petak latar: putar lagi tanpa suara. Bila tamu memegang kendali: dibiarkan.
+  assert.deepEqual(tiktokReaction({ type: "onStateChange", value: 2 }), [mute, play]);
+  assert.deepEqual(tiktokReaction({ type: "onStateChange", value: 2 }, { interactive: true }), []);
+  assert.deepEqual(tiktokReaction({ type: "onStateChange", value: 0 }, { interactive: true }), [tiktokCommand("seekTo", 0), play]);
+  for (const value of [-1, 1, 3]) assert.deepEqual(tiktokReaction({ type: "onStateChange", value }), [], String(value));
+  assert.deepEqual(tiktokReaction({ type: "onCurrentTime", value: { currentTime: 2, duration: 9 } }), []);
+  assert.deepEqual(tiktokReaction(null), []);
+});
+
+test("pesan player TikTok dibaca dari objek atau JSON, pesan lain diabaikan", () => {
+  assert.deepEqual(readTikTokEvent({ "x-tiktok-player": true, type: "onStateChange", value: 1 }), { type: "onStateChange", value: 1 });
+  assert.deepEqual(readTikTokEvent('{"x-tiktok-player":true,"type":"onPlayerReady"}').type, "onPlayerReady");
+  const time = readTikTokEvent({ "x-tiktok-player": true, type: "onCurrentTime", currentTime: 1.5, duration: 9 });
+  assert.equal(isTikTokPlaying(time), true);
+  assert.equal(isTikTokPlaying(readTikTokEvent({ "x-tiktok-player": true, type: "onCurrentTime", value: { currentTime: 3 } })), true);
+  assert.equal(isTikTokPlaying({ type: "onStateChange", value: 1 }), true);
+  assert.equal(isTikTokPlaying({ type: "onStateChange", value: 2 }), false);
+  assert.equal(isTikTokPlaying({ type: "onCurrentTime", value: { currentTime: 0 } }), false);
+  for (const bad of [null, "", "bukan json", { type: "play" }, { "x-tiktok-player": "ya", type: "onPlayerReady" }, { "x-tiktok-player": true }, 42]) {
+    assert.equal(readTikTokEvent(bad), null, JSON.stringify(bad));
+  }
+  assert.equal(isTikTokOrigin("https://www.tiktok.com"), true);
+  assert.equal(isTikTokOrigin("https://tiktok.com"), true);
+  for (const bad of ["http://www.tiktok.com", "https://www.tiktok.com.evil.example", "https://eviltiktok.com", "null", undefined]) {
+    assert.equal(isTikTokOrigin(bad), false, String(bad));
+  }
 });
 
 test("Instagram reel dan post: embed resmi, diputar saat diketuk", () => {
