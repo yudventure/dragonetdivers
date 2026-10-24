@@ -21,7 +21,8 @@ const MORE = 12;
 
 const tileSizes = (size) => (size === "big" || size === "wide" ? "(min-width: 768px) 600px, 100vw" : "(min-width: 768px) 300px, 50vw");
 
-// Kisi galeri gaya bento (grid-flow-dense mengisi celah) + penampil foto layar penuh. Penampil memakai
+// Kisi galeri susunan mosaik (ukuran petak dari src/lib/gallery-layout.js, grid-flow-dense mengisi celah;
+// petak kecil kira-kira 3:2) dengan keterangan foto di kiri bawah, + penampil foto layar penuh. Penampil memakai
 // <dialog> (fokus dan Esc ditangani peramban), panah kiri/kanan berpindah foto, ketuk di luar foto
 // menutup. Gulir halaman dikunci dengan membekukan body (position: fixed), karena Safari di iPhone
 // mengabaikan overflow: hidden untuk sentuhan. t = teks galeri dalam bahasa halaman (src/content/ui.js).
@@ -53,7 +54,7 @@ export default function GalleryGrid({ items, t }) {
 
   return (
     <>
-      <ul className="grid auto-rows-[44vw] grid-cols-2 gap-3 [grid-auto-flow:dense] sm:auto-rows-[200px] md:grid-cols-4 md:gap-4 md:auto-rows-[190px] lg:auto-rows-[220px]">
+      <ul className="grid auto-rows-[33vw] grid-cols-2 gap-3 [grid-auto-flow:dense] md:auto-rows-[clamp(120px,14vw,185px)] md:grid-cols-4 md:gap-4">
         {items.slice(0, limit).map((item, i) => (
           <li key={item.url ?? item.alt ?? item.title ?? i} className={`relative overflow-hidden rounded-card bg-foam ${SIZES[item.size] ?? ""}`}>
             {item.type === "photo" && (
@@ -70,6 +71,14 @@ export default function GalleryGrid({ items, t }) {
                   placeholder="blur"
                   className="size-full object-cover transition-transform duration-500 ease-brand group-hover:scale-105"
                 />
+                {item.caption && (
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-abyss/80 via-abyss/30 to-transparent px-3 pt-10 pb-2.5 text-left text-xs leading-snug font-semibold text-white sm:text-[13px] md:px-4 md:pb-3"
+                  >
+                    {item.caption}
+                  </span>
+                )}
               </button>
             )}
             {item.type === "video" && (

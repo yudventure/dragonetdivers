@@ -20,7 +20,7 @@ const ADVICE_TONE = { good: "bg-success/10 text-success", fair: "bg-sunrise-wash
 
 const blank = (type) => ({ type, mediaId: "", url: "", captionId: "", captionEn: "", size: "auto", order: 0, active: true });
 const SIZE_TEXT = {
-  auto: { label: "Otomatis", text: "Foto jadi petak kecil, video tegak jadi petak tinggi" },
+  auto: { label: "Otomatis", text: "Mengikuti susunan mosaik beranda (besar, kecil, tinggi bergantian)" },
   ...Object.fromEntries(Object.entries(TILE_GUIDE).map(([key, g]) => [key, { label: g.label, text: `${g.shape}, minimal ${g.minWidth} × ${g.minHeight} px` }])),
 };
 // Sel yang dipakai tiap ukuran di petak contoh 4 × 2 (kolom, baris).
@@ -213,10 +213,12 @@ function ItemForm({ initial, onDone, onCancel }) {
   useEffect(() => () => local && URL.revokeObjectURL(local.url), [local]);
 
   const video = value.type === "embed" ? parseVideoUrl(value.url) : null;
-  const tile = tileFor(value.size, { type: value.type, vertical: Boolean(video?.vertical) });
+  // Posisi di beranda (item yang tampil), supaya "Otomatis" menunjukkan petak mosaiknya.
+  const position = initial.position ?? null;
+  const tile = tileFor(value.size, { type: value.type, vertical: Boolean(video?.vertical), position });
   const photoSrc = local?.url ?? (value.mediaId ? `/api/media/${value.mediaId}` : null);
   const dims = local ?? (value.mediaId && initial.mediaId === value.mediaId ? { width: initial.width, height: initial.height } : null);
-  const advice = value.type === "photo" && dims ? photoAdvice(dims, value.size) : null;
+  const advice = value.type === "photo" && dims ? photoAdvice(dims, value.size, position) : null;
 
   // Foto diperkecil di peramban lalu diunggah dengan coba ulang otomatis (src/lib/image-prep.js, ./upload.js).
   async function upload(file) {
@@ -424,6 +426,9 @@ export default function GalleryManager({ items }) {
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const shown = items.filter((item) => item.active).length;
+  // Urutan tiap item yang tampil di beranda (mulai 0), untuk petak mosaik ukuran "Otomatis".
+  const positions = new Map();
+  for (const item of items) if (item.active) positions.set(item.id, positions.size);
   const done = () => {
     setEditing(null);
     router.refresh();
@@ -530,7 +535,7 @@ export default function GalleryManager({ items }) {
             const video = item.type === "embed" ? parseVideoUrl(item.url) : null;
             // Foto ditampilkan lewat pengecil gambar Next.js (640 px), bukan file 2400 px utuh.
             const src = item.type === "photo" ? thumbUrl(`/api/media/${item.mediaId}`) : video?.thumbnail;
-            const tile = tileFor(item.size, { type: item.type, vertical: Boolean(video?.vertical) });
+            const tile = tileFor(item.size, { type: item.type, vertical: Boolean(video?.vertical), position: positions.get(item.id) ?? null });
             return (
               <li key={item.id} className={`flex min-w-0 flex-col overflow-hidden ${BOX} ${item.active ? "" : "opacity-75"}`}>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-foam">
@@ -544,6 +549,7 @@ export default function GalleryManager({ items }) {
                   <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-abyss/75 px-2 py-0.5 text-[11px] font-bold text-white">
                     {item.type === "photo" ? <ImageIcon className="size-3.5" /> : <PlayIcon className="size-3.5" />}
                     {item.type === "photo" ? "Foto" : (video?.label ?? "Video")} · petak {TILE_GUIDE[tile].label}
+                    {(item.size ?? "auto") === "auto" && item.active ? " (otomatis)" : ""}
                   </span>
                 </div>
                 <div className="grid gap-0.5 p-4 pb-2">
@@ -556,7 +562,7 @@ export default function GalleryManager({ items }) {
                     type="button"
                     onClick={() => {
                       setAdding(false);
-                      setEditing(item);
+                      setEditing({ ...item, position: positions.get(item.id) ?? null });
                     }}
                     className="inline-flex h-9 items-center rounded-full px-3 text-sm font-bold text-teal hover:bg-teal-soft"
                   >

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckIcon, CloseIcon, ImageIcon, UploadIcon } from "@/components/icons";
 import { MAX_BATCH, prepareImage } from "@/lib/image-prep";
-import { photoAdvice, TILE_GUIDE } from "@/lib/media-guide";
+import { photoAdvice, TILE_GUIDE, tileFor } from "@/lib/media-guide";
 import { SIZES } from "@/lib/modules/site";
 import { INPUT } from "./RecordManager";
 import { discardUpload, saveGalleryPhotos, uploadPhoto } from "./upload";
@@ -241,8 +241,9 @@ export default function BulkPhotoUpload({ minOrder = 0, onDone, onCancel }) {
           </div>
 
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {entries.map((entry) => {
-              const advice = entry.width ? photoAdvice({ width: entry.width, height: entry.height }, entry.size) : null;
+            {entries.map((entry, index) => {
+              // Foto baru tampil paling depan sesuai urutan di sini, jadi posisinya di mosaik = index.
+              const advice = entry.width ? photoAdvice({ width: entry.width, height: entry.height }, entry.size, index) : null;
               const label = entry.status === "uploading" ? `${STATUS.uploading} ${Math.round((entry.progress ?? 0) * 100)}%` : STATUS[entry.status];
               return (
                 <li key={entry.key} data-status={entry.status} className="flex min-w-0 flex-col overflow-hidden rounded-card bg-white ring-1 ring-mist">
@@ -321,7 +322,7 @@ export default function BulkPhotoUpload({ minOrder = 0, onDone, onCancel }) {
                     >
                       {SIZES.map(([key]) => (
                         <option key={key} value={key}>
-                          Petak {key === "auto" ? "otomatis" : TILE_GUIDE[key].label.toLowerCase()}
+                          Petak {key === "auto" ? `otomatis (${TILE_GUIDE[tileFor("auto", { position: index })].label.toLowerCase()})` : TILE_GUIDE[key].label.toLowerCase()}
                         </option>
                       ))}
                     </select>

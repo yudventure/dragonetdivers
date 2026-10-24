@@ -1,5 +1,6 @@
 import { gallery } from "@/content/gallery";
 import { uiText } from "@/content/ui";
+import { arrangeGallery } from "@/lib/gallery-layout";
 import { socialLinks } from "@/lib/site";
 import { parseVideoUrl } from "@/lib/video-embed";
 import { siteGallery } from "@/server/site-gallery";
@@ -15,7 +16,7 @@ const SOCIAL_ICONS = { instagram: InstagramIcon, tiktok: TikTokIcon, facebook: F
 export default async function Gallery({ lang }) {
   const t = uiText(lang).gallery;
   const source = (await siteGallery()) ?? gallery;
-  const items = source.flatMap((entry) => {
+  const list = source.flatMap((entry) => {
     const item = { ...entry, alt: entry.alt?.[lang] ?? entry.alt?.en, title: entry.title?.[lang] ?? entry.title?.en };
     if (item.type !== "embed") return [item];
     const video = parseVideoUrl(item.url);
@@ -23,8 +24,10 @@ export default async function Gallery({ lang }) {
       if (lang === "en") console.warn(`Galeri: tautan video tidak dikenali, dilewati (${item.url}).`);
       return [];
     }
-    return [{ ...item, video, size: item.size ?? (video.vertical ? "tall" : "wide") }];
+    return [{ ...item, video, vertical: video.vertical }];
   });
+  // Susunan mosaik (src/lib/gallery-layout.js): ukuran petak "Otomatis" mengikuti pola besar, kecil, tinggi.
+  const items = arrangeGallery(list);
   if (items.length === 0) return null;
   const illustrations = items.some((item) => item.illustration);
   const socials = socialLinks();
