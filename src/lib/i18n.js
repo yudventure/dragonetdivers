@@ -36,5 +36,42 @@ export function localeRoute(pathname) {
   return { rewrite: `/${defaultLocale}${pathname === "/" ? "" : pathname}` };
 }
 
+// Pilihan bahasa tamu diingat (permintaan pemilik, Oktober 2026: "kalau memilih English, semuanya English").
+// Tombol EN / ID menambahkan ?lang=xx; proxy.js menyimpannya di cookie dd_lang selama setahun dan sejak itu
+// mengalihkan alamat berbahasa lain (tautan /id dari riwayat peramban, email, atau admin) ke bahasa pilihan.
+// Tanpa pilihan (pengunjung baru, Google) alamat dipakai apa adanya; bawaan tetap English di akar.
+export const LANG_COOKIE = "dd_lang";
+export const LANG_PARAM = "lang";
+export const LANG_COOKIE_DAYS = 365;
+
+/** Bahasa sebuah alamat publik: /id dan /id/... Indonesia, selain itu English. */
+export const langOfPath = (pathname) => (pathname === "/id" || pathname.startsWith("/id/") ? "id" : defaultLocale);
+
+/** Alamat yang sama dalam bahasa lain: "/id/services/x" → "/services/x" (en), "/" → "/id" (id). */
+export function pathIn(lang, pathname) {
+  const base = langOfPath(pathname) === "id" ? pathname.slice(3) || "/" : pathname;
+  return localeHref(lang, base);
+}
+
+/** Tautan tombol bahasa: halaman ini dalam bahasa itu, ditambah ?lang=xx supaya pilihannya diingat. */
+export function chooseLangHref(lang, path = "/") {
+  const href = localeHref(lang, path);
+  const cut = href.indexOf("#");
+  const [main, hash] = cut === -1 ? [href, ""] : [href.slice(0, cut), href.slice(cut)];
+  return `${main}${main.includes("?") ? "&" : "?"}${LANG_PARAM}=${lang}${hash}`;
+}
+
+/**
+ * Keputusan proxy untuk pilihan bahasa (pathname sudah tanpa awalan /en):
+ *   ?lang=xx                → { remember: xx, redirect: alamat ini dalam xx } (cookie diisi, ?lang dibuang)
+ *   cookie xx ≠ bahasa path → { redirect: alamat ini dalam xx }
+ *   selain itu              → null (diteruskan)
+ */
+export function languageChoice(pathname, { param = null, cookie = null } = {}) {
+  if (isLocale(param)) return { remember: param, redirect: pathIn(param, pathname) };
+  if (isLocale(cookie) && cookie !== langOfPath(pathname)) return { redirect: pathIn(cookie, pathname) };
+  return null;
+}
+
 /** Isi {nama} di teks dengan nilai: format("Tanya soal {x}", { x: "kursus" }). */
 export const format = (template, values = {}) => template.replace(/\{(\w+)\}/g, (all, key) => (key in values ? String(values[key]) : all));

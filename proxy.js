@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, pageForPath, pageLocked, PREVIEW_COOKIE, PREVIEW_MINUTES, visitorLocks } from "./src/lib/developer.js";
-import { localeRoute } from "./src/lib/i18n.js";
+import { LANG_COOKIE, LANG_COOKIE_DAYS, LANG_PARAM, languageChoice, localeRoute } from "./src/lib/i18n.js";
 import { adminFromToken } from "./src/server/admin-auth.js";
 import { getDeveloper } from "./src/server/developer-state.js";
 
-// Alamat English tanpa awalan ditulis ulang ke /en/... (aturan di src/lib/i18n.js), lalu mode developer
+// Alamat English tanpa awalan ditulis ulang ke /en/... (aturan di src/lib/i18n.js), bahasa pilihan tamu
+// (?lang= dari tombol EN / ID, diingat di cookie dd_lang) mengalihkan ke alamat dalam bahasa itu, lalu mode developer
 // (src/lib/developer.js): halaman yang ditutup dijawab halaman perawatan 503 (app/maintenance), kecuali
 // untuk operator yang masuk di /admin. ?pratinjau=pengunjung membuat operator melihat seperti pengunjung
 // selama 30 menit, ?pratinjau=admin mengembalikannya. Halaman status pesanan tidak pernah ditutup.
@@ -27,6 +28,29 @@ export async function proxy(request) {
     const url = request.nextUrl.clone();
     url.pathname = route.redirect;
     return NextResponse.redirect(url, 308);
+  }
+
+  if (request.method === "GET" || request.method === "HEAD") {
+    const choice = languageChoice(request.nextUrl.pathname, {
+      param: request.nextUrl.searchParams.get(LANG_PARAM),
+      cookie: request.cookies.get(LANG_COOKIE)?.value,
+    });
+    if (choice) {
+      const url = request.nextUrl.clone();
+      url.pathname = choice.redirect;
+      url.searchParams.delete(LANG_PARAM);
+      const response = NextResponse.redirect(url, 307);
+      response.headers.set("Cache-Control", "private, no-store");
+      if (choice.remember) {
+        response.cookies.set(LANG_COOKIE, choice.remember, {
+          path: "/",
+          maxAge: LANG_COOKIE_DAYS * 86_400,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+        });
+      }
+      return response;
+    }
   }
 
   const lock = await maintenanceLock(request, route.rewrite ?? request.nextUrl.pathname);

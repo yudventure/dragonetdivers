@@ -105,7 +105,7 @@ test("halaman perawatan aman, tidak diindeks, dan menautkan bahasa lain", () => 
   assert.match(html, /<html lang="id">/);
   assert.match(html, /&lt;b&gt;Segera&lt;\/b&gt; &amp; kembali/);
   assert.doesNotMatch(html, /<b>Segera/);
-  assert.match(html, /href="\/services\/fun-dives"/); // ganti ke English
+  assert.match(html, /href="\/services\/fun-dives\?lang=en"/); // ganti ke English, pilihannya diingat
   assert.match(html, /href="\/id"/); // kembali ke beranda
   assert.match(html, /https:\/\/wa\.me\/6281234/);
   assert.match(html, /22 Oktober 2026/);
