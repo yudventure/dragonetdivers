@@ -21,7 +21,7 @@ const FILTERS = [
 ];
 
 // /admin/pesanan: pesanan dari checkout website. Transfer bank ditandai lunas di sini setelah dana
-// masuk; Midtrans dan PayPal berubah sendiri lewat notifikasi atau tombol "Cek status". Setiap kartu
+// masuk, tunai di dive center setelah uangnya diterima (tombol "Tunai diterima"); Midtrans dan PayPal berubah sendiri lewat notifikasi atau tombol "Cek status". Setiap kartu
 // menampilkan email yang sudah dikirim ke tamu (src/server/order-mail.js).
 export default async function OrdersPage({ searchParams }) {
   const admin = await currentAdmin();
@@ -45,7 +45,8 @@ export default async function OrdersPage({ searchParams }) {
   return (
     <AdminShell admin={admin} active="pesanan">
       <ModuleTitle title="Pesanan">
-        Pesanan paket dari website, terbaru di atas. Hubungi tamu lewat WhatsApp atau email untuk memastikan rencana penyelamannya.
+        Pesanan paket dari website, terbaru di atas. Hubungi tamu lewat WhatsApp atau email untuk memastikan rencana penyelamannya. Pesanan
+        transfer bank ditandai lunas setelah dana masuk, pesanan tunai dengan tombol Tunai diterima setelah tamu membayar di dive center.
       </ModuleTitle>
       <DatabaseNotice database={database} />
       {database.ok && (

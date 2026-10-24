@@ -92,7 +92,7 @@ export function orderIncome(orders) {
       description: `Pesanan website ${o.code} · ${o.name}`,
       flow: "in",
       category: INCOME_CATEGORIES.some(([k]) => k === o.service) ? o.service : "other",
-      method: o.method === "transfer" ? "transfer" : o.method,
+      method: o.method === "cash" ? "tunai" : o.method,
       amount: o.amount,
       reference: o.code,
       note: o.packageName,

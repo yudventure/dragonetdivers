@@ -94,6 +94,8 @@ test("keuangan: pesanan lunas jadi pemasukan otomatis, laporan tahunan dan pajak
     { code: "DD-261031-BBBBB", name: "Ben", service: "snorkeling", method: "paypal", amount: 1000000, status: "pending", paidAt: null },
   ]);
   assert.equal(auto.length, 1);
+  const [cash] = orderIncome([{ code: "DD-261031-CCCCC", name: "Cia", service: "fun-dives", method: "cash", amount: 900000, status: "paid", paidAt: "2026-11-02T01:00:00Z" }]);
+  assert.equal(cash.method, "tunai", "pesanan tunai masuk buku kas sebagai tunai");
   assert.equal(auto[0].date, "2026-11-01", "tanggal lunas mengikuti WIT");
   assert.equal(auto[0].category, "fun-dives");
   const rows = [

@@ -5,6 +5,7 @@ import { useState } from "react";
 const PREVIEWS = [
   ["Pesanan diterima", "kind=order&method=midtrans"],
   ["Pesanan diterima, transfer bank", "kind=order&method=transfer"],
+  ["Pesanan diterima, tunai di tempat", "kind=order&method=cash"],
   ["Pembayaran belum masuk", "kind=reminder&method=midtrans"],
   ["Pembayaran diterima", "kind=paid&method=midtrans"],
   ["Kode lupa password", "kind=otp"],

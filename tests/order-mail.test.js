@@ -29,7 +29,7 @@ test("teks email en dan id berkunci sama, tanpa titik koma atau tanda pisah panj
 test("setiap email untuk setiap cara bayar dan bahasa lengkap terisi", () => {
   for (const kind of ORDER_MAIL_KINDS) {
     for (const lang of ["en", "id"]) {
-      for (const method of ["midtrans", "paypal", "transfer"]) {
+      for (const method of ["midtrans", "paypal", "transfer", "cash"]) {
         const order = sampleOrder({ kind, lang, method, now });
         const mail = orderMail(kind, { order, base, accounts, serviceTitles: { "fun-dives": "Fun dives" }, contact, whatsapp: "6281234567890" });
         const where = `${kind} ${lang} ${method}`;
@@ -61,6 +61,12 @@ test("isi email mengikuti jenisnya dan aman dari HTML tamu", () => {
   assert.match(paid.subject, /Payment received/);
   assert.match(paid.html, /Card, e-wallet|QRIS/);
   assert.doesNotMatch(paid.html, /Pay before/);
+  // Tunai: tanpa batas waktu bayar, dengan alamat dive center tempat membayar.
+  const cash = orderMail("order", { order: sampleOrder({ kind: "order", lang: "en", method: "cash", now }), base, contact });
+  assert.match(cash.html, /Pay Rp|in cash when you arrive at our dive center/);
+  assert.doesNotMatch(cash.html, /Pay before/);
+  assert.ok(contact.address.every((line) => cash.text.includes(line)), "alamat dive center");
+  assert.match(orderMail("paid", { order: sampleOrder({ kind: "paid", lang: "id", method: "cash", now }), base, contact }).html, /Tunai/);
   assert.equal(orderUrl(base, { lang: "id", code: "DD-261021-ABCDE", token: "a".repeat(32) }), `${base}/id/order/DD-261021-ABCDE?t=${"a".repeat(32)}`);
   assert.equal(orderUrl(base, { lang: "en", code: "DD-261021-ABCDE", token: "a".repeat(32) }), `${base}/order/DD-261021-ABCDE?t=${"a".repeat(32)}`);
   assert.throws(() => orderMail("other", { order, base }), /tidak dikenal/);

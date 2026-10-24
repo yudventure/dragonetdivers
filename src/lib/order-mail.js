@@ -58,6 +58,7 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}
   const due = order.dueAt ? witTime(order.dueAt, lang) : "";
   const link = orderUrl(base, order);
   const transfer = order.method === "transfer";
+  const cash = order.method === "cash";
   const paid = kind === "paid";
   const host = String(base).replace(/^https?:\/\//, "");
   const subject = format(k.subject, values);
@@ -77,7 +78,7 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}
     ...(order.method === "paypal" && usd ? [[t.charged, usd]] : []),
   ];
 
-  const next = format(transfer && k.transferNext ? k.transferNext : k.next, { ...values, due });
+  const next = format((transfer && k.transferNext) || (cash && k.cashNext) || k.next, { ...values, due });
   const dueBox =
     !paid && due
       ? box(
@@ -98,7 +99,16 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}
           .join("")}${paragraph(escKeep(format(t.transferNote, values), keep), `font-size:14px;color:${colors.slate};`)}`
       : "";
   const paypalLine = !paid && order.method === "paypal" && usd ? paragraph(esc(format(t.paypalNote, values)), `font-size:14px;color:${colors.slate};`) : "";
-  const actions = `<p style="margin:20px 0 8px;">${button(link, paid || transfer ? t.view : t.open)}${
+  // Tunai: alamat dive center (dari /admin/kontak) tempat tamu membayar.
+  const address = (contact.address ?? []).filter(Boolean);
+  const cashBlock =
+    !paid && cash && address.length
+      ? `${heading(t.findUs)}${box(
+          `<p style="margin:0;font-family:${FONT};font-size:15px;line-height:1.6;color:${colors.abyss};">${address.map(esc).join("<br>")}</p>`,
+          { bg: colors.white },
+        )}`
+      : "";
+  const actions = `<p style="margin:20px 0 8px;">${button(link, paid || transfer || cash ? t.view : t.open)}${
     proof && transfer && !paid ? `&nbsp; ${button(proof, t.proof, "secondary")}` : ""
   }</p>`;
   const already = kind === "reminder" ? paragraph(esc(k.paidAlready), `font-size:14px;color:${colors.slate};margin-top:10px;`) : "";
@@ -109,6 +119,7 @@ ${paragraph(escKeep(format(k.intro, values), keep))}
 ${paragraph(escKeep(next, keep))}
 ${dueBox}
 ${transferBlock}
+${cashBlock}
 ${paypalLine}
 ${actions}
 ${already}
@@ -122,7 +133,7 @@ ${rows(amounts)}`;
   const html = layout({
     lang,
     subject,
-    preheader: paid ? format(k.intro, values) : `${t.due} ${due}`,
+    preheader: paid ? format(k.intro, values) : due ? `${t.due} ${due}` : next,
     reference: { label: t.reference, value: order.code },
     badgeHtml: badge(k.tag, TONE[kind]),
     body,
@@ -145,7 +156,8 @@ ${rows(amounts)}`;
       ? [t.transferTitle, ...accounts.map((a) => `${a.bank} ${a.number}, ${t.accountHolder} ${a.holder}`), format(t.transferNote, values), ""]
       : [],
     !paid && order.method === "paypal" && usd ? [format(t.paypalNote, values), ""] : [],
-    `${paid || transfer ? t.view : t.open}  ${link}`,
+    !paid && cash && address.length ? [t.findUs, ...address, ""] : [],
+    `${paid || transfer || cash ? t.view : t.open}  ${link}`,
     kind === "reminder" ? ["", k.paidAlready] : [],
     "",
     t.summary.toUpperCase(),
@@ -181,10 +193,10 @@ export function sampleOrder({ kind = "order", lang = "id", method = "midtrans", 
     ],
     amountUsd: method === "paypal" ? "123.08" : null,
     method,
-    paymentType: kind === "paid" ? (method === "paypal" ? "paypal" : method === "transfer" ? "bank_transfer" : "qris") : null,
+    paymentType: kind === "paid" ? ({ paypal: "paypal", transfer: "bank_transfer", cash: "cash" }[method] ?? "qris") : null,
     date: day,
     certification: "open_water",
-    dueAt: new Date(now.getTime() + 24 * 3600_000).toISOString(),
+    dueAt: method === "cash" ? null : new Date(now.getTime() + 24 * 3600_000).toISOString(),
     paidAt: kind === "paid" ? now.toISOString() : null,
     status: kind === "paid" ? "paid" : "pending",
   };

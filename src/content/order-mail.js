@@ -28,6 +28,7 @@ export const orderMailText = {
     proof: "Send transfer receipt",
     proofMessage: "Hi Dragonet Divers, here is my transfer receipt for booking {code}.",
     paypalNote: "PayPal charges {usd}, the total in US dollars at the rate on your booking day.",
+    findUs: "Our dive center",
     help: "Questions about your booking?",
     helpText: "Reply to this email or write to {email}. We are happy to help.",
     chat: "Chat on WhatsApp",
@@ -41,6 +42,7 @@ export const orderMailText = {
         intro: "Thank you for booking with Dragonet Divers. Your booking is saved, and no payment has come in yet.",
         next: "Finish your payment before {due} to keep this booking.",
         transferNext: "Your booking is confirmed once your transfer reaches us. Please transfer before {due}.",
+        cashNext: "Your places are held. Pay {amount} in cash when you arrive at our dive center and show your booking code {code}. We confirm the booking as soon as you have paid.",
       },
       reminder: {
         subject: "No payment yet for booking {code}",
@@ -71,6 +73,7 @@ export const orderMailText = {
       akulaku: "Akulaku",
       kredivo: "Kredivo",
       paypal: "PayPal",
+      cash: "Cash",
     },
   },
   id: {
@@ -98,6 +101,7 @@ export const orderMailText = {
     proof: "Kirim bukti transfer",
     proofMessage: "Halo Dragonet Divers, ini bukti transfer untuk pesanan {code}.",
     paypalNote: "PayPal menagih {usd}, yaitu total dalam dolar AS dengan kurs pada hari kamu memesan.",
+    findUs: "Dive center kami",
     help: "Ada pertanyaan tentang pesananmu?",
     helpText: "Balas email ini atau kirim email ke {email}. Kami senang membantu.",
     chat: "Chat lewat WhatsApp",
@@ -111,6 +115,7 @@ export const orderMailText = {
         intro: "Terima kasih sudah memesan di Dragonet Divers. Pesananmu sudah tersimpan, dan belum ada pembayaran yang masuk.",
         next: "Selesaikan pembayaran sebelum {due} supaya pesanan ini tetap berlaku.",
         transferNext: "Pesananmu dikonfirmasi setelah transfer masuk. Transfer sebelum {due} ya.",
+        cashNext: "Tempatmu sudah kami tahan. Bayar {amount} tunai saat tiba di dive center kami dan tunjukkan kode pesanan {code}. Pesanan kami konfirmasi begitu pembayaran diterima.",
       },
       reminder: {
         subject: "Pembayaran pesanan {code} belum masuk",
@@ -141,6 +146,7 @@ export const orderMailText = {
       akulaku: "Akulaku",
       kredivo: "Kredivo",
       paypal: "PayPal",
+      cash: "Tunai",
     },
   },
 };

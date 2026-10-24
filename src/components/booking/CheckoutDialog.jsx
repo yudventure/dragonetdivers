@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { cartTotal, lineTotal } from "@/lib/cart";
-import { DIVE_SERVICES, MAX_ITEMS, paypalUsd } from "@/lib/checkout";
+import { DIVE_SERVICES, MANUAL_METHODS, MAX_ITEMS, paypalUsd } from "@/lib/checkout";
 import { formatMoney } from "@/lib/currency";
 import { format } from "@/lib/i18n";
 import { bookable, dayState, partySize, placesLeft } from "@/lib/slots";
+import { CopyButton } from "../checkout/OrderActions";
 import { useCurrency } from "../currency";
 import GuestStepper from "../GuestStepper";
 import { ArrowIcon, ChatIcon, CheckIcon, CloseIcon } from "../icons";
+import PhoneField from "./PhoneField";
 import { longDate, SlotMonth } from "./SlotCalendar";
 
 const FIELD = "h-12 w-full rounded-input border border-line-strong bg-white px-3 text-abyss outline-none focus:border-teal focus:ring-3 focus:ring-lagoon/40";
@@ -301,18 +303,13 @@ export default function CheckoutDialog({ dialogRef, lang, service, packages, ite
               </Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field id="checkout-whatsapp" label={t.whatsapp} required hint={t.whatsappHint}>
-                  <input
+                  <PhoneField
                     id="checkout-whatsapp"
-                    type="tel"
-                    required
-                    maxLength={32}
-                    autoComplete="tel"
-                    inputMode="tel"
-                    placeholder="+62"
+                    lang={lang}
                     value={fields.whatsapp}
-                    onChange={(e) => change("whatsapp", e.target.value)}
-                    className={FIELD}
-                    {...invalid("whatsapp")}
+                    onChange={(value) => change("whatsapp", value)}
+                    t={t.phone}
+                    invalid={invalid("whatsapp")}
                   />
                 </Field>
                 <Field id="checkout-email" label={t.email} required>
@@ -407,21 +404,48 @@ export default function CheckoutDialog({ dialogRef, lang, service, packages, ite
                     const info = t.methods[id];
                     const checked = method === id;
                     return (
-                      <label
+                      <div
                         key={id}
-                        className={`flex cursor-pointer gap-3 rounded-card p-4 ring-1 transition-colors duration-200 ease-brand ${
+                        data-method={id}
+                        className={`grid rounded-card ring-1 transition-colors duration-200 ease-brand ${
                           checked ? "bg-teal-wash ring-2 ring-teal" : "bg-white ring-mist hover:ring-line-strong"
                         }`}
                       >
-                        <input type="radio" name="method" value={id} checked={checked} onChange={() => setMethod(id)} disabled={busy} className="mt-1 size-4 accent-teal" />
-                        <span className="grid gap-0.5">
-                          <span className="flex flex-wrap items-center gap-2 font-semibold text-abyss">
-                            {info.title}
-                            {sandbox && <span className="rounded-full bg-sunrise-wash px-2 py-0.5 text-[10px] font-bold tracking-wide text-ember uppercase">{t.sandbox}</span>}
+                        <label className="flex cursor-pointer gap-3 p-4">
+                          <input type="radio" name="method" value={id} checked={checked} onChange={() => setMethod(id)} disabled={busy} className="mt-1 size-4 accent-teal" />
+                          <span className="grid gap-0.5">
+                            <span className="flex flex-wrap items-center gap-2 font-semibold text-abyss">
+                              {info.title}
+                              {sandbox && <span className="rounded-full bg-sunrise-wash px-2 py-0.5 text-[10px] font-bold tracking-wide text-ember uppercase">{t.sandbox}</span>}
+                            </span>
+                            <span className="text-sm text-slate">{format(info.text, { usd: paypalText, hours: payments.dueHours })}</span>
                           </span>
-                          <span className="text-sm text-slate">{format(info.text, { usd: paypalText, hours: payments.dueHours })}</span>
-                        </span>
-                      </label>
+                        </label>
+                        {/* Transfer: rekening langsung terlihat begitu dipilih. Tunai: jumlah yang perlu disiapkan. */}
+                        {checked && id === "transfer" && payments.accounts?.length > 0 && (
+                          <div className="grid gap-2 px-4 pb-4 sm:pl-11">
+                            <p className="text-xs font-bold tracking-[0.12em] text-slate uppercase">{t.transferTo}</p>
+                            <ul className="grid gap-2">
+                              {payments.accounts.map((account) => (
+                                <li key={account.number} className="flex flex-wrap items-center justify-between gap-3 rounded-input bg-white p-3 ring-1 ring-mist">
+                                  <span className="grid gap-0.5">
+                                    <span className="text-xs font-bold tracking-[0.12em] text-slate uppercase">
+                                      {t.bank} {account.bank}
+                                    </span>
+                                    <span className="font-display text-lg font-semibold text-abyss tabular-nums">{account.number}</span>
+                                    <span className="text-sm text-slate">
+                                      {t.accountHolder} <span className="font-semibold text-abyss">{account.holder}</span>
+                                    </span>
+                                  </span>
+                                  <CopyButton value={account.number} label={t.copy} done={t.copied} />
+                                </li>
+                              ))}
+                            </ul>
+                            <p className="text-sm text-slate">{t.transferNote}</p>
+                          </div>
+                        )}
+                        {checked && id === "cash" && <p className="px-4 pb-4 text-sm font-semibold text-abyss sm:pl-11">{format(t.cashNote, { amount: money(total) })}</p>}
+                      </div>
                     );
                   })}
                 </div>
@@ -430,13 +454,15 @@ export default function CheckoutDialog({ dialogRef, lang, service, packages, ite
 
             {errorBox}
             <button type="button" onClick={pay} disabled={busy || payments.methods.length === 0} className={SOLID}>
-              {busy ? t.working : method === "transfer" ? t.placeOrder : format(t.pay, { amount: method === "paypal" && usd ? paypalText : money(total) })}
-              {!busy && <ArrowIcon className="size-[18px] -rotate-45" />}
+              {busy ? (MANUAL_METHODS.includes(method) ? t.saving : t.working) : MANUAL_METHODS.includes(method) ? t.placeOrder : format(t.pay, { amount: method === "paypal" && usd ? paypalText : money(total) })}
+              {!busy && <ArrowIcon className={`size-[18px] ${MANUAL_METHODS.includes(method) ? "" : "-rotate-45"}`} />}
             </button>
-            <p className="flex gap-2 text-xs text-slate">
-              <CheckIcon className="mt-px size-4 shrink-0 text-teal" />
-              {t.secure}
-            </p>
+            {payments.methods.some(({ id }) => !MANUAL_METHODS.includes(id)) && (
+              <p className="flex gap-2 text-xs text-slate">
+                <CheckIcon className="mt-px size-4 shrink-0 text-teal" />
+                {t.secure}
+              </p>
+            )}
             <button
               type="button"
               disabled={busy}

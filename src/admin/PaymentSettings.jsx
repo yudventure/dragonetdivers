@@ -57,7 +57,7 @@ function TestButton({ provider }) {
   );
 }
 
-// Pengaturan /admin/pembayaran: tiga cara bayar dengan syaratnya masing-masing, rekening transfer,
+// Pengaturan /admin/pembayaran: empat cara bayar dengan syaratnya masing-masing, rekening transfer,
 // dan batas waktu bayar. Disimpan lewat /api/admin/payments (validatePayments di src/lib/checkout.js).
 export default function PaymentSettings({ initial, status, providers, rate }) {
   const router = useRouter();
@@ -168,10 +168,18 @@ export default function PaymentSettings({ initial, status, providers, rate }) {
         </div>
       </Method>
 
+      <Method title="Tunai di dive center" checked={value.cash} onChange={(cash) => set({ cash })} ready>
+        <p className="text-sm text-slate">
+          Tamu memesan sekarang dan membayar tunai saat tiba. Tempatnya ditahan tanpa batas waktu bayar, dan halaman pesanannya menampilkan
+          alamat dari Kontak. Setelah uangnya diterima, tekan Tunai diterima di Pesanan supaya pesanan lunas dan tamu mendapat email pembayaran
+          diterima. Pesanan yang tidak jadi dibatalkan di sana juga.
+        </p>
+      </Method>
+
       <section className="grid gap-3 rounded-card bg-white p-5 ring-1 ring-mist">
         <h2 className="text-xl text-abyss">Batas waktu bayar</h2>
         <label className="grid max-w-xs gap-1.5 text-sm font-semibold text-abyss">
-          Pesanan ditutup bila belum dibayar setelah
+          Pesanan online dan transfer ditutup bila belum dibayar setelah
           <select value={value.dueHours} onChange={(e) => set({ dueHours: Number(e.target.value) })} className={INPUT}>
             {DUE_HOURS.map((h) => (
               <option key={h} value={h}>

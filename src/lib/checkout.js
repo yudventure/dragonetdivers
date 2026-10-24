@@ -1,9 +1,11 @@
 // Checkout paket: isian tamu, harga, cara bayar, dan perubahan status pembayaran. Murni (tanpa
 // Next.js atau database) supaya bisa diuji (tests/checkout.test.js). Alur dan aturan statusnya
 // mengikuti checkout Zanclus: tamu membayar penuh; Midtrans dan PayPal dikonfirmasi oleh
-// penyedianya, transfer bank ditandai lunas oleh tim di /admin/pesanan.
+// penyedianya, transfer bank dan tunai di dive center ditandai lunas oleh tim di /admin/pesanan.
 
-export const METHODS = ["midtrans", "paypal", "transfer"];
+export const METHODS = ["midtrans", "paypal", "transfer", "cash"];
+/** Cara bayar yang ditandai lunas oleh tim (bukan oleh penyedia pembayaran). */
+export const MANUAL_METHODS = ["transfer", "cash"];
 export const UNITS = ["person", "group"];
 export const STATUSES = ["pending", "paid", "expired", "failed", "cancelled", "refunded"];
 export const OPEN = "pending";
@@ -15,7 +17,8 @@ export const CERTIFICATIONS = ["none", "open_water", "advanced", "rescue", "pro"
 /** Layanan selam: checkout menanyakan sertifikasi. */
 export const DIVE_SERVICES = ["fun-dives", "dive-courses", "dusk-dives"];
 
-export const DEFAULT_PAYMENTS = { midtrans: false, paypal: false, transfer: false, accounts: [], dueHours: 24 };
+// Tunai di dive center menyala sejak awal (permintaan pemilik, Oktober 2026); cara lain dinyalakan tim.
+export const DEFAULT_PAYMENTS = { midtrans: false, paypal: false, transfer: false, cash: true, accounts: [], dueHours: 24 };
 
 /** Paket paling banyak dalam satu pesanan (keranjang). */
 export const MAX_ITEMS = 10;
@@ -231,5 +234,6 @@ export function validatePayments(input) {
     if (!/^[\d\s.-]{5,30}$/.test(a.number)) throw new Error("Nomor rekening hanya angka, spasi, titik, atau strip.");
   }
   const dueHours = DUE_HOURS.includes(Number(input.dueHours)) ? Number(input.dueHours) : DEFAULT_PAYMENTS.dueHours;
-  return { midtrans: input.midtrans === true, paypal: input.paypal === true, transfer: input.transfer === true, accounts, dueHours };
+  // Simpanan lama tanpa kunci cash ikut menyalakan tunai, seperti bawaannya.
+  return { midtrans: input.midtrans === true, paypal: input.paypal === true, transfer: input.transfer === true, cash: input.cash !== false, accounts, dueHours };
 }

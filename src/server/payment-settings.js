@@ -25,7 +25,7 @@ export async function savePayments(value) {
 
 /**
  * Kesiapan tiap cara bayar: dinyalakan di admin, key ada di hPanel (Midtrans tanpa salah isi),
- * kurs tersedia untuk PayPal, dan ada rekening untuk transfer.
+ * kurs tersedia untuk PayPal, dan ada rekening untuk transfer. Tunai cukup dinyalakan.
  */
 export function methodStatus(settings, rate) {
   const midtransKeys = midtransConfigured() && midtransIssues().length === 0;
@@ -33,8 +33,9 @@ export function methodStatus(settings, rate) {
     midtrans: { on: settings.midtrans, keys: midtransKeys, ready: settings.midtrans && midtransKeys, sandbox: !midtransProduction() },
     paypal: { on: settings.paypal, keys: paypalConfigured(), rate: Boolean(rate), ready: settings.paypal && paypalConfigured() && Boolean(rate), sandbox: !paypalLive() },
     transfer: { on: settings.transfer, accounts: settings.accounts.length, ready: settings.transfer && settings.accounts.length > 0 },
+    cash: { on: settings.cash, ready: settings.cash },
   };
 }
 
 /** Cara bayar yang ditawarkan di checkout, urut seperti di formulir. */
-export const readyMethods = (status) => ["midtrans", "paypal", "transfer"].filter((m) => status[m].ready);
+export const readyMethods = (status) => ["midtrans", "paypal", "transfer", "cash"].filter((m) => status[m].ready);

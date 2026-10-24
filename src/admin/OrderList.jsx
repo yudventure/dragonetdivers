@@ -11,7 +11,12 @@ const STATUS = {
   cancelled: ["Dibatalkan", "bg-mist text-slate"],
   refunded: ["Dikembalikan", "bg-teal-soft text-teal"],
 };
-const METHOD = { midtrans: "Midtrans", paypal: "PayPal", transfer: "Transfer bank" };
+const METHOD = { midtrans: "Midtrans", paypal: "PayPal", transfer: "Transfer bank", cash: "Tunai di tempat" };
+// Ditandai lunas oleh tim: label tombol dan pertanyaan konfirmasinya.
+const CONFIRM = {
+  transfer: ["Tandai lunas", (o) => `Tandai ${o.code} lunas? Pastikan transfer ${rupiah(o.amount)} sudah masuk ke rekening.`],
+  cash: ["Tunai diterima", (o) => `Tandai ${o.code} lunas? Pastikan uang tunai ${rupiah(o.amount)} sudah diterima dari ${o.name}.`],
+};
 const CERT = { none: "Belum bersertifikat", open_water: "Open Water", advanced: "Advanced", rescue: "Rescue", pro: "Divemaster+" };
 const SERVICE = { "fun-dives": "Fun dive", "dive-courses": "Kursus selam", snorkeling: "Snorkeling", "island-trips": "Trip pulau", "dusk-dives": "Dusk dive" };
 
@@ -51,7 +56,7 @@ function MailLine({ log = {} }) {
   );
 }
 
-/** Tombol tindakan pesanan: tandai transfer lunas, batalkan, cek status ke penyedia, atau kirim email. */
+/** Tombol tindakan pesanan: tandai transfer atau tunai lunas, batalkan, cek status ke penyedia, atau kirim email. */
 function Actions({ order }) {
   const router = useRouter();
   const [busy, setBusy] = useState("");
@@ -72,20 +77,23 @@ function Actions({ order }) {
   };
   const button = "inline-flex h-9 items-center rounded-full px-4 text-sm font-bold transition-colors duration-200 ease-brand disabled:opacity-50";
   const open = order.status === "pending";
+  const manual = CONFIRM[order.method];
+  // Tunai tidak punya batas waktu bayar, jadi tanpa email pengingat; yang bisa dikirim ulang email pesanannya.
+  const reminder = order.method === "cash" ? "order" : "reminder";
   return (
     <div className="grid justify-items-start gap-2 lg:justify-items-end">
       <div className="flex flex-wrap gap-2">
-        {open && order.method === "transfer" && (
+        {open && manual && (
           <button
             type="button"
             disabled={Boolean(busy)}
-            onClick={() => run("paid", `Tandai ${order.code} lunas? Pastikan transfer ${rupiah(order.amount)} sudah masuk ke rekening.`)}
+            onClick={() => run("paid", manual[1](order))}
             className={`${button} bg-teal text-white hover:bg-teal-dark`}
           >
-            {busy === "paid" ? "Menyimpan…" : "Tandai lunas"}
+            {busy === "paid" ? "Menyimpan…" : manual[0]}
           </button>
         )}
-        {(open || order.status === "expired") && order.method !== "transfer" && (
+        {(open || order.status === "expired") && !manual && (
           <button type="button" disabled={Boolean(busy)} onClick={() => run("refresh")} className={`${button} text-teal ring-1 ring-teal hover:bg-teal-soft`}>
             {busy === "refresh" ? "Mengecek…" : "Cek status"}
           </button>
@@ -96,12 +104,12 @@ function Actions({ order }) {
             disabled={Boolean(busy)}
             onClick={() =>
               open
-                ? run("mail", `Kirim email pengingat bayar ke ${order.email}?`, "reminder")
+                ? run("mail", reminder === "order" ? `Kirim ulang email pesanan ke ${order.email}?` : `Kirim email pengingat bayar ke ${order.email}?`, reminder)
                 : run("mail", `Kirim ulang email pembayaran diterima ke ${order.email}?`, "paid")
             }
             className={`${button} text-teal ring-1 ring-mist hover:bg-teal-soft`}
           >
-            {busy === "mail" ? "Mengirim…" : open ? "Email pengingat" : "Kirim ulang email lunas"}
+            {busy === "mail" ? "Mengirim…" : open ? (reminder === "order" ? "Kirim ulang email pesanan" : "Email pengingat") : "Kirim ulang email lunas"}
           </button>
         )}
         {open && (
