@@ -15,7 +15,11 @@ import { HeroConditions } from "./SeaConditionsPanel";
 // ada di seksi Services; data dari Open-Meteo lewat src/server/sea-conditions.js). Teks di atas gradasi Abyss
 // (BRANDING.md §9.2). Hero ditarik ke belakang header yang transparan (64 px di ponsel, 72 px dari 640 px,
 // ditambah garis bawah header 1 px); header berganti ke warna untuk latar gelap (SiteHeader overlay).
-// Desktop: selalu setinggi layar. Ponsel dan tablet: kondisi laut di bawah video. conditionsLocked = bagian
+// Setinggi layar di semua perangkat (permintaan pemilik, Oktober 2026: "full layar di setiap jenis HP"):
+// 100svh = tinggi layar saat bilah alamat peramban tampil, jadi hero pas memenuhi layar begitu dibuka di
+// iPhone maupun Android dan tidak melompat saat bilah alamat menyusut. Minimal 520 px (640 px di desktop)
+// supaya judul tetap muat di ponsel yang dimiringkan. Ponsel dan tablet: kondisi laut di bawah video
+// (terlihat setelah digulir). conditionsLocked = bagian
 // "conditions" ditutup mode developer, kartunya tidak ditampilkan. "\n" di teks judul (src/content/ui.js) = pindah baris.
 export default async function HomeHero({ lang, conditionsLocked = false }) {
   preload(poster.src, { as: "image", fetchPriority: "high" });
@@ -25,7 +29,7 @@ export default async function HomeHero({ lang, conditionsLocked = false }) {
   const leadLines = titleLead.split("\n");
   return (
     <section className="relative isolate -mt-[65px] bg-white sm:-mt-[73px]" aria-labelledby="hero-title">
-      <div className="relative isolate h-[min(84svh,720px)] min-h-[520px] overflow-hidden bg-abyss lg:h-[max(640px,100svh)]">
+      <div className="relative isolate h-[max(520px,100svh)] overflow-hidden bg-abyss lg:h-[max(640px,100svh)]">
         {/* Manta mulai kecil di kiri; di layar tegak potongan video digeser ke kiri supaya manta tetap terlihat. */}
         <LoopVideo
           sources={[
