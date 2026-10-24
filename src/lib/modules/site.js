@@ -5,7 +5,7 @@ import { parseVideoUrl } from "../video-embed.js";
 import { RecordError } from "../records.js";
 
 export const SIZES = [
-  ["auto", "Otomatis (foto kecil, video tegak tinggi, video lain lebar)"],
+  ["auto", "Otomatis (mengikuti susunan mosaik beranda)"],
   ["small", "Kecil (1×1)"],
   ["wide", "Lebar (2×1)"],
   ["tall", "Tinggi (1×2), cocok untuk Shorts, TikTok, Reels"],
@@ -40,8 +40,8 @@ export const galleryItem = {
 
 /** Item galeri tersimpan → bentuk item galeri beranda (src/content/gallery.js). */
 export function toGalleryItem(r) {
-  // "auto": foto kecil; video dipilih Gallery.jsx (tegak = tinggi, lainnya lebar).
-  const size = r.size !== "auto" && SIZES.some(([k]) => k === r.size) ? r.size : r.type === "photo" ? "small" : undefined;
+  // "auto": ukuran ditentukan susunan mosaik beranda menurut posisinya (src/lib/gallery-layout.js).
+  const size = r.size !== "auto" && SIZES.some(([k]) => k === r.size) ? r.size : undefined;
   if (r.type === "photo") {
     const image = { src: `/api/media/${r.mediaId}`, width: r.width || 1600, height: r.height || 1200, blurDataURL: r.blur };
     return { type: "photo", image, alt: { en: r.captionEn, id: r.captionId }, size };
