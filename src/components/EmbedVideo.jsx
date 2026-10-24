@@ -2,9 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { format } from "@/lib/i18n";
+import { isTikTokOrigin, isTikTokPlaying, readTikTokEvent, TIKTOK_STATE, tiktokReaction } from "@/lib/video-embed";
 import { FacebookIcon, InstagramIcon, PlayIcon, TikTokIcon, YouTubeIcon } from "./icons";
 
 const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: InstagramIcon, facebook: FacebookIcon };
+// TikTok yang belum berjalan selama ini setelah iframe-nya termuat dianggap ditolak peramban, lalu
+// dimuat ulang dengan tombol putar.
+const STALL_MS = 8000;
+// Berapa kali TikTok yang dijeda peramban diputar lagi sebelum dibiarkan.
+const MAX_RESUMES = 3;
 
 // Video YouTube, TikTok, Instagram, atau Facebook di galeri. Supaya halaman tetap ringan, player pihak
 // ketiga baru dimuat saat petaknya setidaknya separuh terlihat, lalu dilepas lagi begitu keluar layar
@@ -12,11 +18,16 @@ const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: In
 // jalan tanpa suara dan tanpa tombol, seperti latar bergerak; tombol platform di pojok membuka video
 // aslinya dengan suara. Instagram, atau saat "kurangi animasi"/hemat data aktif, diputar saat diketuk.
 // Ukuran player menutupi petak seperti object-cover (satuan cq dari petak).
+// TikTok dikendalikan lewat postMessage (lihat tiktokReaction di src/lib/video-embed.js): dibisukan dan
+// diputar begitu siap, diulang dari awal bila habis. Bila tetap tidak berjalan dalam STALL_MS, player
+// dimuat ulang dengan tombol putar TikTok dan bisa disentuh, jadi petaknya tidak pernah diam mati.
 export default function EmbedVideo({ video, title, t }) {
   const ref = useRef(null);
+  const frame = useRef(null);
   const [inView, setInView] = useState(false);
   const [auto, setAuto] = useState(false);
   const [tapped, setTapped] = useState(false);
+  const [stalled, setStalled] = useState(false);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -37,9 +48,49 @@ export default function EmbedVideo({ video, title, t }) {
   }, [video.autoplay]);
 
   const live = (inView && auto) || tapped;
-  const interactive = tapped || !video.autoplay;
+  const interactive = tapped || stalled || !video.autoplay;
+  const src = (tapped || stalled) && video.embedControls ? video.embedControls : video.embed;
+  const tiktok = video.platform === "tiktok";
   const Icon = PLATFORM_ICONS[video.platform];
   const ratio = video.vertical ? 9 / 16 : 16 / 9;
+
+  useEffect(() => {
+    const iframe = frame.current;
+    if (!live || !tiktok || !iframe) return;
+    const send = (commands) => commands.forEach((command) => iframe.contentWindow?.postMessage(command, "*"));
+    let playing = false;
+    let resumes = 0;
+    let timer;
+    const watch = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (playing) return;
+        if (document.hidden) return watch(); // tab di belakang memang tidak memutar video
+        setStalled(true);
+      }, STALL_MS);
+    };
+    const onMessage = (e) => {
+      if (!isTikTokOrigin(e.origin) || e.source !== iframe.contentWindow) return;
+      const event = readTikTokEvent(e.data);
+      if (!event) return;
+      if (isTikTokPlaying(event)) playing = true;
+      const paused = event.type === "onStateChange" && Number(event.value) === TIKTOK_STATE.paused;
+      if (paused && !interactive && ++resumes > MAX_RESUMES) return;
+      send(tiktokReaction(event, { interactive }));
+    };
+    // Cadangan bila onPlayerReady terlewat: perintah yang sama saat iframe termuat (diabaikan bila player belum siap).
+    const onLoad = () => {
+      send(tiktokReaction({ type: "onPlayerReady" }));
+      if (!interactive) watch();
+    };
+    window.addEventListener("message", onMessage);
+    iframe.addEventListener("load", onLoad);
+    return () => {
+      window.removeEventListener("message", onMessage);
+      iframe.removeEventListener("load", onLoad);
+      clearTimeout(timer);
+    };
+  }, [live, tiktok, interactive, src]);
 
   return (
     <div ref={ref} className="relative size-full overflow-hidden bg-abyss [container-type:size]">
@@ -52,7 +103,9 @@ export default function EmbedVideo({ video, title, t }) {
 
       {live && (
         <iframe
-          src={video.embed}
+          key={src}
+          ref={frame}
+          src={src}
           title={title}
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
