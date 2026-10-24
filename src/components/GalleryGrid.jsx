@@ -14,6 +14,11 @@ const SIZES = {
   big: "col-span-2 row-span-2",
 };
 
+// Beranda menampilkan 12 item dulu (sisanya lewat tombol), jadi galeri yang diisi puluhan foto lewat
+// /admin/situs tidak memperlambat halaman; penampil layar penuh tetap bisa berpindah ke semua foto.
+const FIRST = 12;
+const MORE = 12;
+
 const tileSizes = (size) => (size === "big" || size === "wide" ? "(min-width: 768px) 600px, 100vw" : "(min-width: 768px) 300px, 50vw");
 
 // Kisi galeri gaya bento (grid-flow-dense mengisi celah) + penampil foto layar penuh. Penampil memakai
@@ -23,6 +28,7 @@ const tileSizes = (size) => (size === "big" || size === "wide" ? "(min-width: 76
 export default function GalleryGrid({ items, t }) {
   const photos = items.filter((item) => item.type === "photo");
   const [open, setOpen] = useState(null);
+  const [limit, setLimit] = useState(FIRST);
   const dialog = useRef(null);
   const isOpen = open != null;
 
@@ -48,7 +54,7 @@ export default function GalleryGrid({ items, t }) {
   return (
     <>
       <ul className="grid auto-rows-[44vw] grid-cols-2 gap-3 [grid-auto-flow:dense] sm:auto-rows-[200px] md:grid-cols-4 md:gap-4 md:auto-rows-[190px] lg:auto-rows-[220px]">
-        {items.map((item, i) => (
+        {items.slice(0, limit).map((item, i) => (
           <li key={item.url ?? item.alt ?? item.title ?? i} className={`relative overflow-hidden rounded-card bg-foam ${SIZES[item.size] ?? ""}`}>
             {item.type === "photo" && (
               <button
@@ -73,6 +79,15 @@ export default function GalleryGrid({ items, t }) {
           </li>
         ))}
       </ul>
+      {items.length > limit && (
+        <button
+          type="button"
+          onClick={() => setLimit((n) => n + MORE)}
+          className="justify-self-center rounded-full border-[1.5px] border-teal px-6 py-3 font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal-soft"
+        >
+          {format(t.more, { count: Math.min(MORE, items.length - limit) })}
+        </button>
+      )}
 
       <dialog
         ref={dialog}
