@@ -2,8 +2,10 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { query } from "./db";
 
-// Foto unggahan tim (tabel media, migrasi 006), dipakai galeri beranda. Diperkecil dengan sharp (ikut
-// terpasang bersama Next.js) ke WebP paling lebar 2400 px, plus gambar buram kecil untuk placeholder.
+// Foto unggahan tim (tabel media, migrasi 006), dipakai galeri beranda. Peramban admin sudah memperkecil
+// foto sebelum dikirim (src/lib/image-prep.js); di sini diolah lagi dengan sharp (ikut terpasang bersama
+// Next.js) ke WebP paling lebar 2400 px, plus gambar buram kecil untuk placeholder. Foto diolah satu per
+// satu (antrean per proses) supaya unggah banyak foto sekaligus tidak menghabiskan memori hosting.
 // Tanpa sharp, JPEG/PNG/WebP sampai 4 MB disimpan apa adanya.
 
 export const MAX_UPLOAD = 15 * 1024 * 1024;
@@ -26,6 +28,14 @@ const sharpLibrary = () => {
 
 export class MediaError extends Error {}
 
+// Antrean pengolahan: satu foto diolah sharp pada satu waktu di proses ini.
+let queue = Promise.resolve();
+function oneAtATime(task) {
+  const run = queue.then(task, task);
+  queue = run.catch(() => {});
+  return run;
+}
+
 /** Simpan satu file gambar; mengembalikan { id, width, height, blur }. */
 export async function saveImage(file) {
   if (!file || typeof file.arrayBuffer !== "function") throw new MediaError("Pilih file foto.");
@@ -40,14 +50,13 @@ export async function saveImage(file) {
   let blur = null;
   if (sharp) {
     try {
-      const image = sharp(input, { failOn: "error" }).rotate().resize({ width: 2400, height: 2400, fit: "inside", withoutEnlargement: true });
-      const result = await image.webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
-      data = result.data;
+      ({ data, width, height, blur } = await oneAtATime(async () => {
+        const image = sharp(input, { failOn: "error", limitInputPixels: 120_000_000 }).rotate().resize({ width: 2400, height: 2400, fit: "inside", withoutEnlargement: true });
+        const result = await image.webp({ quality: 80 }).toBuffer({ resolveWithObject: true });
+        const tiny = await sharp(result.data).resize(16, 16, { fit: "inside" }).webp({ quality: 40 }).toBuffer();
+        return { data: result.data, width: result.info.width, height: result.info.height, blur: `data:image/webp;base64,${tiny.toString("base64")}` };
+      }));
       mime = "image/webp";
-      width = result.info.width;
-      height = result.info.height;
-      const tiny = await sharp(data).resize(16, 16, { fit: "inside" }).webp({ quality: 40 }).toBuffer();
-      blur = `data:image/webp;base64,${tiny.toString("base64")}`;
     } catch {
       throw new MediaError("File ini tidak bisa dibaca sebagai foto.");
     }
@@ -74,3 +83,5 @@ export async function imageInfo(ids) {
 }
 
 export const deleteImage = (id) => query("DELETE FROM media WHERE id = ?", [id]);
+
+export const isMediaId = (id) => typeof id === "string" && /^[a-f0-9]{24}$/.test(id);

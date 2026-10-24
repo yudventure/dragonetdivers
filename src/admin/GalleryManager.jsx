@@ -3,12 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowIcon, CheckIcon, EyeIcon, EyeOffIcon, ImageIcon, PlayIcon, TrashIcon, UploadIcon } from "@/components/icons";
+import { prepareImage } from "@/lib/image-prep";
 import { PHOTO_RULES, photoAdvice, TILE_GUIDE, tileFor, VIDEO_GUIDE } from "@/lib/media-guide";
 import { SIZES } from "@/lib/modules/site";
 import { parseVideoUrl } from "@/lib/video-embed";
+import BulkPhotoUpload from "./BulkPhotoUpload";
 import { INPUT, removeRecord } from "./RecordManager";
+import { thumbUrl, uploadPhoto } from "./upload";
 
-const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
+const ACCEPT = "image/*,.heic,.heif";
 const BOX = "rounded-card bg-white ring-1 ring-mist shadow-[0_1px_2px_rgb(10_50_59/0.05)]";
 const SOLID = "inline-flex h-11 items-center justify-center gap-2 rounded-full bg-teal px-5 font-bold text-white hover:bg-teal-dark disabled:bg-mist disabled:text-slate";
 const OUTLINE = "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 font-bold text-teal ring-1 ring-teal hover:bg-teal-soft";
@@ -43,15 +46,6 @@ function Thumb({ src, alt = "", video = false, className = "size-full object-cov
   }
   return <img src={src} alt={alt} className={className} loading="lazy" onError={() => setFailed(true)} />;
 }
-
-/** Ukuran asli foto yang dipilih (dibaca di peramban sebelum diunggah). */
-const measure = (url) =>
-  new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    img.onerror = () => resolve(null);
-    img.src = url;
-  });
 
 function MiniGrid({ size }) {
   const cells = CELLS[size] ?? [];
@@ -183,7 +177,7 @@ function PhotoDrop({ busy, onFile }) {
 }
 
 /** Tampilan petak di beranda: foto atau gambar video dipotong mengikuti bentuk petaknya. */
-function TilePreview({ src, tile, video, busy }) {
+function TilePreview({ src, tile, video, busy, progress = 0 }) {
   const g = TILE_GUIDE[tile];
   return (
     <figure className="grid gap-2">
@@ -199,7 +193,7 @@ function TilePreview({ src, tile, video, busy }) {
             </span>
           </span>
         )}
-        {busy && <span className="absolute inset-0 grid place-items-center bg-white/70 text-sm font-bold text-teal">Mengunggah…</span>}
+        {busy && <span className="absolute inset-0 grid place-items-center bg-white/70 text-sm font-bold text-teal">Mengunggah {Math.round(progress * 100)}%</span>}
       </div>
       <figcaption className="text-center text-xs text-slate">Tampilan di beranda, petak {g.label}</figcaption>
     </figure>
@@ -211,6 +205,7 @@ function ItemForm({ initial, onDone, onCancel }) {
   const [value, setValue] = useState(initial);
   const [local, setLocal] = useState(null); // { url, width, height } foto yang baru dipilih
   const [busy, setBusy] = useState("");
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const form = useRef(null);
   const set = (key, v) => setValue((current) => ({ ...current, [key]: v }));
@@ -223,21 +218,26 @@ function ItemForm({ initial, onDone, onCancel }) {
   const dims = local ?? (value.mediaId && initial.mediaId === value.mediaId ? { width: initial.width, height: initial.height } : null);
   const advice = value.type === "photo" && dims ? photoAdvice(dims, value.size) : null;
 
+  // Foto diperkecil di peramban lalu diunggah dengan coba ulang otomatis (src/lib/image-prep.js, ./upload.js).
   async function upload(file) {
     setError("");
-    const url = URL.createObjectURL(file);
-    const size = await measure(url);
-    setLocal({ url, ...(size ?? {}) });
     setBusy("upload");
-    const body = new FormData();
-    body.append("file", file);
-    const response = await fetch("/api/admin/media", { method: "POST", body });
-    const result = await response.json().catch(() => ({}));
-    setBusy("");
-    if (!response.ok) {
-      setError(result.error || "Foto belum terunggah. Coba lagi.");
+    setProgress(0);
+    const ready = await prepareImage(file);
+    if (ready.error) {
+      setBusy("");
+      return setError(ready.error);
+    }
+    setLocal({ url: URL.createObjectURL(ready.file), width: ready.width, height: ready.height });
+    try {
+      const saved = await uploadPhoto(ready.file, { onProgress: setProgress });
+      set("mediaId", saved.id);
+    } catch (e) {
+      setError(e.message);
       setLocal(null);
-    } else set("mediaId", result.id);
+    } finally {
+      setBusy("");
+    }
   }
 
   async function save(event) {
@@ -279,7 +279,7 @@ function ItemForm({ initial, onDone, onCancel }) {
           {value.type === "photo" ? (
             photoSrc ? (
               <div className="grid gap-3">
-                <TilePreview src={photoSrc} tile={tile} busy={busy === "upload"} />
+                <TilePreview src={photoSrc} tile={tile} busy={busy === "upload"} progress={progress} />
                 {advice && (
                   <p className={`rounded-input px-3 py-2 text-sm font-semibold ${ADVICE_TONE[advice.level]}`}>
                     {advice.message}
@@ -414,11 +414,13 @@ function PhotoDropButton({ busy, onFile }) {
   );
 }
 
-// Galeri beranda /admin/situs: unggah foto dengan pratinjau petak dan cek resolusi, tempel tautan video,
-// atur urutan dengan tombol naik turun, dan tampilkan atau sembunyikan tanpa menghapus.
+// Galeri beranda /admin/situs: unggah banyak foto sekaligus (BulkPhotoUpload), ubah satu item dengan
+// pratinjau petak dan cek resolusi, tempel tautan video, atur urutan dengan tombol naik turun, dan
+// tampilkan atau sembunyikan tanpa menghapus.
 export default function GalleryManager({ items }) {
   const router = useRouter();
   const [editing, setEditing] = useState(null);
+  const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const shown = items.filter((item) => item.active).length;
@@ -465,11 +467,25 @@ export default function GalleryManager({ items }) {
           ))}
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setEditing(blank("photo"))} className={SOLID}>
+          <button
+            type="button"
+            onClick={() => {
+              setEditing(null);
+              setAdding(true);
+            }}
+            className={SOLID}
+          >
             <UploadIcon className="size-[18px]" />
             Tambah foto
           </button>
-          <button type="button" onClick={() => setEditing(blank("embed"))} className={OUTLINE}>
+          <button
+            type="button"
+            onClick={() => {
+              setAdding(false);
+              setEditing(blank("embed"));
+            }}
+            className={OUTLINE}
+          >
             <PlayIcon className="size-[18px]" />
             Tambah video
           </button>
@@ -485,6 +501,16 @@ export default function GalleryManager({ items }) {
         <p role="alert" className="rounded-input bg-danger/10 px-3 py-2 text-sm font-semibold text-danger">
           {error}
         </p>
+      )}
+      {adding && (
+        <BulkPhotoUpload
+          minOrder={Math.min(0, ...items.map((item) => item.order ?? 0))}
+          onDone={({ keepOpen } = {}) => {
+            if (!keepOpen) setAdding(false);
+            router.refresh();
+          }}
+          onCancel={() => setAdding(false)}
+        />
       )}
       {editing && <ItemForm key={editing.id ?? `new-${editing.type}`} initial={editing} onDone={done} onCancel={() => setEditing(null)} />}
 
@@ -502,7 +528,8 @@ export default function GalleryManager({ items }) {
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((item, index) => {
             const video = item.type === "embed" ? parseVideoUrl(item.url) : null;
-            const src = item.type === "photo" ? `/api/media/${item.mediaId}` : video?.thumbnail;
+            // Foto ditampilkan lewat pengecil gambar Next.js (640 px), bukan file 2400 px utuh.
+            const src = item.type === "photo" ? thumbUrl(`/api/media/${item.mediaId}`) : video?.thumbnail;
             const tile = tileFor(item.size, { type: item.type, vertical: Boolean(video?.vertical) });
             return (
               <li key={item.id} className={`flex min-w-0 flex-col overflow-hidden ${BOX} ${item.active ? "" : "opacity-75"}`}>
@@ -525,7 +552,14 @@ export default function GalleryManager({ items }) {
                   {item.type === "photo" && item.width && <p className="text-xs text-slate tabular-nums">{`${item.width} × ${item.height} px`}</p>}
                 </div>
                 <div className="mt-auto flex items-center gap-1 border-t border-mist p-2">
-                  <button type="button" onClick={() => setEditing(item)} className="inline-flex h-9 items-center rounded-full px-3 text-sm font-bold text-teal hover:bg-teal-soft">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdding(false);
+                      setEditing(item);
+                    }}
+                    className="inline-flex h-9 items-center rounded-full px-3 text-sm font-bold text-teal hover:bg-teal-soft"
+                  >
                     Ubah
                   </button>
                   <button
