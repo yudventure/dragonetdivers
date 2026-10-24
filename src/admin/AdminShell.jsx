@@ -32,7 +32,7 @@ const MENU = [
     items: [
       { key: "paket", label: "Paket & harga", icon: TagIcon, href: "/admin/paket" },
       { key: "situs", label: "Galeri foto & video", icon: GlobeIcon, href: "/admin/situs" },
-      { key: "kontak", label: "Kontak & media sosial", icon: GlobeIcon, href: "/admin/kontak" },
+      { key: "kontak", label: "Kontak, sosial & mata uang", icon: GlobeIcon, href: "/admin/kontak" },
     ],
   },
   {

@@ -17,7 +17,7 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
       id: "whatsapp",
       label: "Nomor WhatsApp booking",
       done: whatsapp,
-      hint: "Isi di Situs web, Kontak & media sosial. Tombol Book a dive dan WhatsApp langsung muncul.",
+      hint: "Isi di Situs web, Kontak, sosial & mata uang. Tombol Book a dive dan WhatsApp langsung muncul.",
       href: "/admin/kontak",
     },
     {
@@ -36,7 +36,7 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
       id: "social",
       label: "Akun media sosial di footer",
       done: socials > 0,
-      hint: "Isi akun Instagram, TikTok, Facebook, atau YouTube di Situs web, Kontak & media sosial.",
+      hint: "Isi akun Instagram, TikTok, Facebook, atau YouTube di Situs web, Kontak, sosial & mata uang.",
       href: "/admin/kontak",
     },
     {
@@ -56,7 +56,7 @@ export function setupChecklist({ whatsapp, socials, database, sessionSecret, gal
 export const SELF_SERVICE = [
   { href: "/admin/paket", label: "Paket & harga", text: "Tambah paket, ubah harga, atau sembunyikan paket di halaman layanan." },
   { href: "/admin/situs", label: "Galeri foto & video", text: "Unggah foto dan tempel tautan video untuk galeri beranda." },
-  { href: "/admin/kontak", label: "Kontak & media sosial", text: "Nomor WhatsApp, email, alamat, Google Maps, dan akun media sosial." },
+  { href: "/admin/kontak", label: "Kontak, sosial & mata uang", text: "Nomor WhatsApp, email, alamat, Google Maps, akun media sosial, dan pilihan dolar AS." },
   { href: "/admin/kalender", label: "Kalender reservasi", text: "Tutup tanggal tertentu dan atur kapasitas tamu per hari." },
   { href: "/admin/pembayaran", label: "Pembayaran online", text: "Cara bayar yang ditawarkan, rekening bank, dan batas waktu bayar." },
   { href: "/admin/developer", label: "Mode developer", text: "Tutup sementara seluruh website atau sebagian saat sedang diperbaiki." },

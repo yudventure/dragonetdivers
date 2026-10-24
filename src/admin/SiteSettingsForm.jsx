@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ChatIcon, CheckIcon, FacebookIcon, InstagramIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "@/components/icons";
+import { BanknoteIcon, ChatIcon, CheckIcon, FacebookIcon, InstagramIcon, MailIcon, MapPinIcon, TikTokIcon, YouTubeIcon } from "@/components/icons";
 import { cleanEmail, cleanWhatsApp } from "@/lib/checkout";
 import { NETWORKS, socialUrl } from "@/lib/site";
 import { ADDRESS_LINES, mapsUrlOf } from "@/lib/site-settings";
@@ -224,6 +224,39 @@ export default function SiteSettingsForm({ initial, fallback }) {
               );
             })}
           </div>
+        </Section>
+
+        <Section
+          icon={BanknoteIcon}
+          title="Mata uang di website"
+          text="Harga selalu ditulis dan ditagih dalam Rupiah. Dolar AS hanya tampilan perkiraan dengan kurs harian Bank Sentral Eropa."
+        >
+          <label className="flex cursor-pointer items-start justify-between gap-4 rounded-input bg-foam p-4 ring-1 ring-mist">
+            <span className="grid gap-1">
+              <span className="font-semibold text-abyss">Tampilkan pilihan dolar AS (USD)</span>
+              <span className="text-sm text-slate">
+                {value.showUsd
+                  ? "Nyala. Tamu bisa memilih Rupiah atau Dolar AS di menu, dan harga dolar tampil sebagai perkiraan."
+                  : "Mati. Semua harga di website hanya dalam Rupiah dan pilihan mata uang disembunyikan."}
+              </span>
+            </span>
+            <input
+              id="site-showUsd"
+              type="checkbox"
+              role="switch"
+              checked={value.showUsd}
+              onChange={(e) => {
+                touch();
+                setValue((v) => ({ ...v, showUsd: e.target.checked }));
+              }}
+              className="peer sr-only"
+            />
+            <span
+              aria-hidden="true"
+              className="relative mt-0.5 h-7 w-12 shrink-0 rounded-full bg-line-strong transition-colors duration-200 ease-brand peer-checked:bg-teal peer-focus-visible:ring-3 peer-focus-visible:ring-lagoon/40 after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform after:duration-200 peer-checked:after:translate-x-5"
+            />
+          </label>
+          <p className="text-xs text-slate">Pembayaran PayPal tetap ditagih dalam dolar dengan kurs hari itu, terlepas dari pengaturan ini.</p>
         </Section>
       </div>
 

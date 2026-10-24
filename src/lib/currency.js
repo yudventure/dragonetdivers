@@ -9,8 +9,12 @@ export const currencies = ["USD", "IDR"];
 export const RATE_URL = "https://api.frankfurter.dev/v1/latest?base=USD&symbols=IDR";
 export const RATE_REFRESH_SECONDS = 12 * 3600;
 
-/** Pilihan awal sebelum tamu memilih: English → USD, Indonesia → IDR. */
-export const defaultCurrency = (lang) => (lang === "id" ? "IDR" : "USD");
+/**
+ * Pilihan awal sebelum tamu memilih: Rupiah untuk semua bahasa (permintaan pemilik, Oktober 2026).
+ * USD hanya bisa dipilih bila tim menyalakannya di /admin/kontak (showUsd di src/lib/site-settings.js).
+ */
+export const DEFAULT_CURRENCY = "IDR";
+export const defaultCurrency = () => DEFAULT_CURRENCY;
 
 export const isCurrency = (value) => currencies.includes(value);
 
