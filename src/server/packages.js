@@ -5,6 +5,7 @@ import { missingPackages, packageFromRow, startingPrices } from "@/lib/packages"
 import { services } from "@/lib/services";
 import { isDatabaseConfigured } from "./db-config.js";
 import { query } from "./db";
+import { getSiteSettings } from "./site-settings";
 
 // Paket di MySQL (tabel packages, database/migrations/002_packages.sql), diisi tim di /admin/paket.
 
@@ -51,18 +52,15 @@ export async function allPackages() {
   return (await query(`SELECT ${COLUMNS} FROM packages ORDER BY service, sort_order, price_idr, id`)).map(packageFromRow);
 }
 
-export async function packageById(id, { activeOnly = false } = {}) {
-  if (!Number.isSafeInteger(id) || id < 1) return null;
-  const [row] = await query(`SELECT ${COLUMNS} FROM packages WHERE id = ?${activeOnly ? " AND active = 1" : ""}`, [id]);
-  return row ? packageFromRow(row) : null;
-}
-
-/** Paket aktif untuk daftar id (keranjang dan checkout): { [id]: paket }. */
+/** Paket aktif untuk daftar id (keranjang dan checkout): { [id]: paket }. Paket layanan yang disimpan tim tidak ikut. */
 export async function packagesByIds(ids) {
   const clean = [...new Set(ids.map(Number).filter((id) => Number.isSafeInteger(id) && id > 0))].slice(0, 20);
   if (!clean.length) return {};
-  const rows = await query(`SELECT ${COLUMNS} FROM packages WHERE active = 1 AND id IN (${clean.map(() => "?").join(", ")})`, clean);
-  return Object.fromEntries(rows.map((row) => [Number(row.id), packageFromRow(row)]));
+  const [rows, { hiddenServices }] = await Promise.all([
+    query(`SELECT ${COLUMNS} FROM packages WHERE active = 1 AND id IN (${clean.map(() => "?").join(", ")})`, clean),
+    getSiteSettings(),
+  ]);
+  return Object.fromEntries(rows.filter((row) => !hiddenServices.includes(row.service)).map((row) => [Number(row.id), packageFromRow(row)]));
 }
 
 const values = (p) => [

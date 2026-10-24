@@ -2,12 +2,14 @@ import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import PackageManager from "@/admin/PackageManager";
 import PriceListImport from "@/admin/PriceListImport";
+import ServiceVisibility from "@/admin/ServiceVisibility";
 import { PRICE_LIST } from "@/content/price-list";
 import { missingPackages } from "@/lib/packages";
 import { servicesIn } from "@/lib/services";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { allPackages, ensurePriceList } from "@/server/packages";
+import { getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Paket & harga" };
@@ -19,7 +21,9 @@ export default async function PackagesPage() {
   const database = await databaseStatus();
   if (database.ok) await ensurePriceList();
   const packages = database.ok ? await allPackages().catch(() => []) : [];
-  const services = servicesIn("id").map(({ slug, title }) => ({ slug, title }));
+  // Layanan yang disimpan (tidak tampil di website) tetap punya daftar paketnya di sini.
+  const { hiddenServices } = await getSiteSettings({ fresh: database.ok });
+  const services = servicesIn("id").map(({ slug, title }) => ({ slug, title, hidden: hiddenServices.includes(slug) }));
   // Daftar harga pemilik: paket yang belum ada bisa ditambahkan sekali klik (src/content/price-list.js).
   const missing = new Set(missingPackages(PRICE_LIST.packages, packages));
   const priceGroups = services
@@ -38,6 +42,12 @@ export default async function PackagesPage() {
         dolar melihat perkiraannya, dan PayPal menagih dalam dolar dengan kurs hari itu.
       </ModuleTitle>
       <DatabaseNotice database={database} />
+      {database.ok && (
+        <ServiceVisibility
+          services={services.map(({ slug, title }) => ({ slug, title, count: packages.filter((p) => p.service === slug).length }))}
+          hidden={hiddenServices}
+        />
+      )}
       {database.ok && <PriceListImport title={PRICE_LIST.title} source={PRICE_LIST.source} groups={priceGroups} />}
       {database.ok && <PackageManager packages={packages} services={services} />}
     </AdminShell>

@@ -1,18 +1,25 @@
 import { uiText } from "@/content/ui";
-import { servicesIn } from "@/lib/services";
 import { whatsappLink } from "@/lib/site";
 import { servicePrices } from "@/server/packages";
+import { shownServices } from "@/server/site-settings";
 import ServiceCard from "./ServiceCard";
 import { ChatIcon } from "./icons";
 
-// Grid layanan lengkap gaya "bento": dua kartu besar di atas, tiga di bawah (desktop). Tiap kartu
-// menampilkan harga mulai dari paket aktif termurahnya (/admin/paket) sebagai ajakan melihat paket.
-// Tombol Teal, karena tombol oranye sudah dipakai di header.
+// Lebar kartu di grid 6 kolom (desktop) menurut jumlah layanan yang tampil: lima = "bento" dua kartu besar
+// di atas dan tiga di bawah, tiga atau enam = sebaris tiga, selain itu dua per baris (satu = selebar grid).
+function spanOf(index, count) {
+  if (count === 1) return "md:col-span-6";
+  if (count === 5) return index < 2 ? "md:col-span-3" : "md:col-span-2";
+  return count % 3 === 0 ? "md:col-span-2" : "md:col-span-3";
+}
+
+// Grid layanan yang tampil (yang disimpan di /admin/paket tidak ikut). Tiap kartu menampilkan harga mulai
+// dari paket aktif termurahnya (/admin/paket) sebagai ajakan melihat paket. Tombol Teal, karena tombol
+// oranye sudah dipakai di header.
 export default async function HomeServices({ lang }) {
   const t = uiText(lang);
-  const prices = await servicePrices();
+  const [prices, services] = await Promise.all([servicePrices(), shownServices(lang)]);
   const ask = whatsappLink(t.whatsapp.services);
-  const [first, second, ...rest] = servicesIn(lang);
   return (
     <section id="services" aria-labelledby="services-title" className="scroll-mt-24 bg-white">
       <div className="gutter mx-auto grid max-w-[1200px] gap-8 pt-16 md:pt-20">
@@ -32,16 +39,19 @@ export default async function HomeServices({ lang }) {
         </div>
 
         <ul className="grid gap-5 md:grid-cols-6">
-          {[first, second].map((service) => (
-            <li key={service.slug} className="grid md:col-span-3">
-              <ServiceCard service={service} lang={lang} from={prices[service.slug]} sizes="(min-width: 768px) 560px, 90vw" />
-            </li>
-          ))}
-          {rest.map((service) => (
-            <li key={service.slug} className="grid md:col-span-2">
-              <ServiceCard service={service} lang={lang} from={prices[service.slug]} />
-            </li>
-          ))}
+          {services.map((service, index) => {
+            const span = spanOf(index, services.length);
+            return (
+              <li key={service.slug} className={`grid ${span}`}>
+                <ServiceCard
+                  service={service}
+                  lang={lang}
+                  from={prices[service.slug]}
+                  sizes={span === "md:col-span-2" ? undefined : "(min-width: 768px) 560px, 90vw"}
+                />
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

@@ -4,8 +4,8 @@ import logo from "../../brand/logo/dragonet-divers-logo.png";
 import logoPlate from "../../brand/logo/dragonet-divers-logo-plate.png";
 import { uiText } from "@/content/ui";
 import { format, localeHref, localeNames, locales } from "@/lib/i18n";
-import { servicesIn } from "@/lib/services";
 import { site, whatsappLink } from "@/lib/site";
+import { shownServices } from "@/server/site-settings";
 import HeaderShell from "./HeaderShell";
 import SiteNav from "./SiteNav";
 
@@ -13,13 +13,14 @@ import SiteNav from "./SiteNav";
 // transparan di paling atas, putih transparan saat di-scroll. path = alamat halaman ini tanpa awalan
 // bahasa ("/" atau "/services/fun-dives"), untuk tombol EN / ID dan menu aktif. overlay = header di atas
 // video gelap hero beranda: logo versi plate dan nama putih selama belum di-scroll (BRANDING.md §2).
-export default function SiteHeader({ lang, path = "/", overlay = false }) {
+// Menu Layanan hanya berisi layanan yang tampil (yang disimpan di /admin/paket tidak ikut).
+export default async function SiteHeader({ lang, path = "/", overlay = false }) {
   const t = uiText(lang);
   const nav = t.nav;
   const booking = whatsappLink(t.whatsapp.general);
   const home = localeHref(lang, "/");
   const homeLabel = format(nav.home, { name: site.name });
-  const services = servicesIn(lang).map(({ slug, title, summary }) => {
+  const services = (await shownServices(lang)).map(({ slug, title, summary }) => {
     const servicePath = `/services/${slug}`;
     return { slug, title, summary, href: localeHref(lang, servicePath), current: path === servicePath };
   });

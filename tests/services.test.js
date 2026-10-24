@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { serviceBySlug, services, servicesIn } from "../src/lib/services.js";
+import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES, serviceBySlug, services, servicesIn, shownServicesIn } from "../src/lib/services.js";
 
 test("setiap layanan punya slug unik, ilustrasi, dan isi halaman detail", () => {
   const slugs = services.map((s) => s.slug);
@@ -21,6 +21,21 @@ test("setiap layanan punya slug unik, ilustrasi, dan isi halaman detail", () => 
   assert.equal(serviceBySlug("fun-dives").title, "Fun dives");
   assert.equal(serviceBySlug("island-trips", "id").title, "Trip pulau");
   assert.equal(serviceBySlug("tidak-ada"), null);
+});
+
+// Permintaan pemilik Oktober 2026: fun dive, dusk dive, dan trip pulau tampil dulu, sisanya disimpan.
+test("layanan yang disimpan tidak tampil, isinya tetap ada", () => {
+  assert.deepEqual(
+    shownServicesIn("en").map((s) => s.slug),
+    ["fun-dives", "island-trips", "dusk-dives"],
+  );
+  assert.deepEqual(
+    shownServicesIn("id", []).map((s) => s.slug),
+    services.map((s) => s.slug),
+  );
+  for (const slug of DEFAULT_HIDDEN_SERVICES) assert.ok(serviceBySlug(slug), slug);
+  assert.deepEqual(cleanHiddenServices(["snorkeling", "x"]), ["snorkeling"]);
+  assert.deepEqual(cleanHiddenServices(undefined), DEFAULT_HIDDEN_SERVICES);
 });
 
 test("versi Indonesia lengkap dan setara dengan versi English", () => {
