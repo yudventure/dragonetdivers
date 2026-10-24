@@ -1,9 +1,11 @@
 import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
+import ClientErrorLog from "@/admin/ClientErrorLog";
 import DeveloperSettings from "@/admin/DeveloperSettings";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { getDeveloper } from "@/server/developer-state";
+import { getSetting } from "@/server/settings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Mode developer" };
@@ -14,6 +16,8 @@ export default async function DeveloperPage() {
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
   const developer = database.ok ? await getDeveloper({ fresh: true }) : null;
+  // Galat terakhir di peramban admin (app/admin/error.jsx → /api/admin/client-error).
+  const errors = database.ok ? ((await getSetting("client_errors", { list: [] }).catch(() => null))?.list ?? []) : [];
   return (
     <AdminShell admin={admin} active="developer">
       <ModuleTitle title="Mode developer">
@@ -22,6 +26,7 @@ export default async function DeveloperPage() {
       </ModuleTitle>
       <DatabaseNotice database={database} />
       {developer && <DeveloperSettings initial={developer} />}
+      {database.ok && <ClientErrorLog errors={errors} />}
     </AdminShell>
   );
 }
