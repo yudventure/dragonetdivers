@@ -35,14 +35,15 @@ export default async function SiteHeader({ lang, path = "/", overlay = false }) 
 
   return (
     <HeaderShell overlay={overlay}>
-      {/* Selebar hero beranda: 85% layar, minimal 1200 px. */}
-      <div className="gutter mx-auto flex h-16 max-w-[max(1200px,85%)] items-center gap-4 sm:h-[72px] xl:gap-6">
-        <Link href={home} className="flex shrink-0 items-center gap-3" aria-label={homeLabel}>
+      {/* Selebar hero beranda: 85% layar, minimal 1200 px. Di bawah 400 px (banyak HP Android 360 px) jarak,
+          nama, dan tombol Book sedikit dirapatkan supaya logo, nama, Book, dan Menu muat tanpa gulir menyamping. */}
+      <div className="gutter mx-auto flex h-16 max-w-[max(1200px,85%)] items-center gap-3 min-[400px]:gap-4 sm:h-[72px] xl:gap-6">
+        <Link href={home} className="flex shrink-0 items-center gap-2.5 min-[400px]:gap-3" aria-label={homeLabel}>
           <Image src={logo} alt="" width={44} height={44} priority className="size-11 group-data-[tone=dark]/header:hidden" />
           {overlay && <Image src={logoPlate} alt="" width={44} height={44} priority className="hidden size-11 group-data-[tone=dark]/header:block" />}
           {/* Nama disembunyikan di 1024–1279 px agar menu desktop muat di satu baris. */}
           <span className="hidden leading-none whitespace-nowrap min-[360px]:grid lg:hidden xl:grid">
-            <span className="font-display text-lg font-semibold text-teal transition-colors duration-300 ease-brand sm:text-xl group-data-[tone=dark]/header:text-white">
+            <span className="font-display text-base font-semibold text-teal min-[400px]:text-lg transition-colors duration-300 ease-brand sm:text-xl group-data-[tone=dark]/header:text-white">
               {site.shortName}
             </span>
             <span className="mt-1.5 text-[10px] font-bold tracking-[0.2em] text-slate transition-colors duration-300 ease-brand group-data-[tone=dark]/header:text-white/80">

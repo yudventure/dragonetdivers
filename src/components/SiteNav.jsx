@@ -222,7 +222,7 @@ function BookButton({ booking, t, className = "" }) {
   return (
     <a
       href={booking}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-full bg-mandarin px-4 text-sm font-bold whitespace-nowrap text-abyss transition-colors duration-200 ease-brand hover:bg-mandarin-hover sm:px-[18px] ${className}`}
+      className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-mandarin px-3 text-sm font-bold whitespace-nowrap text-abyss transition-colors duration-200 ease-brand hover:bg-mandarin-hover min-[400px]:gap-2 min-[400px]:px-4 sm:px-[18px] ${className}`}
     >
       <ChatIcon className="size-[18px]" />
       <span className="sm:hidden">{t.bookShort}</span>
