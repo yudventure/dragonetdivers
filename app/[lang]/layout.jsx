@@ -21,6 +21,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { lang } = await params;
   const meta = uiText(lang).meta;
+  // Kode verifikasi Google Search Console dari /admin/google (tag HTML di <head>, dibaca Google di beranda).
+  const { googleVerification } = await getSiteSettings();
   return {
     metadataBase: new URL(site.url),
     title: { default: `${site.name} · ${meta.title}`, template: `%s · ${site.shortName}` },
@@ -33,6 +35,7 @@ export async function generateMetadata({ params }) {
       locale: ogLocale[lang],
       url: localeHref(lang, "/"),
     },
+    ...(googleVerification ? { verification: { google: googleVerification } } : {}),
   };
 }
 

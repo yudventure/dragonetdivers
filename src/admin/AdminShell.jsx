@@ -10,6 +10,7 @@ import {
   LockIcon,
   MenuIcon,
   ReceiptIcon,
+  SearchIcon,
   TagIcon,
   UserIcon,
   UsersIcon,
@@ -33,6 +34,7 @@ const MENU = [
       { key: "paket", label: "Paket & harga", icon: TagIcon, href: "/admin/paket" },
       { key: "situs", label: "Galeri foto & video", icon: GlobeIcon, href: "/admin/situs" },
       { key: "kontak", label: "Kontak, sosial & mata uang", icon: GlobeIcon, href: "/admin/kontak" },
+      { key: "google", label: "Google Search Console", icon: SearchIcon, href: "/admin/google" },
     ],
   },
   {

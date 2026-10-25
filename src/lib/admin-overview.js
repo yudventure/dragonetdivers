@@ -57,6 +57,7 @@ export const SELF_SERVICE = [
   { href: "/admin/paket", label: "Paket & harga", text: "Tambah paket, ubah harga, sembunyikan paket, atau simpan seluruh layanan supaya tidak tampil di website." },
   { href: "/admin/situs", label: "Galeri foto & video", text: "Unggah foto dan tempel tautan video untuk galeri beranda." },
   { href: "/admin/kontak", label: "Kontak, sosial & mata uang", text: "Nomor WhatsApp, email, alamat, Google Maps, akun media sosial, dan pilihan dolar AS." },
+  { href: "/admin/google", label: "Google Search Console", text: "Tempel kode verifikasi Google dan kirim sitemap supaya website muncul di pencarian Google." },
   { href: "/admin/kalender", label: "Kalender reservasi", text: "Tutup tanggal tertentu dan atur kapasitas tamu per hari." },
   { href: "/admin/pembayaran", label: "Pembayaran online", text: "Cara bayar yang ditawarkan, rekening bank, dan batas waktu bayar." },
   { href: "/admin/developer", label: "Mode developer", text: "Tutup sementara seluruh website atau sebagian saat sedang diperbaiki." },
