@@ -28,10 +28,21 @@ test("isian kontak dibersihkan", () => {
     youtube: "",
     showUsd: true,
     hiddenServices: ["dive-courses", "snorkeling"],
+    googleVerification: "",
   });
   assert.deepEqual(validateSiteSettings({}), DEFAULT_SITE_SETTINGS);
   assert.equal(DEFAULT_SITE_SETTINGS.showUsd, false, "dolar mati sampai tim menyalakannya");
   assert.equal(validateSiteSettings({ showUsd: "ya" }).showUsd, false, "hanya true yang menyalakan");
+});
+
+test("kode verifikasi Google: tag HTML jadi kodenya, kode DNS dan isian asing ditolak dengan pesan", () => {
+  const code = "Abc_DEF-1234567890abcdefGHIJKLmnopqrstuvwxy";
+  assert.equal(validateSiteSettings({ googleVerification: `<meta name="google-site-verification" content="${code}" />` }).googleVerification, code);
+  assert.equal(DEFAULT_SITE_SETTINGS.googleVerification, "");
+  assert.throws(() => validateSiteSettings({ googleVerification: `google-site-verification=${code}` }), (e) => e.field === "googleVerification" && /DNS/.test(e.message));
+  fails({ googleVerification: "kode saya" }, "googleVerification");
+  // Simpanan lama tanpa kode tetap utuh.
+  assert.equal(normalizeSiteSettings({ email: "info@contoh.id" }).email, "info@contoh.id");
 });
 
 test("layanan yang disimpan: bawaan snorkeling dan kursus selam, slug asing dibuang", () => {

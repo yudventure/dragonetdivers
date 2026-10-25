@@ -11,7 +11,8 @@ const unavailable = (e) => {
 };
 
 // Simpan isian /admin/kontak ({ settings: { whatsapp, email, address, mapsUrl, instagram, ... } }).
-// Daftar layanan yang disimpan (/admin/paket) tetap seperti yang tersimpan, bukan dari form ini.
+// Daftar layanan yang disimpan (/admin/paket) dan kode verifikasi Google (/admin/google) tetap seperti
+// yang tersimpan, bukan dari form ini.
 // Berlaku langsung di proses ini, paling lama 15 detik di proses lain (src/server/site-settings.js).
 export async function POST(request) {
   const { error } = await guardAdmin(request);
@@ -25,7 +26,7 @@ export async function POST(request) {
   }
   let settings;
   try {
-    settings = validateSiteSettings(isObject(input?.settings) ? { ...input.settings, hiddenServices: stored.hiddenServices } : null);
+    settings = validateSiteSettings(isObject(input?.settings) ? { ...input.settings, hiddenServices: stored.hiddenServices, googleVerification: stored.googleVerification } : null);
   } catch (e) {
     if (e instanceof SiteSettingsError) return Response.json({ error: e.message, field: e.field }, { status: 400 });
     throw e;

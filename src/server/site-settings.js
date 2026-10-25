@@ -61,6 +61,13 @@ export async function isServiceShown(slug) {
   return !(await getSiteSettings()).hiddenServices.includes(slug);
 }
 
+/** Simpan kode verifikasi Google (/admin/google, sudah dibersihkan) tanpa mengubah isian lain. */
+export async function saveGoogleVerification(code) {
+  const value = { ...(await storedSiteSettings()), googleVerification: code };
+  await saveSiteSettings(value);
+  return value.googleVerification;
+}
+
 /** Simpan daftar layanan yang disimpan (/admin/paket) tanpa mengubah isian /admin/kontak. */
 export async function saveHiddenServices(hidden) {
   const value = { ...(await storedSiteSettings()), hiddenServices: cleanHiddenServices(hidden) };

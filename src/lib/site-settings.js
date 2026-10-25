@@ -1,10 +1,12 @@
 // Isian /admin/kontak: WhatsApp, email, alamat, tautan Google Maps, akun media sosial yang tampil di
 // website, showUsd (pilihan dolar AS di website; mati = semua harga hanya dalam Rupiah), dan hiddenServices
-// (layanan yang disimpan, diatur di /admin/paket). Disimpan di tabel settings baris "site"
+// (layanan yang disimpan, diatur di /admin/paket), dan googleVerification (kode tag HTML Google Search
+// Console, diatur di /admin/google, src/lib/seo.js). Disimpan di tabel settings baris "site"
 // (src/server/site-settings.js) dan dibaca src/lib/site.js.
 // Isian kosong berarti memakai isian lama dari hPanel atau nilai bawaan. Fungsi murni, diuji di
 // tests/site-settings.test.js.
 import { cleanEmail, cleanWhatsApp } from "./checkout.js";
+import { googleVerificationOf, isDnsVerification } from "./seo.js";
 import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES } from "./services.js";
 import { NETWORKS, socialUrl } from "./site.js";
 
@@ -17,6 +19,7 @@ export const DEFAULT_SITE_SETTINGS = {
   ...Object.fromEntries(NETWORKS.map((n) => [n.id, ""])),
   showUsd: false,
   hiddenServices: DEFAULT_HIDDEN_SERVICES,
+  googleVerification: "",
 };
 
 /** Isian yang salah; field = nama kolom di form. */
@@ -77,7 +80,18 @@ export function validateSiteSettings(input) {
   }
   out.showUsd = input.showUsd === true;
   out.hiddenServices = cleanHiddenServices(input.hiddenServices);
+  out.googleVerification = cleanGoogleVerification(input.googleVerification);
   return out;
+}
+
+/** Kode verifikasi Google dari isian /admin/google, atau SiteSettingsError dengan pesan untuk tim. */
+export function cleanGoogleVerification(value) {
+  const code = googleVerificationOf(value);
+  if (code !== null) return code;
+  if (isDnsVerification(value)) {
+    throw new SiteSettingsError("Ini kode untuk DNS (properti Domain). Untuk kolom ini pilih Awalan URL di Search Console, lalu cara verifikasi Tag HTML.", "googleVerification");
+  }
+  throw new SiteSettingsError("Kode belum dikenali. Di Search Console buka cara verifikasi Tag HTML, lalu salin seluruh tag yang diawali <meta name=\"google-site-verification\".", "googleVerification");
 }
 
 /** Simpanan lama atau rusak tetap menghasilkan bentuk lengkap (isian yang salah dikosongkan). */
