@@ -16,6 +16,8 @@ const SOLID =
   "inline-flex h-11 items-center justify-center rounded-full bg-teal font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark disabled:bg-mist disabled:text-slate";
 const OUTLINE =
   "inline-flex h-11 items-center justify-center rounded-full border-[1.5px] border-teal font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal-soft disabled:border-mist disabled:text-slate";
+// Jarak bilah keranjang dari bawah layar saat menempel (px, sama dengan bottom-4).
+const BAR_GAP = 16;
 // Tombol di kartu paket: di ponsel berdua selebar kartu, tanpa teks terlipat.
 const ROW_BUTTON = "gap-1.5 whitespace-nowrap px-2 text-[15px] sm:px-5 sm:text-base";
 
@@ -25,7 +27,8 @@ const forCart = (pkg) => ({ ...pkg, name: pkg.names });
 /**
  * Paket satu layanan dengan alur checkout Zanclus: tombol Tambah ke keranjang (lalu jumlah tamu) dan Pesan
  * sekarang di tiap kartu, kalender tempat di samping daftar, bilah keranjang yang mengikuti tamu di bawah
- * layar, dan jendela checkout di atas halaman. Keranjang disimpan di peramban (src/components/cart.jsx);
+ * layar lalu berhenti tepat di bawah paket terakhir (permintaan pemilik, Oktober 2026: tidak ikut sampai
+ * footer), dan jendela checkout di atas halaman. Keranjang disimpan di peramban (src/components/cart.jsx);
  * halaman ini hanya memakai paket layanannya sendiri, jadi satu pesanan = satu layanan dan satu tanggal.
  */
 export default function ServiceBooking({ lang, service, packages, slots, range, pool, payments, text, ask, email }) {
@@ -34,7 +37,9 @@ export default function ServiceBooking({ lang, service, packages, slots, range, 
   const items = cart.items.filter((item) => item.service === service.slug);
   const [date, setDate] = useState("");
   const [removed, setRemoved] = useState(false);
+  const [docked, setDocked] = useState(false);
   const dialog = useRef(null);
+  const dock = useRef(null);
   const started = useRef(false);
   const full = cart.items.length >= MAX_ITEMS;
 
@@ -81,13 +86,30 @@ export default function ServiceBooking({ lang, service, packages, slots, range, 
       });
   }, [cart]);
 
-  // Bilah keranjang menutupi bagian bawah halaman; beri ruang di bawah selama keranjang berisi.
+  // Bilah keranjang menempel di bawah layar sampai tempatnya di bawah paket terakhir terlihat utuh, lalu
+  // berhenti di situ (docked) dan ikut tergulir bersama halaman. Dihitung dari posisi tempatnya setiap
+  // kali halaman digulir atau ukurannya berubah, jadi lompatan langsung ke footer pun tepat.
+  const hasItems = items.length > 0;
   useEffect(() => {
-    document.body.style.paddingBottom = items.length ? "96px" : "";
-    return () => {
-      document.body.style.paddingBottom = "";
+    if (!hasItems) return;
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const box = dock.current?.getBoundingClientRect();
+      if (box) setDocked(box.bottom <= window.innerHeight - BAR_GAP);
     };
-  }, [items.length]);
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [hasItems]);
 
   function pickDate(day) {
     setDate(day);
@@ -179,39 +201,41 @@ export default function ServiceBooking({ lang, service, packages, slots, range, 
               );
             })}
           </ul>
+          {hasItems && (
+            // Bilah keranjang (acuan: Zanclus): tempatnya setinggi bilah tepat di bawah paket terakhir. Selama
+            // tempat itu belum terlihat utuh, bilah menempel di bawah layar selebar kolom daftar paket.
+            <div ref={dock} className="h-[60px]">
+              <div className={docked ? "" : "pointer-events-none fixed inset-x-0 bottom-4 z-40"}>
+                <div className={docked ? "" : "gutter mx-auto grid max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-10"}>
+                  <div className="pointer-events-auto flex h-[60px] items-center gap-3 rounded-full bg-abyss p-2 text-white shadow-float sm:gap-4">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10">
+                      <CartIcon className="size-5" />
+                    </span>
+                    <a href="#calendar" className="grid min-w-0 flex-1 leading-tight">
+                      <strong className="truncate text-sm sm:text-base">
+                        {ct.title} · {count}
+                      </strong>
+                      <span className="truncate text-xs text-on-dark-muted sm:text-sm">
+                        {ct.total} <Price idr={total} className="tabular-nums" />
+                      </span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={openCheckout}
+                      className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-white px-5 font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal-wash"
+                    >
+                      {ct.checkout}
+                      <ArrowIcon className="size-[18px] -rotate-45" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <SlotCalendar slots={slots} range={range} date={date} onSelect={pickDate} lang={lang} t={st} pool={pool} canCheckout={items.length > 0} onCheckout={openCheckout} />
       </div>
-
-      {items.length > 0 && (
-        // Bilah keranjang (acuan: Zanclus) di bawah layar, selebar kolom daftar paket di layar lebar.
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-3 sm:pb-4">
-          <div className="gutter mx-auto grid max-w-[1200px] lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-10">
-            <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-abyss p-2 text-white shadow-float sm:gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/10">
-                <CartIcon className="size-5" />
-              </span>
-              <a href="#calendar" className="grid min-w-0 flex-1 leading-tight">
-                <strong className="truncate text-sm sm:text-base">
-                  {ct.title} · {count}
-                </strong>
-                <span className="truncate text-xs text-on-dark-muted sm:text-sm">
-                  {ct.total} <Price idr={total} className="tabular-nums" />
-                </span>
-              </a>
-              <button
-                type="button"
-                onClick={openCheckout}
-                className="inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-white px-5 font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal-wash"
-              >
-                {ct.checkout}
-                <ArrowIcon className="size-[18px] -rotate-45" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <CheckoutDialog
         dialogRef={dialog}
