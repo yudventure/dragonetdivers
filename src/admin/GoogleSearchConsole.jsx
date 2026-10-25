@@ -75,7 +75,7 @@ export default function GoogleSearchConsole({ initial, siteUrl, pages }) {
       busy: false,
       ok: true,
       message: result.code
-        ? "Kode tersimpan dan sudah terpasang di beranda. Sekarang klik Verifikasi di Search Console."
+        ? "Kode tersimpan dan sudah terpasang di beranda. Sekarang klik Verifikasi (Verify) di Search Console."
         : "Kode dihapus dari beranda.",
     });
     router.refresh();
@@ -91,7 +91,7 @@ export default function GoogleSearchConsole({ initial, siteUrl, pages }) {
       ),
     },
     {
-      text: "Pilih Tambahkan properti, lalu Awalan URL, dan isi alamat website ini.",
+      text: "Pilih Tambahkan properti (Add property), lalu Awalan URL (URL prefix) di sebelah kanan, isi alamat website ini, dan klik Lanjutkan (Continue).",
       action: (
         <div className="flex flex-wrap items-center gap-2">
           <Address value={siteUrl} />
@@ -99,11 +99,11 @@ export default function GoogleSearchConsole({ initial, siteUrl, pages }) {
         </div>
       ),
     },
-    { text: "Di bagian Metode verifikasi lainnya, buka Tag HTML lalu klik Salin." },
+    { text: "Di bagian Metode verifikasi lainnya (Other verification methods), buka Tag HTML (HTML tag) lalu klik Salin (Copy)." },
     { text: "Tempel di kolom Kode verifikasi di halaman ini, lalu klik Simpan kode." },
-    { text: "Kembali ke Search Console dan klik Verifikasi. Biarkan kodenya tetap tersimpan di sini, karena Google memeriksanya lagi sesekali." },
+    { text: "Kembali ke Search Console dan klik Verifikasi (Verify). Biarkan kodenya tetap tersimpan di sini, karena Google memeriksanya lagi sesekali." },
     {
-      text: "Buka menu Peta Situs (Sitemaps), tulis sitemap.xml, lalu klik Kirim. Data pencarian pertama biasanya muncul beberapa hari kemudian.",
+      text: "Buka menu Peta Situs (Sitemaps), tulis sitemap.xml, lalu klik Kirim (Submit). Data pencarian pertama biasanya muncul beberapa hari kemudian.",
       action: (
         <div className="flex flex-wrap items-center gap-2">
           <Address value={sitemap} />
