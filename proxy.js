@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, pageForPath, pageLocked, PREVIEW_COOKIE, PREVIEW_MINUTES, visitorLocks } from "./src/lib/developer.js";
+import { canonicalRedirect } from "./src/lib/domain.js";
 import { LANG_COOKIE, LANG_COOKIE_DAYS, LANG_PARAM, languageChoice, localeRoute } from "./src/lib/i18n.js";
+import { site } from "./src/lib/site.js";
 import { adminFromToken } from "./src/server/admin-auth.js";
 import { getDeveloper } from "./src/server/developer-state.js";
 
@@ -9,7 +11,22 @@ import { getDeveloper } from "./src/server/developer-state.js";
 // (src/lib/developer.js): halaman yang ditutup dijawab halaman perawatan 503 (app/maintenance), kecuali
 // untuk operator yang masuk di /admin. ?pratinjau=pengunjung membuat operator melihat seperti pengunjung
 // selama 30 menit, ?pratinjau=admin mengembalikannya. Halaman status pesanan tidak pernah ditutup.
+// Sebelum semua itu: halaman (termasuk /admin) yang dibuka lewat domain lain milik situs atau lewat www.
+// dialihkan 301 ke domain utama (src/lib/domain.js). /api tidak dialihkan, jadi notifikasi Midtrans ke
+// domain lama tetap sampai.
 export async function proxy(request) {
+  if (request.method === "GET" || request.method === "HEAD") {
+    const main = canonicalRedirect([request.headers.get("x-forwarded-host"), request.headers.get("host")], site.url);
+    if (main) {
+      const response = NextResponse.redirect(new URL(`${request.nextUrl.pathname}${request.nextUrl.search}`, main), 301);
+      // Tanpa Cache-Control peramban mengingat 301 selamanya; dibatasi sejam supaya salah atur domain cepat pulih.
+      response.headers.set("Cache-Control", "public, max-age=3600");
+      return response;
+    }
+  }
+  const { pathname } = request.nextUrl;
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return NextResponse.next();
+
   const preview = request.nextUrl.searchParams.get("pratinjau");
   if (preview === "pengunjung" || preview === "admin") {
     const url = request.nextUrl.clone();
@@ -85,4 +102,5 @@ async function maintenanceLock(request, target) {
   return { kind: developer.site ? "site" : "page", lang: lang === "id" ? "id" : "en", path };
 }
 
-export const config = { matcher: ["/((?!api(?:/|$)|admin(?:/|$)|maintenance(?:/|$)|_next/|.*\\..*).*)"] };
+// /admin ikut lewat sini hanya untuk pengalihan domain; selebihnya diteruskan apa adanya.
+export const config = { matcher: ["/((?!api(?:/|$)|maintenance(?:/|$)|_next/|.*\\..*).*)"] };

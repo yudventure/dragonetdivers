@@ -64,19 +64,25 @@ Di akun Hostinger yang memegang paket **Business** (yang berisi thedampier.com, 
 
 ## 3. Domain
 
-Domain utama website: **dragonetdivers.com** (sudah tersambung ke website Node.js di akun hosting, 20 Oktober 2026; sebelumnya domain sementara `gold-walrus-261903.hostingersite.com`).
+Website Node.js di akun hosting bernama **dragonetdivers.com** (tersambung 20 Oktober 2026; sebelumnya domain sementara `gold-walrus-261903.hostingersite.com`). Kedua domain milik situs, `dragonetdiversrajaampat.com` (dipindahkan ke akun domain pemilik akhir Oktober 2026) dan `dragonetdivers.com`, terdaftar di akun Hostinger yang lain dan diarahkan ke akun hosting lewat DNS.
 
-Setelah domain website diganti:
-1. **Environment variables:** `NEXT_PUBLIC_SITE_URL` = `https://dragonetdivers.com`, atau hapus barisnya (nilai bawaan sama). Nilai lama seperti `https://dragonetdiversrajaampat.com` membuat tautan bagikan (Open Graph) menunjuk domain yang salah.
-2. **SSL:** Security → SSL, pastikan sertifikat aktif untuk `dragonetdivers.com` dan `www`.
-3. **Variabel GitHub** `HOSTINGER_DOMAIN` (bila diisi) diganti ke `dragonetdivers.com`.
-4. **Deploy ulang** (Actions → **Deploy** → **Run workflow**), lalu uji `https://dragonetdivers.com/api/health` harus menampilkan `"app":"dragonet-divers"`.
+**Domain utama = isian `NEXT_PUBLIC_SITE_URL`** (bawaan `https://dragonetdivers.com`). Dari situ website membuat tautan canonical, sitemap, email ke tamu, dan alamat kembali pembayaran. Halaman (termasuk `/admin`) yang dibuka lewat domain situs yang lain atau lewat `www.` dialihkan 301 ke domain utama oleh `proxy.js` (`src/lib/domain.js`). `/api` tidak dialihkan, jadi notifikasi Midtrans ke domain lama tetap sampai. Jangan buat aturan di menu **Domain → Pengalihan** untuk kedua domain ini, karena bisa berputar dengan pengalihan dari website.
 
-### dragonetdiversrajaampat.com (opsional)
+### Pindah ke dragonetdiversrajaampat.com (permintaan pemilik, Oktober 2026)
 
-Domain lama ini masih tercatat di **akun Hostinger lain** (akses collaborator `backupdata@dewarangga.com`), jadi tidak bisa ditambahkan ke akun hosting. Bila nanti ingin dipakai sebagai alamat kedua yang dialihkan ke `dragonetdivers.com`: minta Hostinger memindahkan domain itu ke akun hosting (chat bantuan dari akun lama), lalu di akun hosting tambahkan sebagai domain parkir/alias atau buat redirect 301 ke `https://dragonetdivers.com`.
+Rencana pemilik: website pindah penuh ke `dragonetdiversrajaampat.com`, `dragonetdivers.com` hanya Parked Domain dan tidak diperpanjang lagi (berakhir 2027-10-20).
 
-Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
+1. Akun hosting → Website dragonetdivers.com → **⋮** di kanan tombol **Memindahkan** → **Ubah domain** → `dragonetdiversrajaampat.com`. Isi catatan DNS yang ditampilkan Hostinger di akun domain (Domains → dragonetdiversrajaampat.com → DNS / Nameservers), menggantikan catatan `@` dan `www` lama yang mengarah ke website pemilik sebelumnya.
+2. **Domain → Parked Domain** → tambahkan `dragonetdivers.com` (catatan DNS-nya di akun domain disesuaikan bila Hostinger meminta).
+3. **Keamanan → SSL**: pastikan sertifikat aktif untuk kedua domain dan `www`-nya.
+4. **Variabel environment**: `NEXT_PUBLIC_SITE_URL` = `https://dragonetdiversrajaampat.com`, simpan, lalu **Memindahkan** (Redeploy). Sejak itu halaman di `dragonetdivers.com` dialihkan 301 ke domain baru.
+5. Uji `https://dragonetdiversrajaampat.com/api/health` harus menampilkan `"app":"dragonet-divers"`, dan `https://dragonetdivers.com/` harus berpindah ke domain baru.
+6. Dashboard Midtrans (bila Notification URL pernah diisi): ganti ke `https://dragonetdiversrajaampat.com/api/payments/midtrans`. Alamat yang benar tampil di `/admin/pembayaran`.
+7. Google Search Console: tambahkan properti Awalan URL `https://dragonetdiversrajaampat.com`, tempel kode tag HTML-nya di `/admin/google`, verifikasi, kirim `sitemap.xml`.
+8. Variabel GitHub `HOSTINGER_DOMAIN` (bila diisi) diganti ke `dragonetdiversrajaampat.com`.
+9. Sebelum `dragonetdivers.com` berakhir: pindahkan email (`halo@dragonetdivers.com`, akun SMTP, `ADMIN_EMAIL`) ke alamat `@dragonetdiversrajaampat.com`, lalu perbarui `/admin/kontak` dan variabel `SMTP_*` di hPanel.
+
+Zona DNS dragonetdiversrajaampat.com di akun pemilik sebelumnya per 20 Oktober 2026 (cadangan):
 
 | Tipe | Nama | Isi | TTL |
 | --- | --- | --- | --- |
@@ -88,7 +94,7 @@ Zona DNS-nya di akun lama per 20 Oktober 2026 (cadangan):
 
 | Nama | Isi |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://dragonetdivers.com` (boleh dihapus: nilai bawaan sama) |
+| `NEXT_PUBLIC_SITE_URL` | Domain utama website (bagian 3), mis. `https://dragonetdiversrajaampat.com`. Kosong = `https://dragonetdivers.com`. Setelah diubah, Redeploy. |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Opsional. Lebih mudah diisi di `/admin/kontak` (langsung berlaku tanpa deploy ulang); nilai di sini hanya dipakai selama kolom di admin kosong. Nomor booking, mis. `6281234567890`. |
 | `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Opsional. Lebih mudah diisi di `/admin/kontak`; nilai di sini (handle `@dragonetdivers` atau URL lengkap) hanya dipakai selama kolom di admin kosong, dan perlu build ulang setelah diubah. |
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
