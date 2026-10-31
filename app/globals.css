@@ -34,8 +34,8 @@
   --color-danger: #C0392B;
 
   /* Font dimuat lewat next/font/local di app/layout.jsx */
-  --font-sans: var(--font-jakarta), "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-fredoka), "Nunito", "Trebuchet MS", system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), var(--font-cjk), "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-fredoka), var(--font-cjk), "Nunito", "Trebuchet MS", system-ui, sans-serif;
 
   --radius-input: 10px;
   --radius-card: 16px;
@@ -64,6 +64,17 @@
     outline: 3px solid var(--color-lagoon);
     outline-offset: 2px;
   }
+}
+
+/* Huruf Mandarin dan Korea: Fredoka dan Plus Jakarta Sans tidak punya aksaranya, jadi aksara itu memakai
+   huruf sistem yang cocok dengan bahasa halaman (<html lang> zh-Hans atau ko). Huruf Latin tetap brand. */
+:root {
+  --font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR";
+}
+html:lang(ko) {
+  --font-cjk: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Noto Sans CJK KR", "Nanum Gothic";
+  /* Bahasa Korea dipotong per kata (berspasi), bukan per suku kata. */
+  word-break: keep-all;
 }
 
 /* Komponen kecil yang dipakai berulang (BRANDING.md §9) */

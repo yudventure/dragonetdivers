@@ -15,8 +15,15 @@ test("tautan English tetap, tautan Indonesia diberi awalan /id", () => {
   for (const href of ["https://wa.me/62", "mailto:halo@dragonetdiversrajaampat.com", "//cdn.example/x", "#faq"]) {
     assert.equal(localeHref("id", href), href);
   }
-  assert.deepEqual(alternates("/services/dusk-dives"), { en: "/services/dusk-dives", id: "/id/services/dusk-dives" });
-  assert.ok(isLocale("id") && isLocale("en") && !isLocale("fr"));
+  assert.deepEqual(alternates("/services/dusk-dives"), {
+    en: "/services/dusk-dives",
+    id: "/id/services/dusk-dives",
+    "zh-Hans": "/zh/services/dusk-dives",
+    ko: "/ko/services/dusk-dives",
+  });
+  assert.equal(localeHref("zh", "/#faq"), "/zh#faq");
+  assert.equal(localeHref("ko", "/services/fun-dives"), "/ko/services/fun-dives");
+  assert.ok(["en", "id", "zh", "ko"].every(isLocale) && !isLocale("fr"));
 });
 
 test("proxy: English di akar, /id diteruskan, /en dialihkan", () => {
@@ -24,6 +31,9 @@ test("proxy: English di akar, /id diteruskan, /en dialihkan", () => {
   assert.deepEqual(localeRoute("/services/fun-dives"), { rewrite: "/en/services/fun-dives" });
   assert.deepEqual(localeRoute("/id"), {});
   assert.deepEqual(localeRoute("/id/services/fun-dives"), {});
+  assert.deepEqual(localeRoute("/zh"), {});
+  assert.deepEqual(localeRoute("/ko/services/fun-dives"), {});
+  assert.deepEqual(localeRoute("/zhx"), { rewrite: "/en/zhx" });
   assert.deepEqual(localeRoute("/en"), { redirect: "/" });
   assert.deepEqual(localeRoute("/en/services/fun-dives"), { redirect: "/services/fun-dives" });
   // Bukan awalan bahasa: /english, /idx tetap ditulis ulang ke English (lalu 404 bila tidak ada).
@@ -36,6 +46,10 @@ test("pilihan bahasa diingat: tombol EN / ID, lalu alamat bahasa lain dialihkan"
   assert.equal(pathIn("en", "/id"), "/");
   assert.equal(pathIn("id", "/"), "/id");
   assert.equal(pathIn("id", "/order/DD-261024-ABCDE"), "/id/order/DD-261024-ABCDE");
+  assert.equal(pathIn("ko", "/zh/services/fun-dives"), "/ko/services/fun-dives");
+  assert.equal(pathIn("en", "/ko"), "/");
+  assert.equal(pathIn("zh", "/id/order/DD-1?t=x"), "/zh/order/DD-1?t=x");
+  assert.equal(chooseLangHref("zh", "/services/fun-dives"), "/zh/services/fun-dives?lang=zh");
   assert.equal(chooseLangHref("en", "/services/fun-dives"), "/services/fun-dives?lang=en");
   assert.equal(chooseLangHref("id", "/"), "/id?lang=id");
   assert.equal(chooseLangHref("id", "/order/DD-261024-ABCDE?t=abc"), "/id/order/DD-261024-ABCDE?t=abc&lang=id");
@@ -46,6 +60,9 @@ test("pilihan bahasa diingat: tombol EN / ID, lalu alamat bahasa lain dialihkan"
   // Sudah memilih English: tautan /id dibawa ke English, dan sebaliknya.
   assert.deepEqual(languageChoice("/id/services/fun-dives", { cookie: "en" }), { redirect: "/services/fun-dives" });
   assert.deepEqual(languageChoice("/services/fun-dives", { cookie: "id" }), { redirect: "/id/services/fun-dives" });
+  assert.deepEqual(languageChoice("/id", { cookie: "ko" }), { redirect: "/ko" });
+  assert.deepEqual(languageChoice("/ko/services/fun-dives", { param: "zh" }), { remember: "zh", redirect: "/zh/services/fun-dives" });
+  assert.equal(languageChoice("/zh", { cookie: "zh" }), null);
   // Bahasa sudah cocok, tanpa pilihan, atau isian asing: diteruskan.
   assert.equal(languageChoice("/services/fun-dives", { cookie: "en" }), null);
   assert.equal(languageChoice("/id", { cookie: "id" }), null);

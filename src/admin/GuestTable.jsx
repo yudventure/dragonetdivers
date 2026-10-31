@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { localeNamesId } from "@/lib/i18n";
 import { rupiah, shortDay } from "@/lib/records";
 import { INPUT } from "./RecordManager";
 
@@ -40,7 +41,7 @@ export default function GuestTable({ guests }) {
                   <td className="px-4 py-3">
                     <span className="block font-semibold text-abyss">{g.name}</span>
                     <span className="text-xs text-slate">
-                      {g.sources} · {g.lang === "id" ? "Indonesia" : "English"}
+                      {g.sources} · {localeNamesId[g.lang] ?? "English"}
                     </span>
                   </td>
                   <td className="px-4 py-3">

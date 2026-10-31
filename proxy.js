@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, pageForPath, pageLocked, PREVIEW_COOKIE, PREVIEW_MINUTES, visitorLocks } from "./src/lib/developer.js";
 import { canonicalRedirect } from "./src/lib/domain.js";
-import { LANG_COOKIE, LANG_COOKIE_DAYS, LANG_PARAM, languageChoice, localeRoute } from "./src/lib/i18n.js";
+import { isLocale, LANG_COOKIE, LANG_COOKIE_DAYS, LANG_PARAM, languageChoice, localeRoute } from "./src/lib/i18n.js";
 import { site } from "./src/lib/site.js";
 import { adminFromToken } from "./src/server/admin-auth.js";
 import { getDeveloper } from "./src/server/developer-state.js";
@@ -99,7 +99,7 @@ async function maintenanceLock(request, target) {
   if (!pageLocked(visitorLocks(developer), page)) return null;
   const { cookies } = request;
   if (!cookies.has(PREVIEW_COOKIE) && (await adminFromToken(cookies.get(ADMIN_COOKIE)?.value))) return null;
-  return { kind: developer.site ? "site" : "page", lang: lang === "id" ? "id" : "en", path };
+  return { kind: developer.site ? "site" : "page", lang: isLocale(lang) ? lang : "en", path };
 }
 
 // /admin ikut lewat sini hanya untuk pengalihan domain; selebihnya diteruskan apa adanya.

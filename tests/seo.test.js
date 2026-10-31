@@ -30,16 +30,27 @@ test("isian yang bukan kode tag HTML Google ditolak", () => {
   assert.equal(isDnsVerification(CODE), false);
 });
 
-test("sitemap: beranda dan layanan yang tampil dalam English dan Indonesia, dengan pasangan bahasanya", () => {
+test("sitemap: beranda dan layanan yang tampil dalam empat bahasa, dengan pasangan bahasanya", () => {
   assert.deepEqual(sitemapPaths(["fun-dives", "dusk-dives"]), ["/", "/services/fun-dives", "/services/dusk-dives"]);
   const entries = sitemapEntries("https://dragonetdiversrajaampat.com", ["fun-dives"]);
   assert.deepEqual(
     entries.map((e) => e.url),
-    ["https://dragonetdiversrajaampat.com/", "https://dragonetdiversrajaampat.com/id", "https://dragonetdiversrajaampat.com/services/fun-dives", "https://dragonetdiversrajaampat.com/id/services/fun-dives"],
+    [
+      "https://dragonetdiversrajaampat.com/",
+      "https://dragonetdiversrajaampat.com/id",
+      "https://dragonetdiversrajaampat.com/zh",
+      "https://dragonetdiversrajaampat.com/ko",
+      "https://dragonetdiversrajaampat.com/services/fun-dives",
+      "https://dragonetdiversrajaampat.com/id/services/fun-dives",
+      "https://dragonetdiversrajaampat.com/zh/services/fun-dives",
+      "https://dragonetdiversrajaampat.com/ko/services/fun-dives",
+    ],
   );
-  assert.deepEqual(entries[3].alternates.languages, {
+  assert.deepEqual(entries[7].alternates.languages, {
     en: "https://dragonetdiversrajaampat.com/services/fun-dives",
     id: "https://dragonetdiversrajaampat.com/id/services/fun-dives",
+    "zh-Hans": "https://dragonetdiversrajaampat.com/zh/services/fun-dives",
+    ko: "https://dragonetdiversrajaampat.com/ko/services/fun-dives",
     "x-default": "https://dragonetdiversrajaampat.com/services/fun-dives",
   });
   assert.equal(entries[0].priority, 1);

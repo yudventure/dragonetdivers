@@ -1,5 +1,5 @@
 import { PREVIEW_COOKIE, retryAfter } from "@/lib/developer";
-import { localeHref } from "@/lib/i18n";
+import { isLocale, localeHref } from "@/lib/i18n";
 import { maintenanceHtml } from "@/lib/maintenance-page";
 import { contact, whatsappNumber } from "@/lib/site";
 import { getDeveloper } from "@/server/developer-state";
@@ -13,7 +13,7 @@ export async function GET(request) {
   await getSiteSettings(); // email dan kontak dari /admin/kontak
   const kind = request.headers.get("x-dd-lock");
   if (kind !== "site" && kind !== "page") return new Response(null, { status: 307, headers: { location: "/" } });
-  const lang = request.headers.get("x-dd-lang") === "id" ? "id" : "en";
+  const lang = isLocale(request.headers.get("x-dd-lang")) ? request.headers.get("x-dd-lang") : "en";
   const asked = request.headers.get("x-dd-path") ?? "";
   const path = /^\/(?![/\\])/.test(asked) ? asked : "/";
   const developer = await getDeveloper();
@@ -22,7 +22,8 @@ export async function GET(request) {
     kind,
     lang,
     path,
-    message: developer.message[lang],
+    // Pesan dari /admin/developer hanya ditulis dalam English dan Indonesia; bahasa lain memakai English.
+    message: developer.message[lang] || developer.message.en,
     until: developer.until,
     whatsapp: whatsappNumber(),
     email: contact.email,

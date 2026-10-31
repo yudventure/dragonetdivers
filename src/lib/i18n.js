@@ -1,13 +1,21 @@
-// Dua bahasa situs publik: English di akar (/, /services/fun-dives) dan Bahasa Indonesia di bawah /id
-// (/id, /id/services/fun-dives). Halaman ada di app/[lang]; proxy.js menulis ulang alamat English ke
-// /en/... di belakang layar. Teks antarmuka di src/content/ui.js. Admin (/admin) hanya Bahasa Indonesia.
-// File ini murni (tanpa Next.js) karena dipakai proxy.js dan diuji di tests/i18n.test.js.
+// Empat bahasa situs publik: English di akar (/, /services/fun-dives), lalu Bahasa Indonesia, Mandarin
+// (Tionghoa Sederhana), dan Korea di bawah /id, /zh, dan /ko (permintaan pemilik akhir Oktober 2026 untuk
+// zh dan ko). Halaman ada di app/[lang]; proxy.js menulis ulang alamat English ke /en/... di belakang
+// layar. Teks antarmuka di src/content/ui.js (en, id) dan src/content/locales/{zh,ko}.js. Admin (/admin)
+// hanya Bahasa Indonesia. File ini murni (tanpa Next.js) karena dipakai proxy.js dan diuji di
+// tests/i18n.test.js.
 
-export const locales = ["en", "id"];
+export const locales = ["en", "id", "zh", "ko"];
 export const defaultLocale = "en";
-export const localeNames = { en: "English", id: "Bahasa Indonesia" };
-export const intlLocale = { en: "en-US", id: "id-ID" };
-export const ogLocale = { en: "en_US", id: "id_ID" };
+/** Nama bahasa dalam bahasanya sendiri (daftar pilihan bahasa) dan singkatannya (tombol header). */
+export const localeNames = { en: "English", id: "Bahasa Indonesia", zh: "简体中文", ko: "한국어" };
+export const localeShort = { en: "EN", id: "ID", zh: "中文", ko: "한국어" };
+/** Nama bahasa dalam Bahasa Indonesia untuk dashboard /admin. */
+export const localeNamesId = { en: "English", id: "Indonesia", zh: "Mandarin", ko: "Korea" };
+export const intlLocale = { en: "en-US", id: "id-ID", zh: "zh-CN", ko: "ko-KR" };
+export const ogLocale = { en: "en_US", id: "id_ID", zh: "zh_CN", ko: "ko_KR" };
+/** Kode bahasa untuk <html lang> dan hreflang (zh-Hans supaya peramban memakai huruf Tionghoa Sederhana). */
+export const htmlLang = { en: "en", id: "id", zh: "zh-Hans", ko: "ko" };
 
 export const isLocale = (value) => locales.includes(value);
 
@@ -20,13 +28,13 @@ export function localeHref(lang, href = "/") {
   return `/${lang}${path === "/" ? "" : path}${rest}`;
 }
 
-/** Alamat yang sama di setiap bahasa (untuk hreflang dan tombol EN / ID). path tanpa awalan bahasa. */
-export const alternates = (path = "/") => Object.fromEntries(locales.map((lang) => [lang, localeHref(lang, path)]));
+/** Alamat yang sama di setiap bahasa, berkunci kode hreflang (metadata halaman). path tanpa awalan bahasa. */
+export const alternates = (path = "/") => Object.fromEntries(locales.map((lang) => [htmlLang[lang], localeHref(lang, path)]));
 
 /**
  * Keputusan proxy untuk sebuah path:
  *   /en, /en/...  → { redirect } ke alamat tanpa /en (English cukup satu alamat)
- *   /id, /id/...  → {} diteruskan apa adanya
+ *   /id, /zh, /ko (dan di bawahnya) → {} diteruskan apa adanya
  *   selain itu    → { rewrite: "/en" + path } ke halaman English
  */
 export function localeRoute(pathname) {
@@ -37,19 +45,23 @@ export function localeRoute(pathname) {
 }
 
 // Pilihan bahasa tamu diingat (permintaan pemilik, Oktober 2026: "kalau memilih English, semuanya English").
-// Tombol EN / ID menambahkan ?lang=xx; proxy.js menyimpannya di cookie dd_lang selama setahun dan sejak itu
+// Tombol bahasa menambahkan ?lang=xx; proxy.js menyimpannya di cookie dd_lang selama setahun dan sejak itu
 // mengalihkan alamat berbahasa lain (tautan /id dari riwayat peramban, email, atau admin) ke bahasa pilihan.
 // Tanpa pilihan (pengunjung baru, Google) alamat dipakai apa adanya; bawaan tetap English di akar.
 export const LANG_COOKIE = "dd_lang";
 export const LANG_PARAM = "lang";
 export const LANG_COOKIE_DAYS = 365;
 
-/** Bahasa sebuah alamat publik: /id dan /id/... Indonesia, selain itu English. */
-export const langOfPath = (pathname) => (pathname === "/id" || pathname.startsWith("/id/") ? "id" : defaultLocale);
+/** Bahasa sebuah alamat publik: /id, /zh, /ko (dan di bawahnya) bahasanya masing-masing, selain itu English. */
+export function langOfPath(pathname) {
+  const [, first] = pathname.split("/");
+  return first !== defaultLocale && isLocale(first) ? first : defaultLocale;
+}
 
-/** Alamat yang sama dalam bahasa lain: "/id/services/x" → "/services/x" (en), "/" → "/id" (id). */
+/** Alamat yang sama dalam bahasa lain: "/id/services/x" → "/services/x" (en), "/" → "/zh" (zh). */
 export function pathIn(lang, pathname) {
-  const base = langOfPath(pathname) === "id" ? pathname.slice(3) || "/" : pathname;
+  const from = langOfPath(pathname);
+  const base = from === defaultLocale ? pathname : pathname.slice(from.length + 1) || "/";
   return localeHref(lang, base);
 }
 

@@ -4,6 +4,8 @@
 // atau klaim lain yang belum diberikan pemilik. Tambahkan di sini bila datanya sudah ada.
 // Setiap layanan punya teks English (en) dan Bahasa Indonesia (id) dengan kunci yang sama; nama biota
 // dalam bahasa kontennya (mandarinfish / ikan mandarin, BRANDING.md §8).
+import * as koPack from "../content/locales/ko.js";
+import * as zhPack from "../content/locales/zh.js";
 
 export const services = [
   {
@@ -182,6 +184,12 @@ export const services = [
     },
   },
 ];
+
+// Mandarin dan Korea dari src/content/locales/, berkunci slug.
+for (const service of services) {
+  service.zh = zhPack.services[service.slug];
+  service.ko = koPack.services[service.slug];
+}
 
 /** Layanan dalam satu bahasa: { slug, title, summary, chips, ask, intro, forWho, goodToKnow }. */
 export const localizeService = (service, lang = "en") => ({ slug: service.slug, ...(service[lang] ?? service.en) });

@@ -1,4 +1,5 @@
 import "server-only";
+import { isLocale } from "@/lib/i18n";
 import { query } from "./db";
 
 // Pesanan di MySQL (tabel orders, database/migrations/003_orders.sql) dan isinya per paket (tabel
@@ -42,7 +43,7 @@ export const orderFromRow = (row) => ({
   date: row.dive_date,
   certification: row.certification,
   notes: row.notes,
-  lang: row.locale === "id" ? "id" : "en",
+  lang: isLocale(row.locale) ? row.locale : "en",
   dueAt: iso(row.due_at),
   paidAt: iso(row.paid_at),
   createdAt: iso(row.created_at),

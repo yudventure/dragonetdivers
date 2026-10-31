@@ -2,7 +2,7 @@
 // verifikasi tag HTML yang ditempel tim di /admin/google (disimpan di settings baris "site", dipasang di
 // <head> lewat app/[lang]/layout.jsx), sitemap.xml (app/sitemap.js), dan robots.txt (app/robots.js).
 // Fungsi murni, diuji di tests/seo.test.js.
-import { defaultLocale, localeHref, locales } from "./i18n.js";
+import { defaultLocale, htmlLang, localeHref, locales } from "./i18n.js";
 
 const TOKEN = /^[A-Za-z0-9_-]{20,100}$/;
 const DNS_PREFIX = "google-site-verification=";
@@ -30,12 +30,13 @@ export function googleVerificationOf(value) {
 export const sitemapPaths = (serviceSlugs) => ["/", ...serviceSlugs.map((slug) => `/services/${slug}`)];
 
 /**
- * Isi sitemap.xml: setiap halaman dalam setiap bahasa, dengan pasangan bahasanya (hreflang) supaya Google
- * menampilkan versi English atau Indonesia sesuai bahasa pencarinya. origin tanpa garis miring akhir.
+ * Isi sitemap.xml: setiap halaman dalam setiap bahasa (English, Indonesia, Mandarin, Korea), dengan pasangan
+ * bahasanya (hreflang, kode htmlLang) supaya Google menampilkan versi yang sesuai bahasa pencarinya.
+ * origin tanpa garis miring akhir.
  */
 export function sitemapEntries(origin, serviceSlugs) {
   return sitemapPaths(serviceSlugs).flatMap((path) => {
-    const languages = Object.fromEntries(locales.map((lang) => [lang, origin + localeHref(lang, path)]));
+    const languages = Object.fromEntries(locales.map((lang) => [htmlLang[lang], origin + localeHref(lang, path)]));
     languages["x-default"] = origin + localeHref(defaultLocale, path);
     return locales.map((lang) => ({
       url: origin + localeHref(lang, path),

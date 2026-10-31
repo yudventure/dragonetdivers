@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal, flushSync } from "react-dom";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import { useCurrency, useRateText } from "./currency";
-import { serviceArt } from "./ServiceCard";
+import { serviceArt } from "./service-art";
 import { BanknoteIcon, ChatIcon, CheckIcon, ChevronIcon, CloseIcon, GlobeIcon, MenuIcon, Wave } from "./icons";
 
 // Menu situs (BRANDING.md §9.1). Desktop (lg ke atas): menu di tengah (Layanan sebagai daftar turun
@@ -107,7 +107,7 @@ function PreferencesMenu({ lang, languages, t }) {
               const current = item.lang === lang;
               return (
                 <a key={item.lang} {...languageLink(item, current)} className={`${OPTION} ${optionTone(current)}`}>
-                  <span className="w-7 text-xs font-bold tracking-wide">{item.short}</span>
+                  <span className="w-7 text-xs font-bold tracking-wide">{item.lang.toUpperCase()}</span>
                   <span className="flex-1">{item.name}</span>
                   {current && <CheckIcon className="size-4" />}
                 </a>

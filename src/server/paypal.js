@@ -1,5 +1,6 @@
 import "server-only";
 import { envText } from "@/lib/env";
+import { intlLocale } from "@/lib/i18n";
 
 // PayPal Checkout (Orders API v2), diambil dari Zanclus. Key dari hPanel: PAYPAL_CLIENT_ID dan
 // PAYPAL_CLIENT_SECRET (developer.paypal.com → Apps & Credentials), PAYPAL_MODE=live untuk
@@ -91,7 +92,7 @@ export async function createPaypalOrder({ orderId, usd, description, returnUrl, 
         paypal: {
           experience_context: {
             brand_name: "Dragonet Divers",
-            locale: lang === "id" ? "id-ID" : "en-US",
+            locale: intlLocale[lang] ?? intlLocale.en,
             shipping_preference: "NO_SHIPPING",
             user_action: "PAY_NOW",
             return_url: returnUrl,

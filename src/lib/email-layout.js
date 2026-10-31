@@ -3,6 +3,7 @@
 // dasar putih, satu tombol oranye (mandarin dengan teks abyss) per email. Fungsi murni: alamat situs
 // dan kontak dikirim pemanggil.
 import tokens from "../../brand/tokens.json" with { type: "json" };
+import { htmlLang } from "./i18n.js";
 
 const { brand: b, neutral: n, semantic: s } = tokens.color;
 export const colors = {
@@ -97,7 +98,7 @@ export function layout({ lang = "en", subject, preheader = "", reference = "", b
   const host = String(base).replace(/^https?:\/\//, "");
   const wa = contact.whatsapp ? `https://wa.me/${contact.whatsapp}` : "";
   return `<!doctype html>
-<html lang="${lang}">
+<html lang="${htmlLang[lang] ?? lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

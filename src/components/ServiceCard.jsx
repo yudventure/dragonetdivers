@@ -1,23 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-// Ilustrasi 3D (Higgsfield GPT Image 2.5, latar transparan), satu per layanan di src/lib/services.js.
-import funDives from "../assets/services/fun-dives.webp";
-import diveCourses from "../assets/services/dive-courses.webp";
-import snorkeling from "../assets/services/snorkeling.webp";
-import islandTrips from "../assets/services/island-trips.webp";
-import duskDives from "../assets/services/dusk-dives.webp";
 import { uiText } from "@/content/ui";
 import { localeHref } from "@/lib/i18n";
 import { Price } from "./currency";
 import { ArrowIcon } from "./icons";
-
-export const serviceArt = {
-  "fun-dives": funDives,
-  "dive-courses": diveCourses,
-  snorkeling,
-  "island-trips": islandTrips,
-  "dusk-dives": duskDives,
-};
+import { serviceArt } from "./service-art";
 
 // Panel ilustrasi: gradasi laguna seperti gelembung + chip teks putih yang melayang.
 export function ServiceVisual({ service, className = "", sizes, priority = false, chips = true }) {

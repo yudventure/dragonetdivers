@@ -1,3 +1,4 @@
+import { isLocale } from "@/lib/i18n";
 import { ORDER_MAIL_KINDS, sampleOrder } from "@/lib/order-mail";
 import { otpMail } from "@/lib/otp-mail";
 import { currentAdmin } from "@/server/admin-auth";
@@ -14,7 +15,7 @@ export async function GET(request) {
   if (!(await currentAdmin())) return new Response("Masuk dulu di /admin.", { status: 401 });
   const params = new URL(request.url).searchParams;
   const kind = params.get("kind");
-  const lang = params.get("lang") === "en" ? "en" : "id";
+  const lang = isLocale(params.get("lang")) ? params.get("lang") : "id";
   const method = ["midtrans", "paypal", "transfer", "cash"].includes(params.get("method")) ? params.get("method") : "midtrans";
   let mail;
   if (kind === "otp") {

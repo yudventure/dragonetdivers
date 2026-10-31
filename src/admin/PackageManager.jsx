@@ -35,7 +35,7 @@ function Field({ label, hint, children, className = "" }) {
   );
 }
 
-/** Form tambah/ubah paket. Teks English dan Indonesia berdampingan supaya keduanya diisi. */
+/** Form tambah/ubah paket. Teks English dan Indonesia berdampingan supaya keduanya diisi (halaman Mandarin dan Korea memakai English). */
 function PackageForm({ initial, services, onDone, onCancel }) {
   const [value, setValue] = useState(initial);
   const form = useRef(null);

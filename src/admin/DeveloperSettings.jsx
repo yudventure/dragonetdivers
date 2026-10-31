@@ -124,7 +124,7 @@ export default function DeveloperSettings({ initial }) {
 
       <section className={BOX}>
         <h2 className="text-xl text-abyss">Pesan untuk pengunjung</h2>
-        <p className="text-sm text-slate">Boleh dikosongkan. Tanpa pesan, halaman perawatan memakai teks bawaan di bawah ini.</p>
+        <p className="text-sm text-slate">Boleh dikosongkan. Tanpa pesan, halaman perawatan memakai teks bawaan di bawah ini. Pengunjung halaman Mandarin dan Korea melihat pesan English, atau teks bawaan dalam bahasanya bila kosong.</p>
         <div className="grid gap-4 lg:grid-cols-2">
           {[
             ["id", "Bahasa Indonesia"],

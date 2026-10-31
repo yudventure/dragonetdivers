@@ -2,6 +2,8 @@
 // harus sama (tests/order-mail.test.js). Tiga email: "order" saat pesanan dibuat, "reminder" bila
 // pembayaran belum masuk menjelang batas waktu, "paid" saat pembayaran diterima. Tanpa titik dua,
 // titik koma, dan tanda pisah panjang di kalimat. Tanpa janji layanan yang belum diberikan pemilik.
+import * as koPack from "./locales/ko.js";
+import * as zhPack from "./locales/zh.js";
 export const orderMailText = {
   en: {
     reference: "Booking",
@@ -149,4 +151,6 @@ export const orderMailText = {
       cash: "Tunai",
     },
   },
+  zh: zhPack.orderMail,
+  ko: koPack.orderMail,
 };

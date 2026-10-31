@@ -16,6 +16,8 @@ import learnDiver from "../assets/learn-diver.webp";
 import mantaBelly from "../assets/gallery/manta-belly.webp";
 import mantaSunrays from "../assets/gallery/manta-sunrays.webp";
 import mantaPoster from "../assets/ocean-manta-loop.webp";
+import * as koPack from "./locales/ko.js";
+import * as zhPack from "./locales/zh.js";
 
 export const gallery = [
   {
@@ -63,3 +65,9 @@ export const gallery = [
     illustration: true,
   },
 ];
+
+// Teks alt dan judul Mandarin dan Korea dari src/content/locales/, urut sama dengan item di atas.
+gallery.forEach((item, i) => {
+  const key = item.alt ? "alt" : "title";
+  item[key] = { ...item[key], zh: zhPack.gallery[i], ko: koPack.gallery[i] };
+});

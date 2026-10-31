@@ -38,7 +38,7 @@ export default async function PackagesPage() {
   return (
     <AdminShell admin={admin} active="paket">
       <ModuleTitle title="Paket & harga">
-        Paket yang aktif tampil di halaman layanannya (English dan Indonesia) dengan tombol Pesan sekarang. Harga dalam Rupiah; tamu yang memilih
+        Paket yang aktif tampil di halaman layanannya dengan tombol Pesan sekarang. Nama dan isi paket ditulis dalam English dan Indonesia; halaman Mandarin dan Korea memakai teks English. Harga dalam Rupiah; tamu yang memilih
         dolar melihat perkiraannya, dan PayPal menagih dalam dolar dengan kurs hari itu.
       </ModuleTitle>
       <DatabaseNotice database={database} />

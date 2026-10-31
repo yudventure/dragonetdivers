@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { localeNamesId } from "@/lib/i18n";
 
 const STATUS = {
   pending: ["Menunggu bayar", "bg-sunrise-wash text-ember ring-1 ring-sunrise"],
@@ -179,7 +180,7 @@ export default function OrderList({ orders, mails = {} }) {
               </span>
               {order.status === "pending" && order.dueAt && <span className="text-slate">Batas bayar {wit(order.dueAt)}</span>}
               {order.paidAt && <span className="text-slate">Lunas {wit(order.paidAt)}</span>}
-              <span className="text-xs text-slate">{order.lang === "id" ? "Pesan dari situs Indonesia" : "Pesan dari situs English"}</span>
+              <span className="text-xs text-slate">{`Pesan dari situs ${localeNamesId[order.lang] ?? "English"}`}</span>
             </div>
             <Actions order={order} />
           </li>

@@ -48,7 +48,7 @@ function itemsTable(items, { lang, t, money, serviceTitles }) {
  */
 export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}, contact = {}, whatsapp = null }) {
   if (!ORDER_MAIL_KINDS.includes(kind)) throw new Error(`Jenis email tidak dikenal: ${kind}`);
-  const lang = order.lang === "id" ? "id" : "en";
+  const lang = orderMailText[order.lang] ? order.lang : "en";
   const t = orderMailText[lang];
   const k = t.kinds[kind];
   const ui = uiText(lang);

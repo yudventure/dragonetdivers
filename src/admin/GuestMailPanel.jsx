@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { localeNamesId } from "@/lib/i18n";
 
 const PREVIEWS = [
   ["Pesanan diterima", "kind=order&method=midtrans"],
@@ -63,9 +64,9 @@ export default function GuestMailPanel({ configured, issues, sender }) {
           {PREVIEWS.map(([label, query]) => (
             <li key={label} className="flex flex-wrap items-center gap-x-3">
               <span className="text-abyss">{label}</span>
-              {(query === "kind=otp" ? ["id"] : ["id", "en"]).map((lang) => (
+              {(query === "kind=otp" ? ["id"] : ["id", "en", "zh", "ko"]).map((lang) => (
                 <a key={lang} href={`/api/admin/mail-preview?${query}&lang=${lang}`} target="_blank" rel="noopener" className="font-semibold text-teal hover:underline">
-                  {lang === "id" ? "Indonesia" : "English"}
+                  {localeNamesId[lang]}
                 </a>
               ))}
             </li>

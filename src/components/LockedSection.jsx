@@ -4,7 +4,7 @@ import { maintenanceText } from "@/content/maintenance";
 // Pengganti satu bagian beranda yang ditutup mode developer (src/lib/developer.js). id bagian tetap
 // ada supaya tautan menu (#faq, #gallery, ...) tetap mendarat di tempatnya.
 export default function LockedSection({ id, lang }) {
-  const t = maintenanceText[lang === "id" ? "id" : "en"];
+  const t = maintenanceText[lang] ?? maintenanceText.en;
   return (
     <section id={id} aria-labelledby={`${id}-locked`} className="scroll-mt-24 bg-white">
       <div className="gutter mx-auto max-w-[1200px] py-10 md:py-14">

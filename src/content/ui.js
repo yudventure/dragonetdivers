@@ -1,7 +1,10 @@
-// Teks antarmuka situs publik dalam dua bahasa (src/lib/i18n.js). Kunci en dan id harus sama;
-// tests/i18n.test.js memeriksanya. {nama} diisi dengan format() dari src/lib/i18n.js.
-// Isi layanan, FAQ, langkah perjalanan, dan galeri ada di filenya masing-masing (juga dua bahasa).
+// Teks antarmuka situs publik (src/lib/i18n.js): English (en) dan Bahasa Indonesia (id) di sini, Mandarin (zh)
+// dan Korea (ko) di src/content/locales/. Kunci semua bahasa harus sama; tests/i18n.test.js dan
+// tests/locales.test.js memeriksanya. {nama} diisi dengan format() dari src/lib/i18n.js.
+// Isi layanan, FAQ, langkah perjalanan, dan galeri ada di filenya masing-masing (juga empat bahasa).
 // Bahasa Indonesia memakai sapaan "kamu", ramah seperti dive guide (BRANDING.md §8).
+import * as koPack from "./locales/ko.js";
+import * as zhPack from "./locales/zh.js";
 
 const en = {
   meta: {
@@ -664,7 +667,7 @@ const id = {
   },
 };
 
-export const ui = { en, id };
+export const ui = { en, id, zh: zhPack.ui, ko: koPack.ui };
 
 /** Teks untuk satu bahasa; bahasa lain jatuh ke English. */
 export const uiText = (lang) => ui[lang] ?? ui.en;

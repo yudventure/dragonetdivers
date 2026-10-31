@@ -2,7 +2,7 @@
 // yang menjawab dengan status 503 supaya mesin pencari kembali lagi nanti. Fungsi murni.
 import { maintenanceText } from "../content/maintenance.js";
 import { colors, esc } from "./email-layout.js";
-import { chooseLangHref, format, localeHref } from "./i18n.js";
+import { chooseLangHref, format, htmlLang, intlLocale, localeHref } from "./i18n.js";
 
 const c = colors;
 const FONT = "'Plus Jakarta Sans','Segoe UI',system-ui,-apple-system,sans-serif";
@@ -13,7 +13,7 @@ export function untilLabel(until, lang) {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(until ?? "")) return "";
   const date = new Date(`${until}:00Z`);
   if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-US", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }).format(date);
+  return new Intl.DateTimeFormat(intlLocale[lang] ?? intlLocale.en, { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }).format(date);
 }
 
 /**
@@ -21,17 +21,18 @@ export function untilLabel(until, lang) {
  * bahasa, untuk tautan ganti bahasa. whatsapp = nomor (angka) atau null.
  */
 export function maintenanceHtml({ kind = "site", lang = "en", path = "/", message = "", until = "", whatsapp = null, email = "", previewExit = "" }) {
-  const t = maintenanceText[lang === "id" ? "id" : "en"];
+  const t = maintenanceText[lang] ?? maintenanceText.en;
   const title = kind === "page" ? t.pageTitle : t.siteTitle;
   const text = message || (kind === "page" ? t.pageText : t.siteText);
   const when = untilLabel(until, lang);
-  const other = lang === "id" ? "en" : "id";
+  // Tautan ganti bahasa: English ke Indonesia, bahasa lain ke English (label t.language).
+  const other = lang === "en" ? "id" : "en";
   const link = (href, label, solid = false) =>
     `<a href="${esc(href)}" style="display:inline-block;margin:6px 6px 0 0;padding:12px 22px;border-radius:999px;font-weight:700;text-decoration:none;${
       solid ? `background:${c.teal};color:${c.white};` : `background:${c.white};color:${c.teal};border:1.5px solid ${c.mist};`
     }">${esc(label)}</a>`;
   return `<!doctype html>
-<html lang="${lang}">
+<html lang="${htmlLang[lang] ?? "en"}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

@@ -4,6 +4,8 @@
 // sekitar 2 jam, kartu masuk taman laut dijual di kantor otoritas di Waisai (kkprajaampat.com).
 // Jadwal dan harga sengaja tidak ditulis (CLAUDE.md), karena sering berubah dan sumbernya berbeda-beda.
 import { contact } from "./site.js";
+import * as koPack from "../content/locales/ko.js";
+import * as zhPack from "../content/locales/zh.js";
 
 /** Proyeksi peta bersama (garis-pantai.json): 1 satuan = 0,001 derajat, titik nol 0.06 LU 130.18 BT. */
 export const toMap = (lat, lng) => [(lng - 130.18) * 1000, (0.06 - lat) * 1000];
@@ -76,4 +78,4 @@ const id = [
   },
 ];
 
-export const steps = { en, id };
+export const steps = { en, id, zh: zhPack.steps, ko: koPack.steps };

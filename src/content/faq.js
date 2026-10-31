@@ -5,6 +5,8 @@
 // belum diberikan pemilik (CLAUDE.md). Jawaban berupa teks biasa; `link` opsional; `rate: true`
 // menambahkan kurs US$ ke Rupiah hari ini di bawah jawabannya (src/server/exchange-rate.js).
 // English (en) dan Bahasa Indonesia (id) berurutan sama; tests/i18n.test.js memeriksa jumlah dan tautannya.
+import * as koPack from "./locales/ko.js";
+import * as zhPack from "./locales/zh.js";
 const en = [
   {
     q: "Do I need to be a certified diver?",
@@ -81,4 +83,4 @@ const id = [
   },
 ];
 
-export const faqs = { en, id };
+export const faqs = { en, id, zh: zhPack.faq, ko: koPack.faq };
