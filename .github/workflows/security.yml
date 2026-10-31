@@ -1,0 +1,84 @@
+name: Keamanan
+
+# Setiap hari (dan lewat Run workflow): periksa dependensi npm dengan npm audit (permintaan pemilik,
+# Oktober 2026, setelah Hostinger menandai nodemailer rentan: "jangan sampai ada lagi yang berulang").
+# Kerentanan yang bisa diperbaiki di dalam rentang versi package.json (npm audit fix, tanpa --force)
+# diperbaiki, diuji (npm test + npm run build), lalu langsung masuk main dan tayang lewat deploy otomatis
+# Hostinger. Kerentanan yang tersisa (butuh naik versi besar) membuat cek ini merah dengan ringkasan di
+# halaman run, supaya ditangani lewat branch kerja seperti biasa.
+on:
+  schedule:
+    - cron: "17 20 * * *" # 05.17 WIT
+  workflow_dispatch:
+
+# Antre bersama job merge di ci.yml supaya dua push ke main tidak bertabrakan.
+concurrency:
+  group: merge-to-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      - name: Perbaiki dependensi rentan
+        id: fix
+        run: |
+          npm audit fix || true
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- package.json package-lock.json
+          fi
+
+      - name: Uji perbaikan
+        if: steps.fix.outputs.changed == 'true'
+        run: |
+          npm test
+          npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Masukkan ke main
+        if: steps.fix.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "Keamanan: perbarui dependensi rentan (npm audit fix otomatis)"
+          if ! git push origin HEAD:main; then
+            # main bergerak selama uji: susun ulang di atasnya; bila bentrok, run berikutnya mencoba lagi.
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+          echo "### Dependensi rentan diperbarui dan masuk main" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sisa kerentanan
+        run: |
+          if npm audit --audit-level=moderate; then
+            echo "Tidak ada kerentanan sedang atau lebih tinggi." >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "### Kerentanan yang perlu naik versi besar (tidak bisa diperbaiki otomatis)"
+              echo '```'
+              npm audit || true
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Kerentanan tersisa::npm audit masih menemukan kerentanan. Lihat ringkasan run ini."
+            exit 1
+          fi

@@ -42,4 +42,5 @@ Website dive center Dragonet Divers Raja Ampat (dragonetdivers.com). Pemilik ber
 ## Git & deploy
 - `main` = produksi; Hostinger membangun dari `main`. Kerjakan di branch lain.
 - **Setiap push ke branch selain `main` yang lulus test + build otomatis digabung ke `main` dan tayang** (job `merge` di `.github/workflows/ci.yml`, lalu job `deploy` → `.github/workflows/deploy.yml` → `scripts/hostinger-deploy.mjs` lewat API Hostinger, secret `HOSTINGER_API_TOKEN`). Push hanya pekerjaan yang sudah selesai dan teruji; percobaan pakai branch `wip/…`.
+- **Keamanan dependensi** (permintaan pemilik Oktober 2026 setelah Hostinger menandai `nodemailer` 10.0.10 rentan): semua dependensi memakai rentang `^` (jangan kunci versi persis, karena `npm audit fix` tidak bisa memperbaikinya). `.github/workflows/security.yml` setiap hari menjalankan `npm audit fix` tanpa `--force`, menguji (`npm test` + `npm run build`), lalu push langsung ke `main` (tayang lewat deploy otomatis Hostinger); kerentanan yang butuh naik versi besar membuat cek **Keamanan** merah dengan ringkasan. CI menampilkan `npm audit` sebagai peringatan.
 - Panduan Hostinger, DNS, dan MySQL: `HOSTINGER-DEPLOY.md`.
