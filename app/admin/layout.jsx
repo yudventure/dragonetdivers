@@ -3,7 +3,7 @@ import { getSiteSettings } from "@/server/site-settings";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
-// Root layout dashboard tim (/admin), terpisah dari situs publik dua bahasa (app/[lang]). Hanya
+// Root layout dashboard tim (/admin), terpisah dari situs publik empat bahasa (app/[lang]). Hanya
 // Bahasa Indonesia dan tidak diindeks mesin pencari.
 export const metadata = {
   metadataBase: new URL(site.url),

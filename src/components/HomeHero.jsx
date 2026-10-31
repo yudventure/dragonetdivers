@@ -5,6 +5,7 @@ import { preload } from "react-dom";
 // kiri). Cara membuat ulang: brand/ocean/README.md.
 import poster from "../assets/ocean-manta-loop.webp";
 import { uiText } from "@/content/ui";
+import { seaWords } from "@/lib/sea-conditions";
 import { site } from "@/lib/site";
 import { getSeaConditions } from "@/server/sea-conditions";
 import LoopVideo from "./LoopVideo";
@@ -82,7 +83,7 @@ export default async function HomeHero({ lang, conditionsLocked = false }) {
           minimal 1200 px, dikurangi gutter), di bawah video (ponsel, tablet). */}
       {!conditionsLocked && (
         <div className="gutter mx-auto max-w-[max(1200px,85%)] pt-8 lg:absolute lg:right-[max(32px,calc((100%-max(1200px,85%))/2+32px))] lg:bottom-24 lg:w-[340px] lg:max-w-none lg:p-0">
-          <HeroConditions initial={conditions} lang={lang} t={t.conditions} />
+          <HeroConditions initial={conditions} lang={lang} t={t.conditions} words={seaWords(lang)} />
         </div>
       )}
     </section>

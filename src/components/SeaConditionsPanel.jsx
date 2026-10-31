@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 // Ilustrasi AI buatan Higgsfield (GPT Image 2.5), bukan dokumentasi lokasi. Cara membuat: brand/boat/README.md.
 import boatPhoto from "../assets/boat-divers.webp";
 import { format, intlLocale } from "@/lib/i18n";
-import { arah, translateLabel } from "@/lib/sea-conditions";
+import { arahDari } from "@/lib/compass";
 import {
   ArrowNorthIcon,
   CloudFogIcon,
@@ -44,7 +44,8 @@ function Tile({ icon: Icon, label, value, unit, detail, arrow, compact }) {
   );
 }
 
-const join = (...parts) => parts.filter(Boolean).join(", ") || null;
+// Pemisah keterangan: koma Tionghoa untuk Mandarin, koma biasa untuk bahasa lain.
+const join = (lang, ...parts) => parts.filter(Boolean).join(lang === "zh" ? "，" : ", ") || null;
 const plus180 = (deg) => (deg == null ? null : (deg + 180) % 360);
 
 /** Data kondisi laut: awal dari server (cache 15 menit), lalu diperbarui tiap 10 menit selama tab terbuka. */
@@ -86,14 +87,14 @@ function statusText(data, failed, lang, t) {
 }
 
 /** Enam ukuran kondisi laut: cuaca, angin, gelombang, arus, suhu air, matahari terbenam. */
-function Tiles({ data, lang, t, compact = false }) {
+function Tiles({ data, lang, t, words, compact = false }) {
   const w = data?.weather;
   const s = data?.sea;
   const WeatherIcon = w?.kind === "clear" ? (w.isDay ? SunIcon : MoonIcon) : (WEATHER_ICONS[w?.kind] ?? CloudIcon);
   const sunset = data?.sunset && (lang === "id" ? data.sunset.replace(":", ".") : data.sunset);
-  const label = (value) => translateLabel(value, lang);
+  const label = (value) => (value ? (words?.labels?.[value] ?? value) : value);
   const n = (value) => (typeof value === "number" ? value.toLocaleString(intlLocale[lang]) : value);
-  const dir = (short, degrees) => (lang === "id" ? arah(degrees) : short);
+  const dir = (short, degrees) => (words ? arahDari(degrees, words.compass) : short);
   return (
     <>
       <Tile compact={compact} icon={WeatherIcon} label={t.weather} value={n(w?.tempC)} unit="°C" detail={label(w?.label)} />
@@ -103,7 +104,7 @@ function Tiles({ data, lang, t, compact = false }) {
         label={t.wind}
         value={n(w?.windKmh)}
         unit={t.kmh}
-        detail={join(w?.windFrom && format(t.from, { dir: dir(w.windFrom, w.windFromDeg) }), w?.gustKmh != null && format(t.gusts, { n: n(w.gustKmh) }))}
+        detail={join(lang, w?.windFrom && format(t.from, { dir: dir(w.windFrom, w.windFromDeg) }), w?.gustKmh != null && format(t.gusts, { n: n(w.gustKmh) }))}
         arrow={plus180(w?.windFromDeg)}
       />
       <Tile
@@ -112,7 +113,7 @@ function Tiles({ data, lang, t, compact = false }) {
         label={t.waves}
         value={n(s?.waveM)}
         unit="m"
-        detail={join(label(s?.seaState), s?.waveFrom && format(t.from, { dir: dir(s.waveFrom, s.waveFromDeg) }))}
+        detail={join(lang, label(s?.seaState), s?.waveFrom && format(t.from, { dir: dir(s.waveFrom, s.waveFromDeg) }))}
         arrow={plus180(s?.waveFromDeg)}
       />
       <Tile
@@ -153,8 +154,9 @@ function SourceNote({ t, className }) {
 
 // Strip kondisi laut di halaman layanan (BRANDING.md §9.7): kotak gelap dengan foto penyelam yang
 // bersiap turun dari perahu di belakang teks putih; lapisan Abyss menjaga keterbacaan.
-// Label dan satuan dari src/content/ui.js (t); arah dalam Bahasa Indonesia memakai delapan penjuru.
-export default function SeaConditionsPanel({ initial, lang, t }) {
+// Label dan satuan dari src/content/ui.js (t); label cuaca, gelombang, dan arah delapan penjuru untuk bahasa
+// selain English dari seaWords() di src/lib/sea-conditions.js (words, dikirim server).
+export default function SeaConditionsPanel({ initial, lang, t, words }) {
   const { data, failed } = useSeaConditions(initial);
 
   return (
@@ -186,7 +188,7 @@ export default function SeaConditionsPanel({ initial, lang, t }) {
           </div>
 
           <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
-            <Tiles data={data} lang={lang} t={t} />
+            <Tiles data={data} lang={lang} t={t} words={words} />
           </dl>
 
           <SourceNote t={t} className="mt-6 text-xs" />
@@ -202,7 +204,7 @@ export default function SeaConditionsPanel({ initial, lang, t }) {
  * tanpa foto. Ponsel dan tablet: kartu Abyss di bawah video, karena latar di sana putih. Enam ukuran dalam
  * dua kolom (tiga di tablet). id "conditions" untuk tautan footer.
  */
-export function HeroConditions({ initial, lang, t, className = "" }) {
+export function HeroConditions({ initial, lang, t, words, className = "" }) {
   const { data, failed } = useSeaConditions(initial);
 
   return (
@@ -224,7 +226,7 @@ export function HeroConditions({ initial, lang, t, className = "" }) {
         </p>
       </div>
       <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 lg:grid-cols-2">
-        <Tiles data={data} lang={lang} t={t} compact />
+        <Tiles data={data} lang={lang} t={t} words={words} compact />
       </dl>
       <SourceNote t={t} className="text-[11px] leading-snug" />
     </section>

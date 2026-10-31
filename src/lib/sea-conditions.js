@@ -3,6 +3,11 @@
 //   Cuaca:  https://open-meteo.com/en/docs
 //   Laut:   https://open-meteo.com/en/docs/marine-weather-api (gelombang, arus SMOC, suhu air)
 // File ini murni (tanpa Next.js) agar bisa dites; pemanggilan dengan cache ada di src/server/sea-conditions.js.
+// Memuat teks Mandarin dan Korea (src/content/locales/), jadi jangan diimpor client component; panelnya
+// menerima kata-kata lewat seaWords() dari server dan memakai src/lib/compass.js.
+import * as koPack from "../content/locales/ko.js";
+import { arahDari } from "./compass.js";
+import * as zhPack from "../content/locales/zh.js";
 
 export const PLACE = "Dampier Strait";
 // Tengah Selat Dampier, antara Kri dan Batanta. cell_selection=sea memilih sel grid laut terdekat.
@@ -96,15 +101,25 @@ export const LABELS_ID = {
   "Very rough": "Sangat tinggi",
 };
 
-export const translateLabel = (label, lang) => (lang === "id" && label ? (LABELS_ID[label] ?? label) : label);
+/** Label per bahasa; English apa adanya. Mandarin dan Korea dari src/content/locales/. */
+const LABELS = { id: LABELS_ID, zh: zhPack.seaLabels, ko: koPack.seaLabels };
+
+export const translateLabel = (label, lang) => (label ? (LABELS[lang]?.[label] ?? label) : label);
 
 // Arah mata angin delapan penjuru dalam Bahasa Indonesia (singkatan 16 penjuru jarang dipakai di sini).
 const ARAH = ["utara", "timur laut", "timur", "tenggara", "selatan", "barat daya", "barat", "barat laut"];
 
-export function arah(degrees) {
-  if (!Number.isFinite(degrees)) return null;
-  return ARAH[Math.round((((degrees % 360) + 360) % 360) / 45) % 8];
-}
+const ARAH_LANG = { id: ARAH, zh: zhPack.compass, ko: koPack.compass };
+
+/** Arah delapan penjuru dalam bahasa halaman (bawaan Indonesia); English memakai singkatan 16 penjuru. */
+export const arah = (degrees, lang = "id") => arahDari(degrees, ARAH_LANG[lang] ?? ARAH);
+
+/**
+ * Kata untuk panel kondisi laut (SeaConditionsPanel.jsx) dalam satu bahasa: label cuaca dan gelombang serta
+ * delapan arah. Dihitung di server dan dikirim sebagai prop, supaya teks bahasa lain tidak ikut ke peramban.
+ * English: null (label apa adanya, arah singkatan 16 penjuru).
+ */
+export const seaWords = (lang) => (LABELS[lang] ? { labels: LABELS[lang], compass: ARAH_LANG[lang] } : null);
 
 const num = (value) => (typeof value === "number" && Number.isFinite(value) ? value : null);
 const round = (value, digits = 0) => (value === null ? null : Number(value.toFixed(digits)));

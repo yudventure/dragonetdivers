@@ -32,7 +32,7 @@ export function siteUrl(value = process.env.NEXT_PUBLIC_SITE_URL) {
   return DEFAULT_URL;
 }
 
-// Tagline dan deskripsi dalam dua bahasa ada di src/content/ui.js (meta).
+// Tagline dan deskripsi tiap bahasa ada di src/content/ui.js (meta).
 export const site = {
   name: "Dragonet Divers Raja Ampat",
   shortName: "Dragonet Divers",

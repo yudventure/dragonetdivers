@@ -2,7 +2,7 @@
 
 Komponen peta interaktif dari skill **peta-raja-ampat** milik pemilik. Sumber kebenaran datanya adalah repo DAMPIER (`yudventure/dampier_system`). Salinan ini diambil dari situs Zanclus (`yudventure/zanclusdive`, `src/components/peta-raja-ampat/`), versi yang sudah punya baris pilihan wilayah yang bisa digeser di ponsel dan tombol "Back to the full map".
 
-Di Dragonet peta dipakai oleh `src/components/DiveSiteMap.jsx` (beranda, di antara layanan dan kursus):
+Di Dragonet peta dipakai oleh `src/components/DiveSiteMap.jsx` (beranda, di antara layanan dan kursus; judulnya dirender di server, peta interaktifnya `DiveSiteMapCanvas.jsx`):
 
 - Hanya titik selam & snorkel (`jenis: "selam"`, 15 titik) dan hanya wilayah yang punya titik. Logikanya di `src/lib/dive-map.js`, diuji `tests/dive-map.test.js`.
 - Kotak zoom tiap wilayah diperlebar sampai semua titiknya masuk (Arborek: Manta Sandy dan Manta Ridge).

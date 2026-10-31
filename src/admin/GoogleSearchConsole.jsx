@@ -219,7 +219,7 @@ export default function GoogleSearchConsole({ initial, siteUrl, pages }) {
               <span className="flex flex-wrap items-center gap-2 font-semibold text-abyss">
                 Sitemap <Chip ok>{pages} halaman</Chip>
               </span>
-              <span className="text-slate">Beranda dan halaman layanan dalam English dan Indonesia.</span>
+              <span className="text-slate">Beranda dan halaman layanan dalam English, Indonesia, Mandarin, dan Korea.</span>
               <a href={sitemap} target="_blank" rel="noopener" className="font-semibold break-all text-teal underline underline-offset-2">
                 {sitemap}
               </a>

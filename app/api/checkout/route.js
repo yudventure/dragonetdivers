@@ -1,6 +1,6 @@
 import { CheckoutError } from "@/lib/checkout";
 import { pageLocked } from "@/lib/developer";
-import { format } from "@/lib/i18n";
+import { format, isLocale } from "@/lib/i18n";
 import { uiText } from "@/content/ui";
 import { contact } from "@/lib/site";
 import { readJson, sameOrigin } from "@/server/admin-auth";
@@ -18,7 +18,8 @@ const FIELD = { closed: "date", full: "date" };
 // halaman pesanan (transfer bank). Salah isian satu paket dikembalikan dengan urutannya (index).
 export async function POST(request) {
   await getSiteSettings(); // email dan kontak dari /admin/kontak
-  const lang = new URL(request.url).searchParams.get("lang") === "id" ? "id" : "en";
+  const asked = new URL(request.url).searchParams.get("lang");
+  const lang = isLocale(asked) ? asked : "en";
   const errors = uiText(lang).checkout.errors;
   const fail = (field, status, index = null) =>
     Response.json({ error: FIELD[field] ?? field, index, message: format(errors[field] ?? errors.server, { email: contact.email }) }, { status, headers: noStore });

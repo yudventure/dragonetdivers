@@ -2,6 +2,8 @@
 // Peta dan datanya dari peta Raja Ampat bersama (src/components/peta-raja-ampat/, sumber DAMPIER),
 // disaring hanya titik selam & snorkel, seperti di situs Zanclus. Fungsi murni supaya bisa diuji.
 import { keSatuan } from "../components/peta-raja-ampat/logika.js";
+import * as koPack from "../content/locales/ko.js";
+import * as zhPack from "../content/locales/zh.js";
 
 /** Jenis tanda "Dive & snorkel site" di data/tata.json. */
 export const SITE_KIND = "selam";
@@ -56,6 +58,8 @@ export const mapText = {
     legenda: "Tanda di peta",
     lihatLayanan: "Lihat fun dive",
   },
+  zh: zhPack.diveMap,
+  ko: koPack.diveMap,
 };
 
 /** Tombol di kartu titik: ke halaman layanan fun dives (diberi awalan bahasa dengan localeHref). */

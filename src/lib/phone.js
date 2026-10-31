@@ -72,14 +72,20 @@ export function joinPhone(iso, national) {
   return `+${dial} ${rest}`.trim();
 }
 
-/** Negara awal: Indonesia untuk halaman Indonesia, selain itu wilayah bahasa peramban (en-AU → AU) bila dikenal. */
+/** Negara bawaan halaman Mandarin dan Korea bila peramban tidak menyebut wilayahnya. */
+const LANG_COUNTRY = { zh: "CN", ko: "KR" };
+
+/**
+ * Negara awal: Indonesia untuk halaman Indonesia, selain itu wilayah bahasa peramban (en-AU → AU) bila
+ * dikenal, lalu negara bawaan bahasa halaman (zh → CN, ko → KR), lalu Indonesia.
+ */
 export function defaultCountry(lang, languages = []) {
   if (lang === "id") return DEFAULT_COUNTRY;
   for (const tag of languages) {
     const region = /^[a-z]{2,3}-([A-Z]{2})\b/i.exec(tag)?.[1]?.toUpperCase();
     if (region && BY_ISO.has(region)) return region;
   }
-  return DEFAULT_COUNTRY;
+  return LANG_COUNTRY[lang] ?? DEFAULT_COUNTRY;
 }
 
 const fold = (text) =>

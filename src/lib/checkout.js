@@ -105,6 +105,14 @@ export function validateCart(input, { packages, methods, now = new Date() }) {
   return { items, name, email, whatsapp, certification, notes, method, amount: items.reduce((sum, item) => sum + item.amount, 0) };
 }
 
+/** Akhiran nama paket untuk paket lain di pesanan yang sama, per bahasa pesanan. */
+const MORE_ITEMS = {
+  en: (n) => ` + ${n} more`,
+  id: (n) => ` + ${n} lainnya`,
+  zh: (n) => ` 等另外${n}项`,
+  ko: (n) => ` 외 ${n}개`,
+};
+
 /**
  * Kolom ringkasan pesanan di tabel orders dari isinya (urut seperti di keranjang): nama paket pertama
  * (+ jumlah paket lain), layanan dan harga paket pertama, tanggal paling awal, dan tamu terbanyak.
@@ -113,7 +121,7 @@ export function validateCart(input, { packages, methods, now = new Date() }) {
 export function summarizeItems(items, lang = "en") {
   const [first] = items;
   const more = items.length - 1;
-  const suffix = more ? (lang === "id" ? ` + ${more} lainnya` : ` + ${more} more`) : "";
+  const suffix = more ? (MORE_ITEMS[lang] ?? MORE_ITEMS.en)(more) : "";
   return {
     packageId: first.packageId ?? null,
     service: first.service,

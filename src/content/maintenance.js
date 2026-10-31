@@ -1,5 +1,8 @@
 // Teks halaman perawatan dan kartu "sedang diperbarui" saat mode developer menutup website, halaman,
-// atau bagian beranda (src/lib/developer.js). Kunci en dan id sama (tests/developer.test.js).
+// atau bagian beranda (src/lib/developer.js). Kunci en dan id sama (tests/developer.test.js); Mandarin dan
+// Korea dari src/content/locales/ (tests/locales.test.js).
+import * as koPack from "./locales/ko.js";
+import * as zhPack from "./locales/zh.js";
 export const maintenanceText = {
   en: {
     siteTitle: "We'll be back soon",
@@ -29,4 +32,6 @@ export const maintenanceText = {
     home: "Kembali ke beranda",
     language: "English",
   },
+  zh: zhPack.maintenance,
+  ko: koPack.maintenance,
 };

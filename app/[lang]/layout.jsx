@@ -3,15 +3,15 @@ import { CartProvider } from "@/components/cart";
 import { CurrencyProvider } from "@/components/currency";
 import DeveloperBar from "@/components/DeveloperBar";
 import { uiText } from "@/content/ui";
-import { isLocale, localeHref, locales, ogLocale } from "@/lib/i18n";
+import { htmlLang, isLocale, localeHref, locales, ogLocale } from "@/lib/i18n";
 import { site } from "@/lib/site";
 import { getUsdIdrRate } from "@/server/exchange-rate";
 import { getSiteSettings } from "@/server/site-settings";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
-// Root layout situs publik dalam dua bahasa: /en/... (alamat English di akar, lewat proxy.js) dan
-// /id/... Bahasa lain 404. Kurs USD → IDR untuk pilihan mata uang diambil sekali di sini.
+// Root layout situs publik dalam empat bahasa: /en/... (alamat English di akar, lewat proxy.js), /id/...,
+// /zh/..., dan /ko/... (<html lang> dari htmlLang). Bahasa lain 404. Kurs USD → IDR untuk pilihan mata uang diambil sekali di sini.
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -48,7 +48,7 @@ export default async function SiteLayout({ children, params }) {
   // showUsd dari halaman yang sama menentukan apakah tamu bisa memilih dolar.
   const [rate, settings] = await Promise.all([getUsdIdrRate(), getSiteSettings()]);
   return (
-    <html lang={lang} className={fontVariables}>
+    <html lang={htmlLang[lang]} className={fontVariables}>
       <body className="min-h-dvh font-sans">
         <CurrencyProvider lang={lang} rate={rate} usd={settings.showUsd}>
           <CartProvider>{children}</CartProvider>
