@@ -1,9 +1,9 @@
 // Ubah tautan video YouTube (termasuk Shorts), TikTok, Instagram, dan Facebook menjadi alamat embed untuk
 // galeri (src/components/EmbedVideo.jsx). Fungsi murni, diuji di tests/video-embed.test.js.
 //
-// Yang bisa diputar otomatis tanpa suara dan berulang: YouTube (parameter resmi autoplay, mute, loop,
-// ditambah perintah postMessage di bawah supaya berulang mulus) dan TikTok (parameter autoplay dan loop,
-// ditambah perintah postMessage di bawah). Facebook bisa diputar
+// Yang bisa diputar otomatis tanpa suara dan berulang: YouTube (parameter resmi autoplay dan mute, diulang
+// lewat perintah postMessage di bawah) dan TikTok (parameter autoplay dan loop, ditambah perintah
+// postMessage di bawah). Facebook bisa diputar
 // otomatis tanpa suara tapi tidak berulang. Instagram tidak mendukung putar otomatis dari embed, jadi
 // diputar saat diketuk. Untuk loop yang paling cepat dan pasti, unggah klip MP4/WebM sendiri (jenis
 // "video" di src/content/gallery.js).
@@ -35,8 +35,8 @@ function youtube({ url, host, parts }) {
   const params = new URLSearchParams({
     autoplay: "1",
     mute: "1",
-    loop: "1",
-    playlist: id, // loop pada satu video butuh playlist berisi video itu sendiri
+    // Tanpa loop=1&playlist: YouTube memperlakukannya sebagai daftar putar dan menampilkan tombol sebelumnya,
+    // jeda, dan berikutnya di tengah video (laporan pemilik 1 November 2026). Video diulang dari halaman.
     controls: "0",
     playsinline: "1",
     rel: "0",

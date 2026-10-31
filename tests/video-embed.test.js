@@ -20,16 +20,19 @@ import {
   youtubeReaction,
 } from "../src/lib/video-embed.js";
 
-test("YouTube biasa, youtu.be, dan Shorts menjadi embed tanpa suara yang berulang", () => {
+test("YouTube biasa, youtu.be, dan Shorts menjadi embed tanpa suara, bukan daftar putar", () => {
   for (const url of ["https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=10s", "https://youtu.be/dQw4w9WgXcQ", "https://m.youtube.com/watch?v=dQw4w9WgXcQ"]) {
     const v = parseVideoUrl(url);
     assert.equal(v.platform, "youtube", url);
     assert.equal(v.vertical, false);
     const embed = new URL(v.embed);
     assert.equal(embed.hostname, "www.youtube-nocookie.com");
-    for (const [k, val] of [["autoplay", "1"], ["mute", "1"], ["loop", "1"], ["playlist", "dQw4w9WgXcQ"], ["playsinline", "1"]]) {
+    for (const [k, val] of [["autoplay", "1"], ["mute", "1"], ["playsinline", "1"]]) {
       assert.equal(embed.searchParams.get(k), val, k);
     }
+    // Bukan daftar putar: loop=1&playlist memunculkan tombol sebelumnya, jeda, dan berikutnya di tengah video.
+    assert.equal(embed.searchParams.has("playlist"), false);
+    assert.equal(embed.searchParams.has("loop"), false);
     assert.equal(v.thumbnail, "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg");
   }
   const short = parseVideoUrl("https://youtube.com/shorts/abcDEF12345?si=xyz");

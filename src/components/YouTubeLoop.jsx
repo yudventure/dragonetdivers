@@ -16,9 +16,12 @@ import {
 
 // Berapa kali video yang dijeda peramban (bukan oleh kita) diputar lagi sebelum dibiarkan.
 const MAX_RESUMES = 5;
-// Salam "listening" ke player diulang tiap 400 ms sampai dijawab; tanpa jawaban, video tetap dimunculkan.
+// Salam "listening" ke player diulang tiap 400 ms sampai dijawab. Player yang tidak pernah menjawab tidak
+// dimunculkan (sampul saja), karena tanpa kendali dari halaman videonya tidak bisa diulang tanpa tombol.
 const HELLO_TRIES = 20;
-const HELLO_MS = 8000;
+// Video baru dimunculkan setelah berjalan sekian lama setiap kali mulai atau lanjut, karena di sebagian
+// perangkat (layar sentuh) YouTube sempat menampilkan tombol jeda di tengah video saat mulai berputar.
+const REVEAL_MS = 2500;
 // Player YouTube diperbesar ke atas dan bawah sejauh ini di luar petak, supaya judul, logo kanal, dan
 // tombol bawaan YouTube (yang menempel di tepi player) tidak pernah terlihat.
 const OVERSCAN_PX = 80;
@@ -28,8 +31,10 @@ const OVERSCAN_PX = 80;
  * suara, berulang mulus. Permintaan pemilik Oktober 2026 ("tidak ada tombol play dan pause, smooth loop,
  * ketika diklik tetap menuju kanal YouTube-nya").
  * - Sampul (gambar YouTube) tampil dulu; player baru dimuat saat petak separuh terlihat dan baru
- *   dimunculkan pelan-pelan setelah videonya benar-benar berjalan, jadi layar hitam, tombol putar merah,
- *   dan judul YouTube tidak sempat terlihat.
+ *   dimunculkan pelan-pelan setelah videonya berjalan REVEAL_MS, jadi layar hitam, tombol putar merah,
+ *   tombol jeda, dan judul YouTube tidak sempat terlihat.
+ * - Bukan daftar putar (tanpa loop=1&playlist): daftar putar memunculkan tombol sebelumnya, jeda, dan
+ *   berikutnya di tengah video (laporan pemilik 1 November 2026, "jangan tampilkan jeda next previous").
  * - Player tidak bisa disentuh (pointer-events none) dan lebih besar dari petak (OVERSCAN_PX), jadi
  *   kendali YouTube tidak muncul. Seluruh petak adalah tautan ke kanal YouTube pemilik video
  *   (video.channel dari oEmbed, src/server/youtube-channel.js), atau ke halaman videonya bila belum diketahui.
@@ -80,9 +85,8 @@ export default function YouTubeLoop({ video, title, t }) {
 
   // Percakapan dengan player: daftar sebagai pendengar, bisukan dan putar, ulang dari awal sebelum habis
   // (menurut jam sendiri, karena YouTube tidak selalu sering mengabarkan waktunya), putar lagi bila dijeda
-  // peramban. Video hanya tampil selama berjalan: saat dijeda (termasuk di luar layar) sampul yang tampil,
-  // jadi panel "Video lainnya" YouTube tidak pernah terlihat. Bila player tidak pernah menjawab, video
-  // tetap dimunculkan setelah HELLO_MS (diputar dan diulang oleh parameter bawaan YouTube).
+  // peramban. Video hanya tampil selama berjalan (setelah REVEAL_MS): saat dijeda, habis, atau di luar layar
+  // sampul yang tampil, jadi panel "Video lainnya" dan tombol YouTube tidak pernah terlihat.
   useEffect(() => {
     const iframe = frame.current;
     if (!live || !iframe) return;
@@ -95,7 +99,22 @@ export default function YouTubeLoop({ video, title, t }) {
     let lastTime = 0; // posisi terakhir saat dijeda, untuk melanjutkan jam
     let restartedAt = -Infinity;
     let hello;
-    let fallback;
+    let reveal = null; // pengatur waktu sebelum video dimunculkan
+    let visible = false;
+    const show = () => {
+      if (visible || reveal) return;
+      reveal = setTimeout(() => {
+        reveal = null;
+        visible = true;
+        setShown(true);
+      }, REVEAL_MS);
+    };
+    const hide = () => {
+      clearTimeout(reveal);
+      reveal = null;
+      visible = false;
+      setShown(false);
+    };
     const restart = () => {
       const now = performance.now();
       if (now - restartedAt < 1000) return; // baru saja diulang
@@ -116,8 +135,6 @@ export default function YouTubeLoop({ video, title, t }) {
         if (heard || ++tries > HELLO_TRIES) return clearInterval(hello);
         send(youtubeListening());
       }, 400);
-      clearTimeout(fallback);
-      fallback = setTimeout(() => !heard && setShown(true), HELLO_MS);
     };
     const onMessage = (e) => {
       if (e.source !== iframe.contentWindow || !isYouTubeOrigin(e.origin)) return;
@@ -130,17 +147,17 @@ export default function YouTubeLoop({ video, title, t }) {
       const info = youtubeInfo(event);
       if (info.duration) duration = info.duration;
       if (info.state === YOUTUBE_STATE.playing) {
-        setShown(true);
+        show();
         clock ??= { time: info.currentTime ?? lastTime, at: performance.now() };
       } else if (info.state === YOUTUBE_STATE.paused || info.state === YOUTUBE_STATE.ended) {
-        setShown(false);
+        hide();
         if (clock) lastTime = info.state === YOUTUBE_STATE.ended ? 0 : clock.time + (performance.now() - clock.at) / 1000;
         clock = null;
       }
       const old = info.currentTime != null && stale(info.currentTime);
       if (info.currentTime != null && !old && (info.state ?? previous) !== YOUTUBE_STATE.paused) {
         clock = { time: info.currentTime, at: performance.now() };
-        if (info.currentTime > 0) setShown(true);
+        if (info.currentTime > 0) show();
       }
       let commands = youtubeReaction(old ? { ...event, info: { ...event.info, currentTime: undefined } } : event, { duration, previous });
       if (info.state === YOUTUBE_STATE.paused && commands.length) {
@@ -164,7 +181,7 @@ export default function YouTubeLoop({ video, title, t }) {
     return () => {
       clearInterval(hello);
       clearInterval(tick);
-      clearTimeout(fallback);
+      clearTimeout(reveal);
       window.removeEventListener("message", onMessage);
       iframe.removeEventListener("load", listen);
       document.removeEventListener("visibilitychange", onVisible);
