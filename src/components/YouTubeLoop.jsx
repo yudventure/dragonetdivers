@@ -4,18 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import { format } from "@/lib/i18n";
 import {
   isYouTubeOrigin,
-  isYouTubePlaying,
   readYouTubeEvent,
   YOUTUBE_STATE,
   youtubeCommand,
   youtubeEmbedFor,
   youtubeInfo,
   youtubeListening,
+  youtubeLoopDue,
   youtubeReaction,
 } from "@/lib/video-embed";
 
 // Berapa kali video yang dijeda peramban (bukan oleh kita) diputar lagi sebelum dibiarkan.
 const MAX_RESUMES = 5;
+// Salam "listening" ke player diulang tiap 400 ms sampai dijawab; tanpa jawaban, video tetap dimunculkan.
+const HELLO_TRIES = 20;
+const HELLO_MS = 8000;
 // Player YouTube diperbesar ke atas dan bawah sejauh ini di luar petak, supaya judul, logo kanal, dan
 // tombol bawaan YouTube (yang menempel di tepi player) tidak pernah terlihat.
 const OVERSCAN_PX = 80;
@@ -30,8 +33,9 @@ const OVERSCAN_PX = 80;
  * - Player tidak bisa disentuh (pointer-events none) dan lebih besar dari petak (OVERSCAN_PX), jadi
  *   kendali YouTube tidak muncul. Seluruh petak adalah tautan ke kanal YouTube pemilik video
  *   (video.channel dari oEmbed, src/server/youtube-channel.js), atau ke halaman videonya bila belum diketahui.
- * - Berulang lewat postMessage (youtubeReaction di src/lib/video-embed.js): diputar ulang dari awal sedikit
- *   sebelum habis, tanpa layar akhir YouTube. Keluar layar: dijeda, masuk lagi: lanjut tanpa dimuat ulang.
+ * - Berulang lewat postMessage (youtubeReaction dan youtubeLoopDue di src/lib/video-embed.js): diputar ulang
+ *   dari awal sedikit sebelum habis menurut jam sendiri, tanpa layar akhir YouTube. Selama dijeda yang tampil
+ *   sampulnya. Keluar layar: dijeda, mulai terlihat lagi: lanjut tanpa dimuat ulang.
  * - "Kurangi animasi" atau hemat data aktif: hanya sampul, tetap bisa diketuk.
  */
 export default function YouTubeLoop({ video, title, t }) {
@@ -40,10 +44,11 @@ export default function YouTubeLoop({ video, title, t }) {
   const [inView, setInView] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [auto, setAuto] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [shown, setShown] = useState(false);
   const [origin, setOrigin] = useState(null);
   const [poster, setPoster] = useState(video.poster ?? video.thumbnail);
   const cover = useRef(null);
+  const away = useRef(false);
   const ratio = video.vertical ? 9 / 16 : 16 / 9;
   const href = video.channel ?? video.href;
 
@@ -52,12 +57,11 @@ export default function YouTubeLoop({ video, title, t }) {
     const saveData = navigator.connection?.saveData === true;
     setAuto(!reduce && !saveData);
     setOrigin(window.location.origin);
+    // Dimuat pertama kali saat separuh petak terlihat; sesudah itu diputar selama ada bagian yang terlihat.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.intersectionRatio >= 0.5) {
-          setInView(true);
-          setLoaded(true);
-        } else if (!entry.isIntersecting) setInView(false);
+        if (entry.intersectionRatio >= 0.5) setLoaded(true);
+        setInView(entry.isIntersecting);
       },
       { threshold: [0, 0.5] },
     );
@@ -74,9 +78,11 @@ export default function YouTubeLoop({ video, title, t }) {
   };
   useEffect(() => checkCover(cover.current));
 
-  // Percakapan dengan player: daftar sebagai pendengar, bisukan dan putar, ulang sebelum habis, putar lagi
-  // bila dijeda peramban. Selama petak di luar layar video dijeda dan kabar "dijeda" tidak dibalas.
-  const away = useRef(false);
+  // Percakapan dengan player: daftar sebagai pendengar, bisukan dan putar, ulang dari awal sebelum habis
+  // (menurut jam sendiri, karena YouTube tidak selalu sering mengabarkan waktunya), putar lagi bila dijeda
+  // peramban. Video hanya tampil selama berjalan: saat dijeda (termasuk di luar layar) sampul yang tampil,
+  // jadi panel "Video lainnya" YouTube tidak pernah terlihat. Bila player tidak pernah menjawab, video
+  // tetap dimunculkan setelah HELLO_MS (diputar dan diulang oleh parameter bawaan YouTube).
   useEffect(() => {
     const iframe = frame.current;
     if (!live || !iframe) return;
@@ -85,31 +91,70 @@ export default function YouTubeLoop({ video, title, t }) {
     let duration = null;
     let previous = null;
     let resumes = 0;
+    let clock = null; // { time, at } selama berjalan
+    let lastTime = 0; // posisi terakhir saat dijeda, untuk melanjutkan jam
+    let restartedAt = -Infinity;
     let hello;
+    let fallback;
+    const restart = () => {
+      const now = performance.now();
+      if (now - restartedAt < 1000) return; // baru saja diulang
+      restartedAt = now;
+      clock = { time: 0, at: now };
+      send(youtubeCommand("seekTo", [0, true]));
+    };
+    // Kabar waktu yang masih menyebut posisi sebelum diulang (terkirim sebelum seek selesai) diabaikan.
+    const stale = (time) => {
+      const since = (performance.now() - restartedAt) / 1000;
+      return since < 3 && time > since + 1;
+    };
     const listen = () => {
       clearInterval(hello);
       let tries = 0;
       send(youtubeListening());
       hello = setInterval(() => {
-        if (heard || ++tries > 20) return clearInterval(hello);
+        if (heard || ++tries > HELLO_TRIES) return clearInterval(hello);
         send(youtubeListening());
       }, 400);
+      clearTimeout(fallback);
+      fallback = setTimeout(() => !heard && setShown(true), HELLO_MS);
     };
     const onMessage = (e) => {
       if (e.source !== iframe.contentWindow || !isYouTubeOrigin(e.origin)) return;
       const event = readYouTubeEvent(e.data);
       if (!event) return;
-      heard = true;
+      if (!heard) {
+        heard = true;
+        send(youtubeCommand("addEventListener", ["onStateChange"]));
+      }
       const info = youtubeInfo(event);
       if (info.duration) duration = info.duration;
-      if (isYouTubePlaying(event)) setPlaying(true);
-      let commands = youtubeReaction(event, { duration, previous });
+      if (info.state === YOUTUBE_STATE.playing) {
+        setShown(true);
+        clock ??= { time: info.currentTime ?? lastTime, at: performance.now() };
+      } else if (info.state === YOUTUBE_STATE.paused || info.state === YOUTUBE_STATE.ended) {
+        setShown(false);
+        if (clock) lastTime = info.state === YOUTUBE_STATE.ended ? 0 : clock.time + (performance.now() - clock.at) / 1000;
+        clock = null;
+      }
+      const old = info.currentTime != null && stale(info.currentTime);
+      if (info.currentTime != null && !old && (info.state ?? previous) !== YOUTUBE_STATE.paused) {
+        clock = { time: info.currentTime, at: performance.now() };
+        if (info.currentTime > 0) setShown(true);
+      }
+      let commands = youtubeReaction(old ? { ...event, info: { ...event.info, currentTime: undefined } } : event, { duration, previous });
       if (info.state === YOUTUBE_STATE.paused && commands.length) {
         if (away.current || document.hidden || ++resumes > MAX_RESUMES) commands = [];
       }
       if (info.state != null) previous = info.state;
-      commands.forEach(send);
+      for (const command of commands) {
+        if (JSON.parse(command).func === "seekTo") restart();
+        else send(command);
+      }
     };
+    const tick = setInterval(() => {
+      if (clock && previous !== YOUTUBE_STATE.paused && youtubeLoopDue(clock, performance.now(), duration)) restart();
+    }, 100);
     const onVisible = () => {
       if (!document.hidden && !away.current) send(youtubeCommand("playVideo"));
     };
@@ -118,13 +163,15 @@ export default function YouTubeLoop({ video, title, t }) {
     document.addEventListener("visibilitychange", onVisible);
     return () => {
       clearInterval(hello);
+      clearInterval(tick);
+      clearTimeout(fallback);
       window.removeEventListener("message", onMessage);
       iframe.removeEventListener("load", listen);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [live]);
 
-  // Keluar layar: jeda (hemat baterai dan data). Masuk lagi: lanjut dari posisi terakhir.
+  // Keluar layar sepenuhnya: jeda (hemat baterai dan data). Mulai terlihat lagi: lanjut dari posisi terakhir.
   useEffect(() => {
     const iframe = frame.current;
     if (!live || !iframe) return;
@@ -161,7 +208,7 @@ export default function YouTubeLoop({ video, title, t }) {
           inert
           allow="autoplay; encrypted-media; picture-in-picture"
           referrerPolicy="strict-origin-when-cross-origin"
-          className={`pointer-events-none absolute top-1/2 left-1/2 max-w-none -translate-1/2 border-0 transition-opacity duration-700 ease-brand ${playing ? "opacity-100" : "opacity-0"}`}
+          className={`pointer-events-none absolute top-1/2 left-1/2 max-w-none -translate-1/2 border-0 transition-opacity duration-700 ease-brand ${shown ? "opacity-100" : "opacity-0"}`}
           style={{ width, height: `calc(${height} + ${OVERSCAN_PX * 2}px)` }}
         />
       )}

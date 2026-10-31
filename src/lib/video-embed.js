@@ -271,6 +271,16 @@ export function youtubeReaction(event, { duration = null, previous = null } = {}
   return [];
 }
 
+/**
+ * Saatnya mengulang dari awal menurut jam sendiri: player YouTube tidak selalu sering mengabarkan waktunya,
+ * jadi waktu sekarang diperkirakan dari kabar terakhir (clock = { time, at } dalam detik dan milidetik
+ * performance.now()) selama video berjalan.
+ */
+export function youtubeLoopDue(clock, now, duration, lead = YOUTUBE_LOOP_LEAD) {
+  if (!clock || !(duration > lead * 2)) return false;
+  return clock.time + Math.max(0, now - clock.at) / 1000 >= duration - lead;
+}
+
 /** Apakah pesan ini tanda videonya sedang berjalan (gambar sudah bergerak, sampul boleh diganti video). */
 export function isYouTubePlaying(event) {
   const { state, currentTime } = youtubeInfo(event);
