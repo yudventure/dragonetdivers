@@ -12,7 +12,7 @@ test("tautan English tetap, tautan Indonesia diberi awalan /id", () => {
   assert.equal(localeHref("id", "/services/snorkeling"), "/id/services/snorkeling");
   assert.equal(localeHref("id", "/services/snorkeling?x=1#top"), "/id/services/snorkeling?x=1#top");
   // Tautan luar, mailto, dan //host tidak disentuh.
-  for (const href of ["https://wa.me/62", "mailto:halo@dragonetdivers.com", "//cdn.example/x", "#faq"]) {
+  for (const href of ["https://wa.me/62", "mailto:halo@dragonetdiversrajaampat.com", "//cdn.example/x", "#faq"]) {
     assert.equal(localeHref("id", href), href);
   }
   assert.deepEqual(alternates("/services/dusk-dives"), { en: "/services/dusk-dives", id: "/id/services/dusk-dives" });

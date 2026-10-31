@@ -194,7 +194,7 @@ export default function SiteSettingsForm({ initial, fallback }) {
         <Section
           icon={InstagramIcon}
           title="Media sosial"
-          text="Ikon akun yang diisi tampil di footer website. Tulis nama akun (mis. @dragonetdivers) atau tempel tautan profilnya."
+          text="Ikon akun yang diisi tampil di footer website. Tulis nama akun (mis. @dragonetdiversrajaampat) atau tempel tautan profilnya."
         >
           <div className="grid gap-4 sm:grid-cols-2">
             {NETWORKS.map((n) => {

@@ -288,7 +288,7 @@ Template ada di `brand/social/templates.html`; pratinjau PNG di `brand/social/pr
 
 ### 10.1 Profil
 - **Foto profil:** `dragonet-divers-logo-white-bg.png` (badge sudah bulat, pas dengan potongan lingkaran). Ganti dengan versi resolusi tinggi bila sudah ada.
-- **Nama:** Dragonet Divers Raja Ampat. **Handle:** usulan `@dragonetdivers` (cek ketersediaan).
+- **Nama:** Dragonet Divers Raja Ampat. **Handle:** Instagram `@dragonetdiversrajaampat`.
 - **Bio (contoh):**
   `Dive into colour 🐠 Small-group diving & snorkeling in Raja Ampat · Dampier Strait · Book via WhatsApp ↓`
 
@@ -386,7 +386,7 @@ Saat website dibangun, salin `brand/fonts/` ke folder aset publik dan sesuaikan 
 
 - [ ] Logo resolusi tinggi atau vektor (SVG/AI/PDF), plus versi satu warna dari desainer.
 - [ ] Pilihan tagline (§1).
-- [ ] Handle media sosial yang sudah aktif/terdaftar (slot ikon footer sudah siap, isi lewat `NEXT_PUBLIC_INSTAGRAM` dst.). Domain website: dragonetdivers.com.
-- [ ] Nomor WhatsApp booking. Email (halo@dragonetdivers.com) dan alamat base (Jl. Mayor, Kurkapa, Meos Mansar) sudah diberikan Oktober 2026.
+- [ ] Handle media sosial yang sudah aktif/terdaftar (slot ikon footer sudah siap, isi lewat `NEXT_PUBLIC_INSTAGRAM` dst.). Domain website: dragonetdiversrajaampat.com (pindah dari dragonetdivers.com akhir Oktober 2026).
+- [ ] Nomor WhatsApp booking. Email (halo@dragonetdiversrajaampat.com, sebelumnya halo@dragonetdivers.com) dan alamat base (Jl. Mayor, Kurkapa, Meos Mansar) sudah diberikan Oktober 2026.
 - [ ] Foto & video asli (makro, luas, tim, kapal, senja).
 - [ ] Data nyata untuk konten: daftar dive site, harga paket, jumlah tamu per pemandu, sertifikasi tim.

@@ -74,7 +74,7 @@ export function validateSiteSettings(input) {
     const value = text(input[n.id]);
     if (!value) continue;
     if (value.length > 200 || !socialUrl(n.id, value)) {
-      throw new SiteSettingsError(`Akun ${n.label} belum benar. Tulis nama akunnya (mis. @dragonetdivers) atau tempel tautan profil ${n.host}.`, n.id);
+      throw new SiteSettingsError(`Akun ${n.label} belum benar. Tulis nama akunnya (mis. @dragonetdiversrajaampat) atau tempel tautan profil ${n.host}.`, n.id);
     }
     out[n.id] = value;
   }

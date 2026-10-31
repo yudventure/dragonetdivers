@@ -63,7 +63,7 @@ export function passwordProblem(email, password) {
   return "";
 }
 
-/** "ha••••@dragonetdivers.com": menunjukkan ke mana kode dikirim tanpa menulis alamat lengkap. */
+/** "ha••••@dragonetdiversrajaampat.com": menunjukkan ke mana kode dikirim tanpa menulis alamat lengkap. */
 export function maskEmail(email) {
   const [name, domain] = String(email).split("@");
   if (!domain) return "••••";

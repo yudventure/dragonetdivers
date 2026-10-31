@@ -136,7 +136,7 @@ function ForgotPassword({ initialEmail, onBack }) {
               id="forgot-email"
               type="email"
               autoComplete="username"
-              placeholder="operator@dragonetdivers.com"
+              placeholder="operator@dragonetdiversrajaampat.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -262,7 +262,7 @@ export default function AdminLogin({ configured, issues }) {
                   name="email"
                   type="email"
                   autoComplete="username"
-                  placeholder="operator@dragonetdivers.com"
+                  placeholder="operator@dragonetdiversrajaampat.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -288,7 +288,7 @@ export default function AdminLogin({ configured, issues }) {
           ) : (
             <div className="grid gap-3 rounded-card bg-sunrise-wash p-4 text-sm text-abyss">
               <p className="font-bold">Login operator belum diatur.</p>
-              <p>Isi variabel berikut di hPanel (Websites → dragonetdivers.com → Environment variables), lalu deploy ulang.</p>
+              <p>Isi variabel berikut di hPanel (Websites → dragonetdiversrajaampat.com → Environment variables), lalu deploy ulang.</p>
               <ul className="grid gap-1.5">
                 {issues.map((issue) => (
                   <li key={issue.name}>

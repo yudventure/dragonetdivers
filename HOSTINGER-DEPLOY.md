@@ -29,7 +29,7 @@ Tanpa token, cek **deploy** tetap hijau tetapi hanya memberi peringatan "Deploy 
 
 1. hPanel akun hosting → ikon profil kanan atas → **Profile** → **API** ([hpanel.hostinger.com/profile/api](https://hpanel.hostinger.com/profile/api)) → buat token baru, mis. nama `github-dragonetdivers`. Salin token (hanya tampil sekali).
 2. github.com/yudventure/dragonetdivers → Settings → Secrets and variables → Actions → **New repository secret**: nama `HOSTINGER_API_TOKEN`, isi token tadi. Jangan tempel token di chat, issue, atau file di repo.
-3. Opsional, tab **Variables** → `HOSTINGER_DOMAIN` = domain website di Hostinger (`dragonetdivers.com`). Bila kosong, website dicari otomatis: website Node.js yang auto-deploy-nya terhubung ke repo ini, atau satu-satunya website Node.js di akun. Bila diisi, perbarui setiap kali domain website diganti.
+3. Opsional, tab **Variables** → `HOSTINGER_DOMAIN` = domain website di Hostinger (`dragonetdiversrajaampat.com`). Bila kosong, website dicari otomatis: website Node.js yang auto-deploy-nya terhubung ke repo ini, atau satu-satunya website Node.js di akun. Bila diisi, perbarui setiap kali domain website diganti.
 4. Tab **Actions** → **Deploy** → **Run workflow** untuk deploy pertama. Setelah itu deploy berjalan sendiri setiap merge ke `main`.
 
 Token berlaku untuk seluruh akun Hostinger. Bila bocor, hapus di halaman API hPanel dan buat yang baru.
@@ -65,23 +65,17 @@ Di akun Hostinger yang memegang paket **Business** (yang berisi thedampier.com, 
 
 ## 3. Domain
 
-Website Node.js di akun hosting bernama **dragonetdivers.com** (tersambung 20 Oktober 2026; sebelumnya domain sementara `gold-walrus-261903.hostingersite.com`). Kedua domain milik situs, `dragonetdiversrajaampat.com` (dipindahkan ke akun domain pemilik akhir Oktober 2026) dan `dragonetdivers.com`, terdaftar di akun Hostinger yang lain dan diarahkan ke akun hosting lewat DNS.
+Domain utama website: **dragonetdiversrajaampat.com** (pindah akhir Oktober 2026; domain ini dipindahkan pemilik lama ke akun domain pemilik, dan website di akun hosting diganti ke domain ini). `dragonetdivers.com` (dipakai 20 sampai 31 Oktober 2026) kini hanya **Parked Domain** di website yang sama dan tidak diperpanjang setelah berakhir 2027-10-20. Kedua domain terdaftar di akun Hostinger yang lain dan diarahkan ke akun hosting lewat DNS (A `@` ke IP server, CNAME `www`, TXT verifikasi Hostinger).
 
-**Domain utama = isian `NEXT_PUBLIC_SITE_URL`** (bawaan `https://dragonetdivers.com`). Dari situ website membuat tautan canonical, sitemap, email ke tamu, dan alamat kembali pembayaran. Halaman (termasuk `/admin`) yang dibuka lewat domain situs yang lain atau lewat `www.` dialihkan 301 ke domain utama oleh `proxy.js` (`src/lib/domain.js`). `/api` tidak dialihkan, jadi notifikasi Midtrans ke domain lama tetap sampai. Jangan buat aturan di menu **Domain → Pengalihan** untuk kedua domain ini, karena bisa berputar dengan pengalihan dari website.
+**Domain utama = isian `NEXT_PUBLIC_SITE_URL`** (bawaan `https://dragonetdiversrajaampat.com`, jadi barisnya boleh dihapus). Dari situ website membuat tautan canonical, sitemap, email ke tamu, dan alamat kembali pembayaran. Halaman (termasuk `/admin`) yang dibuka lewat domain situs yang lain atau lewat `www.` dialihkan 301 ke domain utama oleh `proxy.js` (`src/lib/domain.js`). `/api` tidak dialihkan, jadi notifikasi Midtrans ke domain lama tetap sampai. Jangan buat aturan di menu **Domain → Pengalihan** untuk kedua domain ini, karena bisa berputar dengan pengalihan dari website.
 
-### Pindah ke dragonetdiversrajaampat.com (permintaan pemilik, Oktober 2026)
+### Setelah pindah domain
 
-Rencana pemilik: website pindah penuh ke `dragonetdiversrajaampat.com`, `dragonetdivers.com` hanya Parked Domain dan tidak diperpanjang lagi (berakhir 2027-10-20).
-
-1. Akun hosting → Website dragonetdivers.com → **⋮** di kanan tombol **Memindahkan** → **Ubah domain** → `dragonetdiversrajaampat.com`. Isi catatan DNS yang ditampilkan Hostinger di akun domain (Domains → dragonetdiversrajaampat.com → DNS / Nameservers), menggantikan catatan `@` dan `www` lama yang mengarah ke website pemilik sebelumnya.
-2. **Domain → Parked Domain** → tambahkan `dragonetdivers.com` (catatan DNS-nya di akun domain disesuaikan bila Hostinger meminta).
-3. **Keamanan → SSL**: pastikan sertifikat aktif untuk kedua domain dan `www`-nya.
-4. **Variabel environment**: `NEXT_PUBLIC_SITE_URL` = `https://dragonetdiversrajaampat.com`, simpan, lalu **Memindahkan** (Redeploy). Sejak itu halaman di `dragonetdivers.com` dialihkan 301 ke domain baru.
-5. Uji `https://dragonetdiversrajaampat.com/api/health` harus menampilkan `"app":"dragonet-divers"`, dan `https://dragonetdivers.com/` harus berpindah ke domain baru.
-6. Dashboard Midtrans (bila Notification URL pernah diisi): ganti ke `https://dragonetdiversrajaampat.com/api/payments/midtrans`. Alamat yang benar tampil di `/admin/pembayaran`.
-7. Google Search Console: tambahkan properti Awalan URL `https://dragonetdiversrajaampat.com`, tempel kode tag HTML-nya di `/admin/google`, verifikasi, kirim `sitemap.xml`.
-8. Variabel GitHub `HOSTINGER_DOMAIN` (bila diisi) diganti ke `dragonetdiversrajaampat.com`.
-9. Sebelum `dragonetdivers.com` berakhir: pindahkan email (`halo@dragonetdivers.com`, akun SMTP, `ADMIN_EMAIL`) ke alamat `@dragonetdiversrajaampat.com`, lalu perbarui `/admin/kontak` dan variabel `SMTP_*` di hPanel.
+1. **Variabel environment**: `NEXT_PUBLIC_SITE_URL` = `https://dragonetdiversrajaampat.com` (atau hapus barisnya), lalu **Memindahkan** (Redeploy). `https://dragonetdivers.com/` harus berpindah ke domain baru.
+2. Dashboard Midtrans (bila Notification URL pernah diisi): `https://dragonetdiversrajaampat.com/api/payments/midtrans`. Alamat yang benar tampil di `/admin/pembayaran`.
+3. Google Search Console: properti Awalan URL `https://dragonetdiversrajaampat.com`, kode tag HTML-nya di `/admin/google`, lalu kirim `sitemap.xml`.
+4. Variabel GitHub `HOSTINGER_DOMAIN` (bila diisi) = `dragonetdiversrajaampat.com`.
+5. **Email** `halo@dragonetdiversrajaampat.com` (bawaan email publik website sejak 31 Oktober 2026): buat kotak emailnya di hPanel **Email** untuk domain ini dan isi catatan MX/SPF/DKIM yang diminta di akun domain. Lalu di hPanel ganti `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `ADMIN_OTP_EMAIL` (dan `ADMIN_EMAIL` bila memakai alamat lama) ke alamat baru, dan pastikan kolom email di `/admin/kontak` kosong atau berisi alamat baru. Semua harus selesai sebelum `dragonetdivers.com` berakhir.
 
 Zona DNS dragonetdiversrajaampat.com di akun pemilik sebelumnya per 20 Oktober 2026 (cadangan):
 
@@ -95,7 +89,7 @@ Zona DNS dragonetdiversrajaampat.com di akun pemilik sebelumnya per 20 Oktober 2
 
 | Nama | Isi |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Domain utama website (bagian 3), mis. `https://dragonetdiversrajaampat.com`. Kosong = `https://dragonetdivers.com`. Setelah diubah, Redeploy. |
+| `NEXT_PUBLIC_SITE_URL` | Domain utama website (bagian 3), mis. `https://dragonetdiversrajaampat.com`. Kosong = `https://dragonetdiversrajaampat.com`. Setelah diubah, Redeploy. |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Opsional. Lebih mudah diisi di `/admin/kontak` (langsung berlaku tanpa deploy ulang); nilai di sini hanya dipakai selama kolom di admin kosong. Nomor booking dengan kode negara, mis. `6281234567890` atau `+6281234567890` (spasi, tanda hubung, dan awalan `0` dirapikan). |
 | `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Opsional. Lebih mudah diisi di `/admin/kontak`; nilai di sini (handle `@dragonetdivers` atau URL lengkap) hanya dipakai selama kolom di admin kosong, dan perlu build ulang setelah diubah. |
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
@@ -108,8 +102,8 @@ Zona DNS dragonetdiversrajaampat.com di akun pemilik sebelumnya per 20 Oktober 2
 | `PAYPAL_MODE` | `live` untuk pembayaran sungguhan. Hapus barisnya selama uji coba (sandbox). |
 | `SMTP_HOST` | Server email untuk kode lupa password admin dan email pesanan ke tamu. Email Hostinger: `smtp.hostinger.com`. |
 | `SMTP_PORT` | `465` (SSL, bawaan) atau `587` (STARTTLS). |
-| `SMTP_USER`, `SMTP_PASS` | Alamat email pengirim lengkap (mis. `halo@dragonetdivers.com`) dan password kotak email itu. Rahasia, hanya di hPanel. |
-| `SMTP_FROM` | Opsional. Nama dan alamat pengirim, mis. `Dragonet Divers <halo@dragonetdivers.com>`. Kosong = "Dragonet Divers" dengan alamat `SMTP_USER`. |
+| `SMTP_USER`, `SMTP_PASS` | Alamat email pengirim lengkap (mis. `halo@dragonetdiversrajaampat.com`) dan password kotak email itu. Rahasia, hanya di hPanel. |
+| `SMTP_FROM` | Opsional. Nama dan alamat pengirim, mis. `Dragonet Divers <halo@dragonetdiversrajaampat.com>`. Kosong = "Dragonet Divers" dengan alamat `SMTP_USER`. |
 | `ADMIN_OTP_EMAIL` | Opsional. Kotak masuk yang menerima kode **Lupa password**. Kosong = dikirim ke `ADMIN_EMAIL`. |
 | `MYSQL_HOST` | Hostname database dari hPanel |
 | `MYSQL_PORT` | `3306` |
@@ -128,7 +122,7 @@ Paket, pesanan, dan pengaturan pembayaran disimpan di MySQL, jadi database (bagi
 1. Isi key Midtrans dan/atau PayPal di tabel di atas, lalu deploy ulang. Mulai dengan key **sandbox** untuk uji coba.
 2. Buka `/admin/pembayaran`: tekan **Uji koneksi** untuk tiap penyedia, centang cara bayar yang ditawarkan, isi rekening untuk transfer bank, lalu **Simpan pengaturan**. **Tunai di dive center** menyala sejak awal, jadi checkout tetap bisa dipakai walau Midtrans, PayPal, dan rekening belum diisi. Transfer bank baru tampil di checkout setelah dicentang dan minimal satu rekening diisi; rekeningnya langsung terlihat begitu tamu memilih transfer. Rekening BRI dari pemilik (PT Nusa Birawa Integrated, dengan SWIFT/BIC untuk transfer dari luar negeri) dimasukkan otomatis sekali saat aplikasi terhubung ke database, dan transfer bank ikut menyala; setelah itu rekening diubah atau dihapus di halaman yang sama dan tidak kembali.
 3. Buka `/admin/paket` dan tambahkan paket (nama dan isi dalam English dan Indonesia, harga Rupiah). Paket aktif langsung tampil di halaman layanannya.
-4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdivers.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
+4. Coba satu pesanan dari situs dengan mode sandbox. Notifikasi Midtrans dikirim otomatis ke `https://dragonetdiversrajaampat.com/api/payments/midtrans`; alamat yang sama boleh juga diisi di dashboard Midtrans (Settings → Payment → Notification URL).
 5. Setelah uji coba lancar, ganti ke key production/live dan tambahkan `MIDTRANS_PRODUCTION=true` / `PAYPAL_MODE=live`. Di checkout, label "Mode uji" hilang begitu mode sungguhan aktif.
 
 ### Modul tim di /admin
@@ -147,7 +141,7 @@ Kalender reservasi, Tamu, Galeri foto & video, Kalender konten, Agen & mitra, Pe
 
 Isi `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, dan `SMTP_PASS` (tabel di atas), lalu deploy ulang. Di `/admin/pembayaran` bagian **Email ke tamu**, tekan **Kirim email uji ke operator** dan buka pratinjau tiap email. Setelah aktif:
 
-- Tamu menerima email **pesanan diterima** (menunggu pembayaran, dengan rekening untuk transfer bank), email **pembayaran belum masuk** saat separuh waktu bayar lewat (status Midtrans/PayPal dicek dulu), dan email **pembayaran diterima** saat lunas. Email ditulis dalam bahasa yang dipakai tamu saat memesan, dibalas ke `halo@dragonetdivers.com`.
+- Tamu menerima email **pesanan diterima** (menunggu pembayaran, dengan rekening untuk transfer bank), email **pembayaran belum masuk** saat separuh waktu bayar lewat (status Midtrans/PayPal dicek dulu), dan email **pembayaran diterima** saat lunas. Email ditulis dalam bahasa yang dipakai tamu saat memesan, dibalas ke email publik dari `/admin/kontak` (bawaan `halo@dragonetdiversrajaampat.com`).
 - `/admin/pesanan` menampilkan email yang sudah terkirim per pesanan, dengan tombol **Email pengingat** dan **Kirim ulang email lunas**.
 - Halaman masuk `/admin` punya **Lupa password?**: kode 6 angka dikirim ke `ADMIN_EMAIL` (atau `ADMIN_OTP_EMAIL`), berlaku 10 menit. Password baru disimpan sebagai hash di database dan berlaku sampai `ADMIN_PASSWORD` di hPanel diganti; setelah itu password hPanel yang berlaku lagi.
 

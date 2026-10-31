@@ -20,7 +20,7 @@ test("YouTube biasa, youtu.be, dan Shorts menjadi embed tanpa suara yang berulan
 });
 
 test("TikTok memakai Embed Player v1 dengan autoplay dan loop, cadangannya dengan tombol", () => {
-  const v = parseVideoUrl("https://www.tiktok.com/@dragonetdivers/video/7312345678901234567?is_from_webapp=1");
+  const v = parseVideoUrl("https://www.tiktok.com/@dragonetdiversrajaampat/video/7312345678901234567?is_from_webapp=1");
   assert.equal(v.platform, "tiktok");
   const embed = new URL(v.embed);
   assert.equal(embed.pathname, "/player/v1/7312345678901234567");
@@ -31,7 +31,7 @@ test("TikTok memakai Embed Player v1 dengan autoplay dan loop, cadangannya denga
   assert.equal(backup.searchParams.get("controls"), "1");
   for (const k of ["autoplay", "loop"]) assert.equal(backup.searchParams.get(k), "1", k);
   assert.equal(backup.searchParams.get("description"), "0");
-  assert.equal(v.href, "https://www.tiktok.com/@dragonetdivers/video/7312345678901234567");
+  assert.equal(v.href, "https://www.tiktok.com/@dragonetdiversrajaampat/video/7312345678901234567");
   assert.equal(v.vertical, true);
   assert.equal(parseVideoUrl("https://www.tiktok.com/player/v1/7312345678901234567").id, "7312345678901234567");
 });
@@ -82,8 +82,8 @@ test("Instagram reel dan post: embed resmi, diputar saat diketuk", () => {
 
 test("Facebook video, reel, dan watch memakai plugin video", () => {
   for (const [url, id, vertical] of [
-    ["https://www.facebook.com/dragonetdivers/videos/1234567890123456/", "1234567890123456", false],
-    ["https://www.facebook.com/dragonetdivers/videos/manta-dive/1234567890123456", "1234567890123456", false],
+    ["https://www.facebook.com/dragonetdiversrajaampat/videos/1234567890123456/", "1234567890123456", false],
+    ["https://www.facebook.com/dragonetdiversrajaampat/videos/manta-dive/1234567890123456", "1234567890123456", false],
     ["https://www.facebook.com/reel/987654321098765", "987654321098765", true],
     ["https://www.facebook.com/watch/?v=1234567890123456", "1234567890123456", false],
   ]) {
@@ -105,7 +105,7 @@ test("tautan yang tidak dikenali ditolak", () => {
     "bukan url",
     "https://vt.tiktok.com/ZSabc123/",
     "https://www.youtube.com/watch?v=short",
-    "https://www.facebook.com/dragonetdivers",
+    "https://www.facebook.com/dragonetdiversrajaampat",
     "https://example.com/watch?v=dQw4w9WgXcQ",
     "javascript:alert(1)",
   ]) {
