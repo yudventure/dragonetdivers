@@ -96,7 +96,7 @@ Zona DNS dragonetdiversrajaampat.com di akun pemilik sebelumnya per 20 Oktober 2
 | Nama | Isi |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Domain utama website (bagian 3), mis. `https://dragonetdiversrajaampat.com`. Kosong = `https://dragonetdivers.com`. Setelah diubah, Redeploy. |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Opsional. Lebih mudah diisi di `/admin/kontak` (langsung berlaku tanpa deploy ulang); nilai di sini hanya dipakai selama kolom di admin kosong. Nomor booking, mis. `6281234567890`. |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Opsional. Lebih mudah diisi di `/admin/kontak` (langsung berlaku tanpa deploy ulang); nilai di sini hanya dipakai selama kolom di admin kosong. Nomor booking dengan kode negara, mis. `6281234567890` atau `+6281234567890` (spasi, tanda hubung, dan awalan `0` dirapikan). |
 | `NEXT_PUBLIC_INSTAGRAM`, `NEXT_PUBLIC_TIKTOK`, `NEXT_PUBLIC_FACEBOOK`, `NEXT_PUBLIC_YOUTUBE` | Opsional. Lebih mudah diisi di `/admin/kontak`; nilai di sini (handle `@dragonetdivers` atau URL lengkap) hanya dipakai selama kolom di admin kosong, dan perlu build ulang setelah diubah. |
 | `ADMIN_EMAIL` | Email operator untuk masuk ke dashboard `/admin` (tautan "Operator sign in" di footer). Rahasia, hanya di hPanel. |
 | `ADMIN_PASSWORD` | Password operator, minimal 10 karakter. Mengganti nilainya langsung mengakhiri semua sesi yang sedang masuk. Spasi atau tanda kutip yang ikut tersalin ke kolom Value diabaikan. Lupa password: tekan **Lupa password?** di halaman masuk (perlu SMTP dan database). |

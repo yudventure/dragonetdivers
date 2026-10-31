@@ -2,6 +2,7 @@
 // settings baris "site", dimuat src/server/site-settings.js ke memori proses dan dibaca di sini saat
 // halaman dibuat); isian yang kosong memakai isian lama dari hPanel (NEXT_PUBLIC_*, ditanam saat build)
 // atau nilai bawaan. "-" dari hPanel berarti belum diisi (src/lib/env.js). Hanya dipakai di server.
+import { cleanWhatsApp } from "./checkout.js";
 import { envText } from "./env.js";
 
 /** Tempat isian /admin/kontak di memori proses (diisi src/server/site-settings.js). */
@@ -104,10 +105,11 @@ export function socialLinks(values = socialValues()) {
   });
 }
 
-// Nomor WhatsApp hanya angka dengan kode negara (mis. 6281234567890). Nilai lain diabaikan.
+// Nomor WhatsApp dengan kode negara (mis. 6281234567890). Isian seperti "+62 822-9131-1277" atau
+// "0822..." dirapikan dengan aturan yang sama dengan /admin/kontak (cleanWhatsApp); nilai lain diabaikan.
 export function whatsappNumber(value = live()?.whatsapp || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) {
-  const digits = envText(value);
-  return digits && /^[1-9]\d{7,14}$/.test(digits) ? digits : null;
+  const raw = envText(value);
+  return raw ? cleanWhatsApp(raw) : null;
 }
 
 export function whatsappLink(text, number = whatsappNumber()) {

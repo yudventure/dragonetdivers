@@ -2,9 +2,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { contact, mapsLink, siteConfigWarnings, siteUrl, socialLinks, socialUrl, whatsappLink, whatsappNumber } from "../src/lib/site.js";
 
-test("nomor WhatsApp hanya diterima dalam format kode negara + angka", () => {
-  assert.equal(whatsappNumber("6281234567890"), "6281234567890");
-  for (const bad of ["", undefined, "+6281234567890", "081234567890", "62 812 3456", "abc"]) {
+test("nomor WhatsApp dirapikan ke kode negara + angka, isian asing diabaikan", () => {
+  // Isian hPanel pemilik Oktober 2026 memakai "+"; sebelumnya ditolak dan tombol WhatsApp hilang.
+  for (const ok of ["6281234567890", "+6281234567890", "+62 812-3456-7890", "081234567890", " 0812 3456 7890 "]) {
+    assert.equal(whatsappNumber(ok), "6281234567890", ok);
+  }
+  for (const bad of ["", undefined, "-", "abc", "+62 812", "0", "++6281234567890"]) {
     assert.equal(whatsappNumber(bad), null, String(bad));
   }
 });
