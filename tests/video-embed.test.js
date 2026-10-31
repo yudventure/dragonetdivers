@@ -15,6 +15,7 @@ import {
   youtubeEmbedFor,
   youtubeInfo,
   youtubeListening,
+  youtubeLoopDue,
   youtubeOembedUrl,
   youtubeReaction,
 } from "../src/lib/video-embed.js";
@@ -79,6 +80,18 @@ test("player YouTube: dibisukan dan diputar saat siap, berulang mulus sebelum ha
   assert.deepEqual(youtubeReaction({ event: "onStateChange", info: 2 }, { previous: 1 }), [play]);
   for (const state of [1, 3]) assert.deepEqual(youtubeReaction({ event: "onStateChange", info: state }), [], String(state));
   assert.deepEqual(youtubeReaction(null), []);
+});
+
+test("player YouTube: saat mengulang dihitung dengan jam sendiri walau kabar waktunya jarang", () => {
+  // Kabar terakhir: detik 28 dari 30, diterima pada 1000 ms. Waktu mengulang: 0,4 detik sebelum habis.
+  const clock = { time: 28, at: 1000 };
+  assert.equal(youtubeLoopDue(clock, 2000, 30), false, "perkiraan 29,0");
+  assert.equal(youtubeLoopDue(clock, 2650, 30), true, "perkiraan 29,65");
+  assert.equal(youtubeLoopDue({ time: 29.7, at: 5000 }, 5000, 30), true);
+  assert.equal(youtubeLoopDue(clock, 900, 30), false, "jam mundur tidak dihitung");
+  assert.equal(youtubeLoopDue(clock, 9000, null), false, "durasi belum diketahui");
+  assert.equal(youtubeLoopDue({ time: 0.2, at: 0 }, 1000, 0.6), false, "video sangat pendek memakai loop bawaan");
+  assert.equal(youtubeLoopDue(null, 1000, 30), false);
 });
 
 test("pesan player YouTube dibaca dari JSON, pesan lain diabaikan", () => {
