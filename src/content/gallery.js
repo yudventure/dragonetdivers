@@ -6,7 +6,8 @@
 //       dan pasti diputar otomatis tanpa suara serta berulang.
 //   { type: "embed", url: "<tautan YouTube, Shorts, TikTok, Instagram, atau Facebook>", title: { en, id }, size }
 //       Tautan dibaca src/lib/video-embed.js. YouTube dan TikTok diputar otomatis dan berulang,
-//       Facebook otomatis tanpa berulang, Instagram saat diketuk.
+//       Facebook otomatis tanpa berulang, Instagram saat diketuk. YouTube tanpa tombol apa pun dan
+//       diketuk membuka kanal pemilik videonya (src/components/YouTubeLoop.jsx).
 //
 // Teks alt dan judul ditulis dalam English (en) dan Bahasa Indonesia (id).
 // size: "small" (1×1), "wide" (2×1), "tall" (1×2, cocok untuk Shorts, TikTok, Reels), "big" (2×2).

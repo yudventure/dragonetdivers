@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { format } from "@/lib/i18n";
 import { isTikTokOrigin, isTikTokPlaying, readTikTokEvent, TIKTOK_STATE, tiktokReaction } from "@/lib/video-embed";
 import { FacebookIcon, InstagramIcon, PlayIcon, TikTokIcon, YouTubeIcon } from "./icons";
+import YouTubeLoop from "./YouTubeLoop";
 
 const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: InstagramIcon, facebook: FacebookIcon };
 // TikTok yang belum berjalan selama ini setelah iframe-nya termuat dianggap ditolak peramban, lalu
@@ -12,9 +13,10 @@ const STALL_MS = 8000;
 // Berapa kali TikTok yang dijeda peramban diputar lagi sebelum dibiarkan.
 const MAX_RESUMES = 3;
 
-// Video YouTube, TikTok, Instagram, atau Facebook di galeri. Supaya halaman tetap ringan, player pihak
+// Video TikTok, Instagram, atau Facebook di galeri (YouTube punya pemutar sendiri tanpa tombol,
+// YouTubeLoop.jsx). Supaya halaman tetap ringan, player pihak
 // ketiga baru dimuat saat petaknya setidaknya separuh terlihat, lalu dilepas lagi begitu keluar layar
-// (videonya berhenti dan memori dibebaskan). Yang bisa diputar otomatis (YouTube, TikTok, Facebook)
+// (videonya berhenti dan memori dibebaskan). Yang bisa diputar otomatis (TikTok, Facebook)
 // jalan tanpa suara dan tanpa tombol, seperti latar bergerak; tombol platform di pojok membuka video
 // aslinya dengan suara. Instagram, atau saat "kurangi animasi"/hemat data aktif, diputar saat diketuk.
 // Ukuran player menutupi petak seperti object-cover (satuan cq dari petak).
@@ -22,6 +24,11 @@ const MAX_RESUMES = 3;
 // diputar begitu siap, diulang dari awal bila habis. Bila tetap tidak berjalan dalam STALL_MS, player
 // dimuat ulang dengan tombol putar TikTok dan bisa disentuh, jadi petaknya tidak pernah diam mati.
 export default function EmbedVideo({ video, title, t }) {
+  if (video.platform === "youtube") return <YouTubeLoop video={video} title={title} t={t} />;
+  return <PlatformEmbed video={video} title={title} t={t} />;
+}
+
+function PlatformEmbed({ video, title, t }) {
   const ref = useRef(null);
   const frame = useRef(null);
   const [inView, setInView] = useState(false);
