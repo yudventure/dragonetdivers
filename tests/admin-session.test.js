@@ -5,18 +5,18 @@ import { createThrottle } from "../src/lib/login-throttle.js";
 
 const secret = "test-secret-yang-panjang";
 const fingerprint = passwordFingerprint("rahasia-operator-123");
-const fingerprintFor = (email) => (email === "operator@dragonetdivers.com" ? fingerprint : null);
+const fingerprintFor = (email) => (email === "operator@dragonetdiversrajaampat.com" ? fingerprint : null);
 
 test("token sesi sah dibaca kembali, email dinormalkan", () => {
-  const token = createSessionToken({ email: " Operator@DragonetDivers.com ", fingerprint, secret, now: 1000 });
-  assert.equal(readSessionToken(token, { secret, fingerprintFor, now: 2000 }), "operator@dragonetdivers.com");
+  const token = createSessionToken({ email: " Operator@DragonetDiversRajaAmpat.com ", fingerprint, secret, now: 1000 });
+  assert.equal(readSessionToken(token, { secret, fingerprintFor, now: 2000 }), "operator@dragonetdiversrajaampat.com");
 });
 
 test("token kedaluwarsa, diubah, salah secret, atau password diganti ditolak", () => {
-  const token = createSessionToken({ email: "operator@dragonetdivers.com", fingerprint, secret, now: 0, hours: 1 });
+  const token = createSessionToken({ email: "operator@dragonetdiversrajaampat.com", fingerprint, secret, now: 0, hours: 1 });
   assert.equal(readSessionToken(token, { secret, fingerprintFor, now: 3600_000 + 1 }), null, "kedaluwarsa");
   const [payload, sig] = token.split(".");
-  const forged = Buffer.from(JSON.stringify({ e: "operator@dragonetdivers.com", x: Date.now() * 2 })).toString("base64url");
+  const forged = Buffer.from(JSON.stringify({ e: "operator@dragonetdiversrajaampat.com", x: Date.now() * 2 })).toString("base64url");
   assert.equal(readSessionToken(`${forged}.${sig}`, { secret, fingerprintFor, now: 1 }), null, "payload diubah");
   assert.equal(readSessionToken(`${payload}.${sig}x`, { secret, fingerprintFor, now: 1 }), null, "tanda tangan diubah");
   assert.equal(readSessionToken(token, { secret: "secret-lain", fingerprintFor, now: 1 }), null, "secret lain");

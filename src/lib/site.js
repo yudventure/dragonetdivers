@@ -9,7 +9,7 @@ import { envText } from "./env.js";
 export const SITE_STATE = "__dragonetSite";
 const live = () => globalThis[SITE_STATE]?.value ?? null;
 
-const DEFAULT_URL = "https://dragonetdivers.com";
+const DEFAULT_URL = "https://dragonetdiversrajaampat.com";
 
 // Origin http(s) dari sebuah isian, atau null bila bukan URL yang valid.
 function parseSiteUrl(raw) {
@@ -42,7 +42,7 @@ export const site = {
 // Kontak dan base dari pemilik (Oktober 2026), dipakai selama /admin/kontak belum diisi. Kotak email
 // dibuat pemilik di Hostinger.
 export const DEFAULT_CONTACT = {
-  email: "halo@dragonetdivers.com",
+  email: "halo@dragonetdiversrajaampat.com",
   address: ["Jl. Mayor, Kurkapa", "Meos Mansar, Raja Ampat", "Papua Barat Daya 98472"],
   base: { lat: -0.5778994776222449, lng: 130.61021304365477 },
 };
@@ -64,7 +64,7 @@ const pointLink = ({ lat, lng }) => `https://www.google.com/maps/search/?api=1&q
 export const mapsLink = (point) => (point ? pointLink(point) : live()?.mapsUrl || pointLink(DEFAULT_CONTACT.base));
 
 // Akun media sosial dari /admin/kontak (atau variabel publik lama di hPanel), berupa handle
-// (@dragonetdivers) atau URL lengkap di domain jaringan itu. Yang kosong atau tidak valid tidak ditampilkan.
+// (@dragonetdiversrajaampat) atau URL lengkap di domain jaringan itu. Yang kosong atau tidak valid tidak ditampilkan.
 export const NETWORKS = [
   { id: "instagram", label: "Instagram", host: "instagram.com", url: (h) => `https://www.instagram.com/${h}/` },
   { id: "tiktok", label: "TikTok", host: "tiktok.com", url: (h) => `https://www.tiktok.com/@${h}` },
@@ -131,7 +131,7 @@ export function siteConfigWarnings(env = process.env) {
   for (const n of NETWORKS) {
     const value = envText(env[`NEXT_PUBLIC_${n.id.toUpperCase()}`]);
     if (value && !socialUrl(n.id, value)) {
-      warnings.push(`NEXT_PUBLIC_${n.id.toUpperCase()} tidak valid; ikon ${n.label} disembunyikan. Isi handle (@dragonetdivers) atau URL ${n.host}.`);
+      warnings.push(`NEXT_PUBLIC_${n.id.toUpperCase()} tidak valid; ikon ${n.label} disembunyikan. Isi handle (@dragonetdiversrajaampat) atau URL ${n.host}.`);
     }
   }
   return warnings;

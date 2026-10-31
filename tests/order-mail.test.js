@@ -5,8 +5,8 @@ import { colors } from "../src/lib/email-layout.js";
 import { ORDER_MAIL_KINDS, orderMail, orderUrl, sampleOrder } from "../src/lib/order-mail.js";
 import { otpMail } from "../src/lib/otp-mail.js";
 
-const base = "https://dragonetdivers.com";
-const contact = { email: "halo@dragonetdivers.com", address: ["Jl. Mayor, Kurkapa"] };
+const base = "https://dragonetdiversrajaampat.com";
+const contact = { email: "halo@dragonetdiversrajaampat.com", address: ["Jl. Mayor, Kurkapa"] };
 const accounts = [{ bank: "Bank Rakyat Indonesia (BRI)", number: "1234 5678 90", holder: "Dragonet Divers", swift: "BRINIDJAXXX" }];
 const now = new Date("2026-10-21T02:00:00Z");
 
@@ -74,7 +74,7 @@ test("isi email mengikuti jenisnya dan aman dari HTML tamu", () => {
 });
 
 test("email kode OTP admin", () => {
-  const mail = otpMail({ code: "048213", account: "halo@dragonetdivers.com", minutes: 10, base, now });
+  const mail = otpMail({ code: "048213", account: "halo@dragonetdiversrajaampat.com", minutes: 10, base, now });
   assert.match(mail.subject, /^048213 /);
   assert.ok(mail.html.includes("048213") && mail.text.includes("048213"));
   assert.match(mail.text, /berlaku 10 menit/);

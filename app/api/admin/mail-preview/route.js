@@ -18,7 +18,7 @@ export async function GET(request) {
   const method = ["midtrans", "paypal", "transfer", "cash"].includes(params.get("method")) ? params.get("method") : "midtrans";
   let mail;
   if (kind === "otp") {
-    mail = otpMail({ code: "482913", account: "operator@dragonetdivers.com", minutes: 10 });
+    mail = otpMail({ code: "482913", account: "operator@dragonetdiversrajaampat.com", minutes: 10 });
   } else if (ORDER_MAIL_KINDS.includes(kind)) {
     // Rekening dari /admin/pembayaran; tanpa rekening tersimpan (atau database) dipakai rekening contoh.
     const saved = method === "transfer" ? await getPayments().then((p) => p.accounts).catch(() => []) : [];

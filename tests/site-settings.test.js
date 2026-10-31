@@ -8,22 +8,22 @@ const fails = (input, field) => assert.throws(() => validateSiteSettings(input),
 test("isian kontak dibersihkan", () => {
   const clean = validateSiteSettings({
     whatsapp: "0812-3456-7890",
-    email: " Halo@DragonetDivers.com ",
+    email: " Halo@DragonetDiversRajaAmpat.com ",
     address: ["  Jl. Mayor,   Kurkapa ", "Meos Mansar"],
     mapsUrl: "https://maps.app.goo.gl/abc123",
-    instagram: "@dragonetdivers",
-    tiktok: "https://www.tiktok.com/@dragonetdivers",
+    instagram: "@dragonetdiversrajaampat",
+    tiktok: "https://www.tiktok.com/@dragonetdiversrajaampat",
     facebook: "",
     showUsd: true,
     extra: "dibuang",
   });
   assert.deepEqual(clean, {
     whatsapp: "6281234567890",
-    email: "halo@dragonetdivers.com",
+    email: "halo@dragonetdiversrajaampat.com",
     address: ["Jl. Mayor, Kurkapa", "Meos Mansar", ""],
     mapsUrl: "https://maps.app.goo.gl/abc123",
-    instagram: "@dragonetdivers",
-    tiktok: "https://www.tiktok.com/@dragonetdivers",
+    instagram: "@dragonetdiversrajaampat",
+    tiktok: "https://www.tiktok.com/@dragonetdiversrajaampat",
     facebook: "",
     youtube: "",
     showUsd: true,
@@ -74,7 +74,7 @@ test("website memakai isian admin, lalu nilai bawaan", () => {
   const before = globalThis[SITE_STATE];
   try {
     globalThis[SITE_STATE] = { value: null };
-    assert.equal(contact.email, "halo@dragonetdivers.com");
+    assert.equal(contact.email, "halo@dragonetdiversrajaampat.com");
     assert.equal(contact.address.length, 3);
     assert.match(mapsLink(), /google\.com\/maps\/search/);
     globalThis[SITE_STATE] = {

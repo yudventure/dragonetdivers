@@ -100,7 +100,7 @@ test("teks halaman perawatan lengkap di kedua bahasa dan mengikuti aturan tulisa
 });
 
 test("halaman perawatan aman, tidak diindeks, dan menautkan bahasa lain", () => {
-  const html = maintenanceHtml({ kind: "page", lang: "id", path: "/services/fun-dives", message: "<b>Segera</b> & kembali", until: "2026-10-22T18:00", whatsapp: "6281234", email: "halo@dragonetdivers.com" });
+  const html = maintenanceHtml({ kind: "page", lang: "id", path: "/services/fun-dives", message: "<b>Segera</b> & kembali", until: "2026-10-22T18:00", whatsapp: "6281234", email: "halo@dragonetdiversrajaampat.com" });
   assert.match(html, /<meta name="robots" content="noindex">/);
   assert.match(html, /<html lang="id">/);
   assert.match(html, /&lt;b&gt;Segera&lt;\/b&gt; &amp; kembali/);

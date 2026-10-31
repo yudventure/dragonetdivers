@@ -1,6 +1,6 @@
 # Dragonet Divers Raja Ampat
 
-Website dive center Dragonet Divers, Raja Ampat — **dragonetdivers.com**. Next.js 16 (App Router) + React 19 + Tailwind CSS 4 + MySQL, dijalankan sebagai Node.js Web App di Hostinger.
+Website dive center Dragonet Divers, Raja Ampat — **dragonetdiversrajaampat.com** (dulu dragonetdivers.com, kini Parked Domain yang dialihkan). Next.js 16 (App Router) + React 19 + Tailwind CSS 4 + MySQL, dijalankan sebagai Node.js Web App di Hostinger.
 
 ## Development
 

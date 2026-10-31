@@ -27,7 +27,7 @@ export function adminConfig(env = process.env) {
   const email = envText(env.ADMIN_EMAIL).toLowerCase();
   const password = envText(env.ADMIN_PASSWORD) ? env.ADMIN_PASSWORD : "";
   const issues = [];
-  if (!email || !email.includes("@")) issues.push({ name: "ADMIN_EMAIL", reason: "Isi email operator, mis. operator@dragonetdivers.com." });
+  if (!email || !email.includes("@")) issues.push({ name: "ADMIN_EMAIL", reason: "Isi email operator, mis. operator@dragonetdiversrajaampat.com." });
   if (!password) issues.push({ name: "ADMIN_PASSWORD", reason: "Isi password operator." });
   else if (envPasswordForms(password).at(-1).length < MIN_PASSWORD) issues.push({ name: "ADMIN_PASSWORD", reason: `Minimal ${MIN_PASSWORD} karakter.` });
   return { email, password, issues };

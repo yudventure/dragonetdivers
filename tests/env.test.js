@@ -8,7 +8,7 @@ import { databaseIssues, isDatabaseConfigured, mysqlSettings } from "../src/serv
 
 // hPanel tidak menerima value kosong, jadi file impor .env memakai "-" untuk key yang belum diisi.
 const IMPORTED = {
-  NEXT_PUBLIC_SITE_URL: "https://dragonetdivers.com",
+  NEXT_PUBLIC_SITE_URL: "https://dragonetdiversrajaampat.com",
   NEXT_PUBLIC_WHATSAPP_NUMBER: "-",
   NEXT_PUBLIC_INSTAGRAM: "-",
   NEXT_PUBLIC_TIKTOK: "-",
@@ -31,7 +31,7 @@ test("situs: placeholder tidak memunculkan tombol, ikon, atau peringatan", (t) =
   t.mock.method(console, "warn", () => {});
   assert.equal(whatsappNumber("-"), null);
   assert.equal(socialUrl("instagram", "-"), null, "bukan akun instagram.com/-/");
-  assert.equal(siteUrl("-"), "https://dragonetdivers.com");
+  assert.equal(siteUrl("-"), "https://dragonetdiversrajaampat.com");
   assert.deepEqual(siteConfigWarnings(IMPORTED), []);
   assert.equal(console.warn.mock.callCount(), 0);
 });
