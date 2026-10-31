@@ -15,6 +15,7 @@ Workflow `.github/workflows/ci.yml` berjalan di setiap push:
 | **build** | `npm ci`, `npm test`, `npm run build` |
 | **merge** | Hanya untuk branch selain `main`, setelah **build** lulus. Membuka PR ke `main` (bila diizinkan), lalu menggabungkannya. Bila Actions belum diizinkan membuat PR, branch digabung langsung ke `main`. |
 | **deploy / hostinger** | Setelah ada yang masuk `main`. Lewat API Hostinger (`scripts/hostinger-deploy.mjs`, `.github/workflows/deploy.yml`): memastikan auto-deploy website menunjuk branch `main`, membangun website dari `main` (atau memakai build yang sudah dipicu Hostinger), menunggu sampai selesai, lalu membuka `/api/health`. |
+| **Keamanan** (`security.yml`) | Setiap hari 05.17 WIT dan lewat **Run workflow**: `npm audit fix` tanpa `--force`, lalu `npm test` + `npm run build`; bila ada perubahan, langsung masuk `main` dan tayang. Merah bila masih ada kerentanan yang butuh naik versi besar (rinciannya di ringkasan run). |
 
 Jadi setiap push yang lulus test + build **langsung tayang**. Bila build gagal, tidak ada yang digabung. Bila branch bentrok dengan `main`, cek **merge** merah dan menjelaskan konfliknya. Bila build di Hostinger gagal, cek **deploy** merah dan menampilkan log build Hostinger (juga di ringkasan run di tab Actions).
 
