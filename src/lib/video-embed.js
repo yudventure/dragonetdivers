@@ -1,8 +1,9 @@
 // Ubah tautan video YouTube (termasuk Shorts), TikTok, Instagram, dan Facebook menjadi alamat embed untuk
 // galeri (src/components/EmbedVideo.jsx). Fungsi murni, diuji di tests/video-embed.test.js.
 //
-// Yang bisa diputar otomatis tanpa suara dan berulang: YouTube (parameter resmi autoplay, mute, loop) dan
-// TikTok (parameter autoplay dan loop, ditambah perintah postMessage di bawah). Facebook bisa diputar
+// Yang bisa diputar otomatis tanpa suara dan berulang: YouTube (parameter resmi autoplay, mute, loop,
+// ditambah perintah postMessage di bawah supaya berulang mulus) dan TikTok (parameter autoplay dan loop,
+// ditambah perintah postMessage di bawah). Facebook bisa diputar
 // otomatis tanpa suara tapi tidak berulang. Instagram tidak mendukung putar otomatis dari embed, jadi
 // diputar saat diketuk. Untuk loop yang paling cepat dan pasti, unggah klip MP4/WebM sendiri (jenis
 // "video" di src/content/gallery.js).
@@ -41,6 +42,10 @@ function youtube({ url, host, parts }) {
     rel: "0",
     modestbranding: "1",
     disablekb: "1",
+    fs: "0",
+    iv_load_policy: "3", // tanpa anotasi dan kartu
+    cc_load_policy: "0",
+    enablejsapi: "1", // kendali lewat postMessage (youtubeReaction di bawah)
   });
   return {
     platform: "youtube",
@@ -48,7 +53,10 @@ function youtube({ url, host, parts }) {
     id,
     href: vertical ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`,
     embed: `https://www.youtube-nocookie.com/embed/${id}?${params}`,
+    // Gambar mini yang selalu ada (4:3, dipakai juga pratinjau admin) dan gambar tajam untuk sampul petak:
+    // Shorts tegak (oardefault) atau 1280 px (maxresdefault). Sampul yang tidak ada jatuh ke thumbnail.
     thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    poster: `https://i.ytimg.com/vi/${id}/${vertical ? "oardefault" : "maxresdefault"}.jpg`,
     vertical,
     autoplay: true,
     loops: true,
@@ -191,4 +199,93 @@ export function tiktokReaction(event, { interactive = false } = {}) {
 export function isTikTokPlaying(event) {
   if (event?.type === "onStateChange") return Number(event.value) === TIKTOK_STATE.playing;
   return event?.type === "onCurrentTime" && Number(event.value?.currentTime ?? event.value) > 0;
+}
+
+// Kendali player YouTube lewat postMessage (protokol "widget" yang dipakai YouTube IFrame API, aktif karena
+// enablejsapi=1). Halaman mengirim { event: "listening" } setelah iframe termuat; player lalu mengabarkan
+// onReady, onStateChange (info = keadaan), initialDelivery dan infoDelivery (info berisi playerState,
+// currentTime, duration). Perintah: { event: "command", func, args }.
+// Supaya berulang mulus tanpa layar akhir dan tanpa layar hitam, video diputar ulang dari awal sedikit
+// sebelum habis (YOUTUBE_LOOP_LEAD detik), bukan menunggu loop bawaan YouTube yang memuat ulang player.
+export const YOUTUBE_STATE = { unstarted: -1, ended: 0, playing: 1, paused: 2, buffering: 3, cued: 5 };
+export const YOUTUBE_LOOP_LEAD = 0.4;
+const YOUTUBE_CHANNEL = "widget";
+
+/** Pesan player hanya diterima dari youtube-nocookie.com atau youtube.com (https, dengan atau tanpa www). */
+export function isYouTubeOrigin(origin) {
+  return typeof origin === "string" && /^https:\/\/(www\.)?(youtube-nocookie|youtube)\.com$/.test(origin);
+}
+
+/** Alamat embed dengan origin halaman, supaya player mengirim kabarnya ke halaman ini. */
+export function youtubeEmbedFor(embed, origin) {
+  const url = new URL(embed);
+  if (typeof origin === "string" && /^https?:\/\/[^/]+$/.test(origin)) url.searchParams.set("origin", origin);
+  return url.toString();
+}
+
+export const youtubeListening = () => JSON.stringify({ event: "listening", id: 1, channel: YOUTUBE_CHANNEL });
+
+export const youtubeCommand = (func, args = []) => JSON.stringify({ event: "command", func, args, id: 1, channel: YOUTUBE_CHANNEL });
+
+/** Pesan dari player YouTube sebagai { event, info }, atau null bila bukan pesan player. */
+export function readYouTubeEvent(data) {
+  let msg = data;
+  if (typeof msg === "string") {
+    try {
+      msg = JSON.parse(msg);
+    } catch {
+      return null;
+    }
+  }
+  if (!msg || typeof msg !== "object" || typeof msg.event !== "string") return null;
+  return { event: msg.event, info: msg.info ?? null };
+}
+
+/** Keadaan, waktu, dan durasi yang dibawa sebuah pesan (yang tidak ada = null). */
+export function youtubeInfo(event) {
+  const info = event?.info;
+  const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
+  if (event?.event === "onStateChange") return { state: num(Number(info)), currentTime: null, duration: null };
+  if (!info || typeof info !== "object") return { state: null, currentTime: null, duration: null };
+  return { state: num(info.playerState), currentTime: num(info.currentTime), duration: num(info.duration) };
+}
+
+/**
+ * Perintah untuk player YouTube setelah sebuah pesan darinya. duration = durasi video yang sudah diketahui,
+ * previous = keadaan terakhir (keadaan yang sama dari pesan berikutnya tidak memicu perintah lagi).
+ * Siap atau belum mulai: bisukan lalu putar. Hampir habis atau sudah habis: ulang dari awal.
+ * Dijeda peramban (petak tidak bisa disentuh): putar lagi.
+ */
+export function youtubeReaction(event, { duration = null, previous = null } = {}) {
+  const mute = youtubeCommand("mute");
+  const play = youtubeCommand("playVideo");
+  const restart = youtubeCommand("seekTo", [0, true]);
+  if (event?.event === "onReady") return [mute, play];
+  const { state, currentTime, duration: told } = youtubeInfo(event);
+  const length = told ?? duration;
+  if (currentTime != null && length != null && length > YOUTUBE_LOOP_LEAD * 2 && currentTime >= length - YOUTUBE_LOOP_LEAD) return [restart];
+  if (state == null || state === previous) return [];
+  if (state === YOUTUBE_STATE.ended) return [restart, play];
+  if (state === YOUTUBE_STATE.paused) return [play];
+  if (state === YOUTUBE_STATE.unstarted || state === YOUTUBE_STATE.cued) return [mute, play];
+  return [];
+}
+
+/** Apakah pesan ini tanda videonya sedang berjalan (gambar sudah bergerak, sampul boleh diganti video). */
+export function isYouTubePlaying(event) {
+  const { state, currentTime } = youtubeInfo(event);
+  if (state != null) return state === YOUTUBE_STATE.playing;
+  return currentTime != null && currentTime > 0;
+}
+
+// Kanal YouTube pemilik video, untuk tautan petak galeri (ketuk video → kanalnya). Dibaca server dari oEmbed
+// YouTube (src/server/youtube-channel.js); author_url berbentuk https://www.youtube.com/@nama (atau /channel/…).
+export const youtubeOembedUrl = (id) =>
+  `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}`;
+
+/** Alamat kanal dari jawaban oEmbed, atau null bila tidak ada atau bukan alamat kanal YouTube. */
+export function channelFromOembed(data) {
+  const raw = typeof data?.author_url === "string" ? data.author_url.trim() : "";
+  const match = raw.match(/^https?:\/\/(?:www\.|m\.)?youtube\.com\/(@[\w.\-\u00C0-\uFFFF]{3,100}|channel\/UC[\w-]{22}|c\/[\w.\-]{1,100}|user\/[\w.\-]{1,100})\/?$/);
+  return match ? `https://www.youtube.com/${match[1]}` : null;
 }

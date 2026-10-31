@@ -110,7 +110,7 @@ function MediaGuide({ open }) {
             {[
               "Letakkan objek utama di tengah, karena foto dan video dipotong mengikuti bentuk petak.",
               "Unggah videonya dulu ke YouTube, TikTok, Instagram, atau Facebook, lalu tempel tautan dari tombol Bagikan.",
-              "Video YouTube dan TikTok diputar otomatis tanpa suara dan berulang di beranda.",
+              "Video YouTube dan TikTok diputar otomatis tanpa suara dan berulang di beranda. Video YouTube tampil tanpa tombol apa pun; diketuk, membuka kanal YouTube pemilik videonya.",
             ].map((tip) => (
               <li key={tip} className="grid grid-cols-[18px_1fr] gap-2">
                 <CheckIcon className="mt-0.5 size-4 text-teal" />

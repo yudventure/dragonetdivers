@@ -4,6 +4,7 @@ import { arrangeGallery } from "@/lib/gallery-layout";
 import { socialLinks } from "@/lib/site";
 import { parseVideoUrl } from "@/lib/video-embed";
 import { siteGallery } from "@/server/site-gallery";
+import { youtubeChannels } from "@/server/youtube-channel";
 import GalleryGrid from "./GalleryGrid";
 import { FacebookIcon, InstagramIcon, TikTokIcon, Wave, YouTubeIcon } from "./icons";
 
@@ -26,6 +27,12 @@ export default async function Gallery({ lang }) {
     }
     return [{ ...item, video, vertical: video.vertical }];
   });
+  // Video YouTube diketuk → kanal YouTube pemilik videonya (src/server/youtube-channel.js).
+  const youtube = list.filter((item) => item.video?.platform === "youtube");
+  if (youtube.length) {
+    const channels = await youtubeChannels(youtube.map((item) => item.video.id));
+    for (const item of youtube) item.video = { ...item.video, channel: channels[item.video.id] };
+  }
   // Susunan mosaik (src/lib/gallery-layout.js): ukuran petak "Otomatis" mengikuti pola besar, kecil, tinggi.
   const items = arrangeGallery(list);
   if (items.length === 0) return null;
