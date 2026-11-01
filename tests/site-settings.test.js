@@ -41,6 +41,13 @@ test("kode verifikasi Google: tag HTML jadi kodenya, kode DNS dan isian asing di
   assert.equal(DEFAULT_SITE_SETTINGS.googleVerification, "");
   assert.throws(() => validateSiteSettings({ googleVerification: `google-site-verification=${code}` }), (e) => e.field === "googleVerification" && /DNS/.test(e.message));
   fails({ googleVerification: "kode saya" }, "googleVerification");
+  // Pindah domain: kode properti lama dan baru tersimpan bersama, dipisah spasi.
+  const other = code.split("").reverse().join("");
+  const two = validateSiteSettings({ googleVerification: `<meta name="google-site-verification" content="${code}" />\n${other}` }).googleVerification;
+  assert.equal(two, `${code} ${other}`);
+  assert.equal(validateSiteSettings({ googleVerification: two }).googleVerification, two, "simpanan dibaca ulang apa adanya");
+  assert.throws(() => validateSiteSettings({ googleVerification: `${code}\ngoogle-site-verification=${other}` }), (e) => /DNS/.test(e.message));
+  fails({ googleVerification: Array.from({ length: 6 }, (_, i) => code.slice(0, -1) + "abcdef"[i]).join("\n") }, "googleVerification");
   // Simpanan lama tanpa kode tetap utuh.
   assert.equal(normalizeSiteSettings({ email: "info@contoh.id" }).email, "info@contoh.id");
 });

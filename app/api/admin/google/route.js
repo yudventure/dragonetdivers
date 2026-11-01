@@ -4,14 +4,14 @@ import { saveGoogleVerification } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 
-// Kode verifikasi Google Search Console dari /admin/google ({ code: "<meta ...>" atau kodenya saja, "" untuk
-// menghapus}). Disimpan di settings baris "site" tanpa mengubah isian lain, dan langsung dipasang di <head>
+// Kode verifikasi Google Search Console dari /admin/google ({ code: satu atau beberapa "<meta ...>" atau kodenya
+// saja, satu per baris; "" untuk menghapus}). Beberapa kode disimpan dipisah spasi. Disimpan di settings baris "site" tanpa mengubah isian lain, dan langsung dipasang di <head>
 // beranda (app/[lang]/layout.jsx).
 export async function POST(request) {
   const { error } = await guardAdmin(request);
   if (error) return error;
   const input = await readJson(request);
-  if (typeof input?.code !== "string" || input.code.length > 500) return Response.json({ error: "Isian tidak valid." }, { status: 400 });
+  if (typeof input?.code !== "string" || input.code.length > 3000) return Response.json({ error: "Isian tidak valid." }, { status: 400 });
   let code;
   try {
     code = cleanGoogleVerification(input.code);

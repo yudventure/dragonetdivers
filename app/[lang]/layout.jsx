@@ -22,6 +22,7 @@ export async function generateMetadata({ params }) {
   const { lang } = await params;
   const meta = uiText(lang).meta;
   // Kode verifikasi Google Search Console dari /admin/google (tag HTML di <head>, dibaca Google di beranda).
+  // Bisa beberapa kode dipisah spasi (properti domain lama dan baru saat pindah domain): satu tag per kode.
   const { googleVerification } = await getSiteSettings();
   return {
     metadataBase: new URL(site.url),
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }) {
       locale: ogLocale[lang],
       url: localeHref(lang, "/"),
     },
-    ...(googleVerification ? { verification: { google: googleVerification } } : {}),
+    ...(googleVerification ? { verification: { google: googleVerification.split(" ") } } : {}),
   };
 }
 

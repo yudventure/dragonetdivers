@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { googleVerificationOf, isDnsVerification, robotsRules, sitemapEntries, sitemapPaths } from "../src/lib/seo.js";
+import { googleVerificationOf, googleVerificationsOf, isDnsVerification, robotsRules, sitemapEntries, sitemapPaths } from "../src/lib/seo.js";
 
 const CODE = "Abc_DEF-1234567890abcdefGHIJKLmnopqrstuvwxy";
 
@@ -11,6 +11,19 @@ test("kode verifikasi Google dari tag HTML utuh atau kodenya saja", () => {
   assert.equal(googleVerificationOf(""), "");
   assert.equal(googleVerificationOf("   "), "");
   assert.equal(googleVerificationOf(undefined), "");
+});
+
+test("beberapa kode verifikasi (properti domain lama dan baru), satu per baris atau dari simpanan", () => {
+  const OTHER = "Zyx_DEF-1234567890abcdefGHIJKLmnopqrstuvwxy";
+  const tag = (code) => `<meta name="google-site-verification" content="${code}" />`;
+  assert.deepEqual(googleVerificationsOf(`${tag(CODE)}\n${tag(OTHER)}`), [CODE, OTHER]);
+  assert.deepEqual(googleVerificationsOf(`${tag(CODE)}${tag(OTHER)}`), [CODE, OTHER], "tag ditempel berdempetan");
+  assert.deepEqual(googleVerificationsOf(`${CODE} ${OTHER} ${CODE}`), [CODE, OTHER], "bentuk simpanan, kode ganda dibuang");
+  assert.deepEqual(googleVerificationsOf(`${tag(CODE)}\n${OTHER}`), [CODE, OTHER]);
+  assert.deepEqual(googleVerificationsOf(""), []);
+  assert.deepEqual(googleVerificationsOf([CODE, OTHER]), [CODE, OTHER]);
+  assert.equal(googleVerificationsOf(`${CODE}\nkode saya`), null);
+  assert.equal(googleVerificationsOf(`${CODE}\ngoogle-site-verification=${OTHER}`), null);
 });
 
 test("isian yang bukan kode tag HTML Google ditolak", () => {
