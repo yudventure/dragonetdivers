@@ -26,6 +26,22 @@ export function googleVerificationOf(value) {
   return TOKEN.test(code) ? code : null;
 }
 
+/** Paling banyak sekian kode verifikasi (mis. properti domain lama dan domain baru saat pindah domain). */
+export const MAX_GOOGLE_CODES = 5;
+
+/**
+ * Semua kode verifikasi dari isian tim: satu atau beberapa tag HTML atau kode, dipisah baris baru atau spasi
+ * (juga bentuk simpanan "kode1 kode2"). [] bila kosong, null bila ada isian yang bukan kode tag HTML.
+ */
+export function googleVerificationsOf(value) {
+  const raw = Array.isArray(value) ? value.join("\n") : typeof value === "string" ? value : "";
+  const tags = raw.match(/<meta\b[^>]*>/gi) ?? [];
+  const words = raw.replace(/<meta\b[^>]*>/gi, " ").split(/[\s,;]+/).filter(Boolean);
+  const codes = [...tags, ...words].map(googleVerificationOf);
+  if (codes.some((code) => code === null)) return null;
+  return [...new Set(codes.filter(Boolean))];
+}
+
 /** Halaman publik yang didaftarkan ke Google: beranda dan halaman layanan yang tampil. */
 export const sitemapPaths = (serviceSlugs) => ["/", ...serviceSlugs.map((slug) => `/services/${slug}`)];
 

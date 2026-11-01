@@ -35,3 +35,34 @@ export function canonicalRedirect(hosts, siteUrl) {
   if (!isSiteDomain(main.hostname) || main.hostname === name) return null;
   return main.origin;
 }
+
+const bare = (name) => name.replace(/^www\./, "");
+
+/**
+ * Origin untuk sitemap.xml dan robots.txt (keduanya tidak dialihkan proxy.js karena alamatnya berisi titik).
+ * Dibuka lewat domain lama milik situs: origin domain lama tanpa www, jadi sitemap di sana berisi alamat
+ * domain lama yang dialihkan 301 ke domain utama. Properti Search Console lama tetap menerima sitemapnya dan
+ * Google menemukan pengalihannya (pindah domain). Selain itu origin domain utama (site.url).
+ */
+export function seoOrigin(hosts, siteUrl) {
+  let main;
+  try {
+    main = new URL(siteUrl);
+  } catch {
+    return siteUrl;
+  }
+  const name = [hosts].flat().map(hostname).find(isSiteDomain);
+  if (!name || !isSiteDomain(main.hostname) || bare(name) === bare(main.hostname)) return main.origin;
+  return `https://${bare(name)}`;
+}
+
+/** Domain milik situs selain domain utama (domain lama yang dialihkan), sebagai origin https. */
+export function oldOrigins(siteUrl) {
+  let main;
+  try {
+    main = bare(new URL(siteUrl).hostname);
+  } catch {
+    return [];
+  }
+  return SITE_DOMAINS.includes(main) ? SITE_DOMAINS.filter((d) => d !== main).map((d) => `https://${d}`) : [];
+}

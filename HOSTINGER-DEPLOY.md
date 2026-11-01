@@ -73,7 +73,7 @@ Domain utama website: **dragonetdiversrajaampat.com** (pindah akhir Oktober 2026
 
 1. **Variabel environment**: `NEXT_PUBLIC_SITE_URL` = `https://dragonetdiversrajaampat.com` (atau hapus barisnya), lalu **Memindahkan** (Redeploy). `https://dragonetdivers.com/` harus berpindah ke domain baru.
 2. Dashboard Midtrans (bila Notification URL pernah diisi): `https://dragonetdiversrajaampat.com/api/payments/midtrans`. Alamat yang benar tampil di `/admin/pembayaran`.
-3. Google Search Console: properti Awalan URL `https://dragonetdiversrajaampat.com`, kode tag HTML-nya di `/admin/google`, lalu kirim `sitemap.xml`.
+3. Google Search Console (langkahnya juga di panel **Pindah domain** `/admin/google`): tambahkan properti Awalan URL `https://dragonetdiversrajaampat.com` tanpa menghapus properti lama, tempel kode tag HTML barunya di `/admin/google` pada baris baru di bawah kode lama (keduanya tetap terpasang), kirim `sitemap.xml` di properti baru, lalu di properti lama buka **Setelan → Perubahan alamat** (Change of address) ke properti baru. `sitemap.xml` dan `robots.txt` yang dibuka lewat `dragonetdivers.com` berisi alamat domain lama (dialihkan 301), jadi sitemap di properti lama tetap sah.
 4. Variabel GitHub `HOSTINGER_DOMAIN` (bila diisi) = `dragonetdiversrajaampat.com`.
 5. **Email** `halo@dragonetdiversrajaampat.com` (bawaan email publik website sejak 31 Oktober 2026): buat kotak emailnya di hPanel **Email** untuk domain ini dan isi catatan MX/SPF/DKIM yang diminta di akun domain. Lalu di hPanel ganti `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `ADMIN_OTP_EMAIL` (dan `ADMIN_EMAIL` bila memakai alamat lama) ke alamat baru, dan pastikan kolom email di `/admin/kontak` kosong atau berisi alamat baru. Semua harus selesai sebelum `dragonetdivers.com` berakhir.
 

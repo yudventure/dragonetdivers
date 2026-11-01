@@ -6,7 +6,7 @@
 // Isian kosong berarti memakai isian lama dari hPanel atau nilai bawaan. Fungsi murni, diuji di
 // tests/site-settings.test.js.
 import { cleanEmail, cleanWhatsApp } from "./checkout.js";
-import { googleVerificationOf, isDnsVerification } from "./seo.js";
+import { googleVerificationsOf, isDnsVerification, MAX_GOOGLE_CODES } from "./seo.js";
 import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES } from "./services.js";
 import { NETWORKS, socialUrl } from "./site.js";
 
@@ -84,11 +84,17 @@ export function validateSiteSettings(input) {
   return out;
 }
 
-/** Kode verifikasi Google dari isian /admin/google, atau SiteSettingsError dengan pesan untuk tim. */
+/**
+ * Kode verifikasi Google dari isian /admin/google, disimpan dipisah spasi ("kode1 kode2": properti domain
+ * lama dan baru saat pindah domain), atau SiteSettingsError dengan pesan untuk tim.
+ */
 export function cleanGoogleVerification(value) {
-  const code = googleVerificationOf(value);
-  if (code !== null) return code;
-  if (isDnsVerification(value)) {
+  const codes = googleVerificationsOf(value);
+  if (codes && codes.length > MAX_GOOGLE_CODES) {
+    throw new SiteSettingsError(`Paling banyak ${MAX_GOOGLE_CODES} kode. Hapus kode properti yang sudah tidak dipakai.`, "googleVerification");
+  }
+  if (codes !== null) return codes.join(" ");
+  if (String(value ?? "").split(/\s+/).some(isDnsVerification)) {
     throw new SiteSettingsError("Ini kode untuk DNS (properti Domain). Untuk kolom ini pilih Awalan URL di Search Console, lalu cara verifikasi Tag HTML.", "googleVerification");
   }
   throw new SiteSettingsError("Kode belum dikenali. Di Search Console buka cara verifikasi Tag HTML, lalu salin seluruh tag yang diawali <meta name=\"google-site-verification\".", "googleVerification");

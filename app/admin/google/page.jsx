@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import GoogleSearchConsole from "@/admin/GoogleSearchConsole";
+import { oldOrigins } from "@/lib/domain";
 import { site } from "@/lib/site";
 import { services } from "@/lib/services";
 import { locales } from "@/lib/i18n";
@@ -49,6 +50,7 @@ export default async function GoogleSearchConsolePage() {
         <GoogleSearchConsole
           initial={settings.googleVerification}
           siteUrl={site.url}
+          oldUrls={oldOrigins(site.url)}
           pages={(1 + shown) * locales.length}
         />
       )}
