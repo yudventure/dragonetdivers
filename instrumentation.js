@@ -22,6 +22,11 @@ export async function register() {
   import("./src/server/packages.js").then(({ ensurePriceList }) => ensurePriceList()).catch(() => {});
   // Rekening transfer dari pemilik masuk ke /admin/pembayaran sekali (src/server/payment-settings.js).
   import("./src/server/payment-settings.js").then(({ ensureBankAccount }) => ensureBankAccount()).catch(() => {});
+  // Formulir selam yang belum terkirim ke Google Sheets dicoba lagi berkala (src/server/waiver-sheet.js).
+  import("./src/server/waiver-sheet.js").then(({ startSheetSync, syncWaiverSheet }) => {
+    startSheetSync();
+    syncWaiverSheet().catch(() => {});
+  }).catch((error) => console.error(`[formulir/sheet] tidak bisa dimulai: ${error?.message}`));
   try {
     const { startReminders } = await import("./src/server/reminders.js");
     startReminders();

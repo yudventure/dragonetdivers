@@ -12,6 +12,7 @@ import { mailConfigured, sendMail } from "@/server/mailer";
 import { later } from "@/server/order-mail";
 import { orderByCode } from "@/server/orders";
 import { getSiteSettings } from "@/server/site-settings";
+import { syncWaiverSheet } from "@/server/waiver-sheet";
 import { createWaiver, getAgreement } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,8 @@ export const dynamic = "force-dynamic";
 // Kirim formulir selam dari /waiver: { ...isian, medical, signature (PNG base64), order?, token? }.
 // Diperiksa ulang di server (cleanWaiver, src/lib/waiver.js), disimpan di tabel waivers bersama salinan teks
 // perjanjian yang disetujui, lalu salinan dikirim ke email tamu bila diisi. Pesanan hanya ditautkan bila
-// token rahasianya cocok dan pesanannya berisi layanan selam. Paling banyak 30 formulir per jam per alamat IP
+// token rahasianya cocok dan pesanannya berisi layanan selam. Setelah tersimpan, formulir dikirim ke Google
+// Sheets tim bila disambungkan. Paling banyak 30 formulir per jam per alamat IP
 // (satu rombongan sering mengisi dari satu ponsel).
 const state = (globalThis.__ddWaiver ??= { throttle: createThrottle({ limit: 30, windowMs: 60 * 60_000 }) });
 const noStore = { "Cache-Control": "no-store" };
@@ -74,6 +76,8 @@ export async function POST(request) {
     }
   }
   state.throttle.fail(key); // setiap formulir dihitung
+  // Ke Google Sheets tim bila sudah disambungkan di /admin/formulir (src/server/waiver-sheet.js).
+  later(() => syncWaiverSheet());
 
   const copy = Boolean(waiver.email) && mailConfigured();
   if (copy) {

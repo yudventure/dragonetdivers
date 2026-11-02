@@ -74,7 +74,7 @@ export default async function WaiverPage({ params, searchParams }) {
               <Image src={logoPlate} alt="" width={52} height={52} className="size-13" />
               <span className="grid leading-none">
                 <span className="font-display text-xl font-semibold">Dragonet Divers</span>
-                <span className="mt-2.5 text-[10px] font-bold tracking-[0.2em] text-white/80">RAJA AMPAT</span>
+                <span className="text-[10px] font-bold tracking-[0.22em] text-white/80">RAJA AMPAT</span>
               </span>
             </div>
             <div className="grid gap-4">

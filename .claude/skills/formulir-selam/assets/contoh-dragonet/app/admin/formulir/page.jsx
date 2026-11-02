@@ -4,16 +4,19 @@ import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import { CopyText } from "@/admin/CopyText";
 import WaiverAgreementForm from "@/admin/WaiverAgreementForm";
 import WaiverPhotoPicker from "@/admin/WaiverPhotoPicker";
+import WaiverSheetPanel from "@/admin/WaiverSheetPanel";
 import { Stats } from "@/admin/parts";
 import learnDiver from "@/assets/learn-diver.webp";
 import { defaultAgreements } from "@/content/waiver-agreement";
 import { witToday } from "@/lib/checkout";
 import { localeNamesId } from "@/lib/i18n";
+import { appsScript } from "@/lib/waiver-sheet";
 import { site } from "@/lib/site";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { listRecords } from "@/server/records";
 import { getSetting } from "@/server/settings";
+import { ensureSheetToken, pendingCount, sheetSyncRunning } from "@/server/waiver-sheet";
 import { DEFAULT_AGREEMENT, getAgreement, listWaivers } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
@@ -25,19 +28,22 @@ const witId = (iso) =>
   iso ? `${new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jayapura" }).format(new Date(iso))} WIT` : "";
 
 // /admin/formulir: formulir selam yang diisi tamu (/waiver), terbaru di atas, dengan tanda "Perlu dokter" dari
-// kuesioner medis; tautan formulir untuk dibagikan (atau dijadikan kode QR di dive center); teks perjanjian.
+// kuesioner medis; tautan formulir untuk dibagikan (atau dijadikan kode QR di dive center); spreadsheet (unduh
+// Excel dan Google Sheets otomatis, WaiverSheetPanel.jsx); foto samping formulir; teks perjanjian.
 export default async function WaiversPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
-  const [waivers, agreement, gallery, photo] = database.ok
+  const [waivers, agreement, gallery, photo, sheet, pending] = database.ok
     ? await Promise.all([
         listWaivers().catch((error) => console.error(`[admin/formulir] ${error.code ?? error.message}`)),
         getAgreement().catch(() => DEFAULT_AGREEMENT),
         listRecords("gallery").catch(() => []),
         getSetting("waiver_photo", { mediaId: "" }).catch(() => ({ mediaId: "" })),
+        ensureSheetToken().catch(() => null),
+        pendingCount().catch(() => 0),
       ])
-    : [null, DEFAULT_AGREEMENT, [], { mediaId: "" }];
+    : [null, DEFAULT_AGREEMENT, [], { mediaId: "" }, null, 0];
   // Foto galeri yang bisa dipilih untuk panel kiri /waiver (yang tampil lebih dulu).
   const photos = gallery
     .filter((r) => r.type === "photo" && r.mediaId)
@@ -69,6 +75,21 @@ export default async function WaiversPage() {
             <CopyText value={link} />
             <p className="text-xs text-slate">Tautan dari halaman pesanan otomatis terhubung ke pesanannya. Untuk di meja dive center, jadikan tautan ini kode QR.</p>
           </section>
+          {sheet?.token && (
+            <WaiverSheetPanel
+              initial={{
+                connected: Boolean(sheet.url),
+                url: sheet.url,
+                pending,
+                running: sheetSyncRunning(),
+                lastSync: sheet.lastSync,
+                lastError: sheet.lastError,
+                sheet: sheet.lastSheet,
+              }}
+              script={appsScript(sheet.token)}
+              total={waivers.length}
+            />
+          )}
           <section className="grid gap-3">
             <h2 className="text-xl text-abyss">Formulir terbaru</h2>
             {waivers.length === 0 ? (

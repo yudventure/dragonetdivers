@@ -52,6 +52,20 @@ Baca `references/memasang.md` untuk rinciannya. Intinya:
    kode QR di meja dive center.
 7. Uji di peramban di semua bahasa situs, ponsel 390 px, tanda tangan
    dengan sentuhan.
+8. Spreadsheet (permintaan pemilik 2 November 2026, "hasil form bisa
+   langsung rapih di spreadsheet"): satu baris per penyelam dengan kolom
+   tetap, dikirim otomatis ke Google Sheets tim lewat Apps Script yang
+   ditempel tim sendiri, plus unduh Excel. Contohnya di
+   `assets/contoh-dragonet/`: `src/lib/waiver-sheet.js` (kolom, skrip Apps
+   Script dengan kode rahasia, alamat yang diterima hanya
+   script.google.com), `src/server/waiver-sheet.js` (kirim setelah
+   formulir tersimpan, coba lagi berkala, tabel catatan terkirim
+   `010_waiver_sheet.sql`), `src/admin/WaiverSheetPanel.jsx` (langkah
+   menyambungkan), `src/lib/xlsx.js` (Excel dengan tanggal asli, judul
+   berwarna, filter), dan uji dengan Google Sheets tiruan
+   (`tests/waiver-sheet.test.js`, `tests/helpers/fake-sheets.js`). Kolom
+   teks diberi format teks sebelum nilainya supaya nomor yang diawali + tidak
+   menjadi #ERROR!.
 
 ## Aturan yang tidak boleh dilanggar
 
@@ -100,4 +114,5 @@ lain sebaiknya dikembalikan ke Dragonet juga.
 - [ ] Di bawah 18 tahun meminta nama wali dan wali yang mengetik konfirmasi
 - [ ] Teks di semua bahasa situs bersih dari titik dua, titik koma, tanda pisah panjang
 - [ ] Ponsel 390 px tanpa gulir menyamping, tanda tangan bisa digambar dengan sentuhan
+- [ ] Bila spreadsheet dipasang, formulir baru masuk ke Google Sheets dengan telepon tetap teks, dan kirim ulang tidak membuat baris ganda
 - [ ] Katakan terus terang hanya Chromium Linux yang diuji, Windows, Mac, Android, dan iOS belum
