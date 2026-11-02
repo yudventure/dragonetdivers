@@ -6,6 +6,11 @@
       "title": "Registration, medical questionnaire and liability release",
       "intro": "Each diver fills in their own form before the first dive with us. It takes about five minutes, at home or at the dive center.",
       "forOrder": "For booking {code}",
+      "points": [
+        "About five minutes per diver",
+        "Know right away if you need a physician's approval",
+        "Signed online, nothing to print"
+      ],
       "read": "Please read the agreement below before you sign.",
       "englishOnly": "This agreement is available in English only for now. Please read it before you sign.",
       "terms": "Read the full agreement",
@@ -19,6 +24,8 @@
         "fullName": "Full name (as in passport)",
         "birthDate": "Date of birth",
         "age": "Age",
+        "ageAuto": "Calculated automatically",
+        "ageYears": "{age} years",
         "address": "Home address",
         "nationality": "Nationality",
         "date": "Date of your first dive with us",
@@ -197,6 +204,11 @@
       "title": "Pendaftaran, kuesioner medis, dan pernyataan pelepasan tanggung jawab",
       "intro": "Setiap penyelam mengisi formulirnya sendiri sebelum menyelam pertama kali bersama kami. Cukup sekitar lima menit, bisa di rumah atau di dive center.",
       "forOrder": "Untuk pesanan {code}",
+      "points": [
+        "Sekitar lima menit per penyelam",
+        "Langsung tahu perlu persetujuan dokter atau tidak",
+        "Ditandatangani online, tidak perlu dicetak"
+      ],
       "read": "Baca perjanjian di bawah ini sebelum kamu tanda tangan.",
       "englishOnly": "Perjanjian ini baru tersedia dalam bahasa Inggris. Baca dulu sebelum kamu tanda tangan.",
       "terms": "Baca perjanjian lengkap",
@@ -210,6 +222,8 @@
         "fullName": "Nama lengkap (sesuai paspor)",
         "birthDate": "Tanggal lahir",
         "age": "Umur",
+        "ageAuto": "Dihitung otomatis",
+        "ageYears": "{age} tahun",
         "address": "Alamat rumah",
         "nationality": "Kewarganegaraan",
         "date": "Tanggal menyelam pertama bersama kami",
@@ -388,6 +402,11 @@
       "title": "登记、潜水员健康问卷与免责声明",
       "intro": "每位潜水员在首次与我们潜水前填写自己的表格。大约需要五分钟，在家或在潜水中心填写均可。",
       "forOrder": "用于预订 {code}",
+      "points": [
+        "每位潜水员约五分钟",
+        "立即知道是否需要医生许可",
+        "在线签署，无需打印"
+      ],
       "read": "签署前请仔细阅读以下协议。",
       "englishOnly": "本协议目前仅提供英文版本。签署前请仔细阅读。",
       "terms": "阅读完整协议",
@@ -401,6 +420,8 @@
         "fullName": "全名（与护照一致）",
         "birthDate": "出生日期",
         "age": "年龄",
+        "ageAuto": "自动计算",
+        "ageYears": "{age} 岁",
         "address": "家庭住址",
         "nationality": "国籍",
         "date": "首次与我们潜水的日期",
@@ -579,6 +600,11 @@
       "title": "등록, 의료 질문지 및 면책 동의서",
       "intro": "다이버마다 저희와 첫 다이빙을 하기 전에 각자 신청서를 작성해 주세요. 5분 정도 걸리고, 집에서나 다이브 센터에서 작성할 수 있어요.",
       "forOrder": "예약 코드 {code}",
+      "points": [
+        "다이버 한 명당 약 5분이면 돼요",
+        "의사 승인이 필요한지 바로 알 수 있어요",
+        "온라인으로 서명하고 인쇄할 필요가 없어요"
+      ],
       "read": "서명하기 전에 아래 동의서를 꼭 읽어 주세요.",
       "englishOnly": "이 동의서는 아직 영어로만 제공돼요. 서명하기 전에 꼭 읽어 주세요.",
       "terms": "동의서 전문 읽기",
@@ -592,6 +618,8 @@
         "fullName": "성명 (여권과 동일하게)",
         "birthDate": "생년월일",
         "age": "나이",
+        "ageAuto": "자동으로 계산돼요",
+        "ageYears": "{age}세",
         "address": "자택 주소",
         "nationality": "국적",
         "date": "저희와 함께하는 첫 다이빙 날짜",

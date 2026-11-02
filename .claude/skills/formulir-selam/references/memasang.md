@@ -136,6 +136,16 @@ Contoh `assets/contoh-dragonet/app/api/waiver/route.js`. Urutannya
   terkirim menawarkan "isi untuk penyelam lain" (formulir dikosongkan,
   tanda tangan ikut). `?order=<kode>&t=<token>` mengisi tanggal selam
   pertama (`firstDiveDate`). Halaman tidak diindeks (`robots noindex`).
+- **Tata letak** (keputusan pemilik 2 November 2026): dua kolom, kiri panel
+  berlogo dengan foto penyelam terbaik dari galeri (dipilih tim di admin,
+  `WaiverPhotoPicker.jsx`, settings baris `waiver_photo`) yang menempel saat
+  digulir, kanan formulir. Di ponsel panel di atas formulir.
+- **Tanggal** memakai pemilih tanggal bermerek, bukan kalender bawaan
+  peramban (`src/components/DatePicker.jsx` + `src/lib/date-picker.js`
+  dengan ujinya): pilihan bulan dan tahun, nama hari dan bulan dalam bahasa
+  halaman, keyboard, ketuk di luar menutup. Tanggal lahir dibuka di sekitar
+  30 tahun lalu dan paling baru 8 tahun lalu; umur terhitung sendiri
+  ("36 tahun").
 - **Kotak tanda tangan** `assets/formulir-selam/SignaturePad.jsx`. Ganti
   kelas warna Tailwind (`border-lagoon`, `text-ember`, `bg-sunrise-wash`,
   `border-danger`, `rounded-input`) dengan token situs, dan warna goresan

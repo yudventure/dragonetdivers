@@ -3,13 +3,17 @@ import AdminGate from "@/admin/AdminGate";
 import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import { CopyText } from "@/admin/CopyText";
 import WaiverAgreementForm from "@/admin/WaiverAgreementForm";
+import WaiverPhotoPicker from "@/admin/WaiverPhotoPicker";
 import { Stats } from "@/admin/parts";
+import learnDiver from "@/assets/learn-diver.webp";
 import { defaultAgreements } from "@/content/waiver-agreement";
 import { witToday } from "@/lib/checkout";
 import { localeNamesId } from "@/lib/i18n";
 import { site } from "@/lib/site";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
+import { listRecords } from "@/server/records";
+import { getSetting } from "@/server/settings";
 import { DEFAULT_AGREEMENT, getAgreement, listWaivers } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +30,19 @@ export default async function WaiversPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
-  const [waivers, agreement] = database.ok
+  const [waivers, agreement, gallery, photo] = database.ok
     ? await Promise.all([
         listWaivers().catch((error) => console.error(`[admin/formulir] ${error.code ?? error.message}`)),
         getAgreement().catch(() => DEFAULT_AGREEMENT),
+        listRecords("gallery").catch(() => []),
+        getSetting("waiver_photo", { mediaId: "" }).catch(() => ({ mediaId: "" })),
       ])
-    : [null, DEFAULT_AGREEMENT];
+    : [null, DEFAULT_AGREEMENT, [], { mediaId: "" }];
+  // Foto galeri yang bisa dipilih untuk panel kiri /waiver (yang tampil lebih dulu).
+  const photos = gallery
+    .filter((r) => r.type === "photo" && r.mediaId)
+    .sort((a, b) => Number(b.active) - Number(a.active) || (a.order ?? 0) - (b.order ?? 0))
+    .map((r) => ({ id: r.mediaId, src: `/api/media/${r.mediaId}`, caption: r.captionId }));
   const today = witToday();
   const link = `${site.url}/waiver`;
   const upcoming = waivers?.filter((w) => w.date >= today) ?? [];
@@ -107,6 +118,7 @@ export default async function WaiversPage() {
               </div>
             )}
           </section>
+          <WaiverPhotoPicker photos={photos} current={photos.some((p) => p.id === photo.mediaId) ? photo.mediaId : ""} fallback={learnDiver.src} />
           <WaiverAgreementForm
             initial={{ en: agreement.en ?? "", id: agreement.id ?? "", zh: agreement.zh ?? "", ko: agreement.ko ?? "" }}
             fallback={defaultAgreements}

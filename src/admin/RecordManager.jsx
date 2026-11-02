@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { optionLabel, rupiah, shortDay } from "@/lib/records";
+import DatePicker from "@/components/DatePicker";
 import { schemaFor } from "@/lib/modules";
+import { ADMIN_DATE_TEXT } from "./date-text";
 
 export const INPUT = "h-11 w-full rounded-input border border-line-strong bg-white px-3 text-abyss outline-none focus:border-teal focus:ring-3 focus:ring-lagoon/40";
 const AREA = "w-full rounded-input border border-line-strong bg-white px-3 py-2 text-abyss outline-none focus:border-teal focus:ring-3 focus:ring-lagoon/40";
@@ -55,7 +57,10 @@ function Input({ field, value, values, onChange, refs }) {
       </select>
     );
   }
-  const type = { date: "date", month: "month", time: "time", email: "email", url: "url" }[field.type] ?? "text";
+  // Tanggal memakai pemilih tanggal bermerek yang sama dengan website, bukan kalender bawaan peramban.
+  if (field.type === "date")
+    return <DatePicker id={common.id} name={common.name} value={value ?? ""} onChange={onChange} required={field.required} lang="id" t={ADMIN_DATE_TEXT} className={INPUT} />;
+  const type = { month: "month", time: "time", email: "email", url: "url" }[field.type] ?? "text";
   const numeric = field.type === "money" || field.type === "number";
   return (
     <input

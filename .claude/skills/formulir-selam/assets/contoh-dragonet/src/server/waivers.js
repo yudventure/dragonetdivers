@@ -1,5 +1,6 @@
 import "server-only";
 import { query } from "./db";
+import { FALLBACK_BLUR, imageInfo } from "./media";
 import { getSetting, saveSetting } from "./settings";
 
 // Formulir selam di database (tabel waivers, migrasi 008) dan teks perjanjian dari /admin/formulir
@@ -8,6 +9,19 @@ import { getSetting, saveSetting } from "./settings";
 export const DEFAULT_AGREEMENT = { en: "", id: "", zh: "", ko: "", updatedAt: "" };
 
 export const getAgreement = () => getSetting("waiver", DEFAULT_AGREEMENT);
+
+/**
+ * Foto di panel kiri /waiver yang dipilih tim dari galeri di /admin/formulir (settings baris "waiver_photo",
+ * { mediaId }): gambar next/image, atau null (pakai foto bawaan) bila belum dipilih atau fotonya sudah dihapus.
+ */
+export async function waiverPhoto() {
+  const { mediaId } = await getSetting("waiver_photo", { mediaId: "" });
+  if (!/^[a-f0-9]{24}$/.test(mediaId ?? "")) return null;
+  const info = (await imageInfo([mediaId]))[mediaId];
+  return info ? { src: `/api/media/${mediaId}`, width: info.width || 1600, height: info.height || 1200, blurDataURL: info.blur || FALLBACK_BLUR } : null;
+}
+
+export const saveWaiverPhoto = (mediaId) => saveSetting("waiver_photo", { mediaId: mediaId ?? "" });
 
 /** Simpan teks perjanjian yang sudah dibersihkan (cleanAgreement): { en, id, zh, ko }. */
 export async function saveAgreement({ en, id, zh, ko }) {
