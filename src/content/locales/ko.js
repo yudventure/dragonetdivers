@@ -67,7 +67,7 @@ export const ui = {
   services: {
     titleLead: "라자암팟에서 저희가 하는 모든 것,",
     titleRest: "현지 가이드와 함께 소규모 그룹으로 진행해요.",
-    ask: "WhatsApp으로 문의",
+    waiver: "다이빙 신청서 작성하기",
     viewDetails: "자세히 보기",
     from: "최저가",
   },

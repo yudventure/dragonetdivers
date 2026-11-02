@@ -216,13 +216,16 @@ function ServicesMenu({ t, services, allHref, active }) {
   );
 }
 
-/** Tombol oranye ke WhatsApp; tanpa nomor WhatsApp (NEXT_PUBLIC_WHATSAPP_NUMBER) tidak ditampilkan. */
+/**
+ * Tombol oranye ke WhatsApp; tanpa nomor WhatsApp (NEXT_PUBLIC_WHATSAPP_NUMBER) tidak ditampilkan. Tulisannya
+ * putih atas permintaan pemilik 2 November 2026 (pengecualian aturan brand teks gelap di atas oranye).
+ */
 function BookButton({ booking, t, className = "" }) {
   if (!booking) return null;
   return (
     <a
       href={booking}
-      className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-mandarin px-3 text-sm font-bold whitespace-nowrap text-abyss transition-colors duration-200 ease-brand hover:bg-mandarin-hover min-[400px]:gap-2 min-[400px]:px-4 sm:px-[18px] ${className}`}
+      className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-mandarin px-3 text-sm font-bold whitespace-nowrap text-white transition-colors duration-200 ease-brand hover:bg-mandarin-hover min-[400px]:gap-2 min-[400px]:px-4 sm:px-[18px] ${className}`}
     >
       <ChatIcon className="size-[18px]" />
       <span className="sm:hidden">{t.bookShort}</span>
@@ -379,7 +382,7 @@ function MobileMenu({ lang, t, brand, home, homeLabel, services, allServicesHref
         <div className="gutter shrink-0 border-t border-mist bg-white pt-3 pb-[max(12px,env(safe-area-inset-bottom,0px))]">
           <a
             href={booking}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-mandarin font-bold text-abyss transition-colors duration-200 ease-brand hover:bg-mandarin-hover"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-mandarin font-bold text-white transition-colors duration-200 ease-brand hover:bg-mandarin-hover"
           >
             <ChatIcon className="size-[18px]" />
             {t.book}

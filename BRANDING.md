@@ -132,7 +132,7 @@ Website **minimalis berdasar putih**. Warna logo hanya aksen.
 | Putih di Abyss | 13.7 : 1 | Footer |
 | Biru Laguna di Putih | 3.7 : 1 | **Hanya** teks ≥ 24 px, ikon, focus ring |
 
-**Dilarang:** teks putih di atas oranye (2.9 : 1), teks kuning atau oranye terang di atas putih, gradasi ungu-biru, dan memakai lebih dari satu tombol oranye dalam satu layar.
+**Dilarang:** teks putih di atas oranye (2.9 : 1; satu pengecualian dari pemilik 2 November 2026, tombol WhatsApp oranye di header website bertulisan putih), teks kuning atau oranye terang di atas putih, gradasi ungu-biru, dan memakai lebih dari satu tombol oranye dalam satu layar.
 
 ---
 
