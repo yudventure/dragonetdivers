@@ -45,7 +45,7 @@ export default async function SiteFooter({ lang }) {
             <Image src={plate} alt="" width={56} height={56} className="size-14" />
             <span className="grid leading-none">
               <span className="font-display text-xl font-semibold">{site.shortName}</span>
-              <span className="mt-2.5 text-[10px] font-bold tracking-[0.2em] text-on-dark-muted">RAJA AMPAT</span>
+              <span className="text-[10px] font-bold tracking-[0.22em] text-on-dark-muted">RAJA AMPAT</span>
             </span>
           </Link>
           <div className="grid gap-2">

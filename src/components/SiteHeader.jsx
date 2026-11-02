@@ -46,7 +46,7 @@ export default async function SiteHeader({ lang, path = "/", overlay = false }) 
             <span className="font-display text-base font-semibold text-teal min-[400px]:text-lg transition-colors duration-300 ease-brand sm:text-xl group-data-[tone=dark]/header:text-white">
               {site.shortName}
             </span>
-            <span className="mt-2.5 text-[10px] font-bold tracking-[0.2em] text-slate transition-colors duration-300 ease-brand group-data-[tone=dark]/header:text-white/80">
+            <span className="text-[10px] font-bold tracking-[0.22em] text-slate transition-colors duration-300 ease-brand group-data-[tone=dark]/header:text-white/80">
               RAJA AMPAT
             </span>
           </span>
