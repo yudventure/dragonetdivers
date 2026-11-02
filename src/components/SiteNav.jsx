@@ -291,7 +291,7 @@ function MobileMenu({ lang, t, brand, home, homeLabel, services, allServicesHref
           <Image src={logo} alt="" width={44} height={44} className="size-11" />
           <span className="grid leading-none whitespace-nowrap">
             <span className="font-display text-lg font-semibold text-teal sm:text-xl">{brand}</span>
-            <span className="mt-1.5 text-[10px] font-bold tracking-[0.2em] text-slate">RAJA AMPAT</span>
+            <span className="mt-2.5 text-[10px] font-bold tracking-[0.2em] text-slate">RAJA AMPAT</span>
           </span>
         </Link>
         <button
