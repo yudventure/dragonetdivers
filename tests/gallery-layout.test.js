@@ -70,3 +70,46 @@ test("keterangan tampil di foto hanya bila unik", () => {
     ["Hiu karang di Cape Kri", null, null, null],
   );
 });
+
+test("galeri dirapatkan tanpa lubang untuk setiap jumlah item, dengan video tegak dan ukuran pilihan tim", async () => {
+  const { denseLayout, fitGallery } = await import("../src/lib/gallery-layout.js");
+  // Susunan seperti galeri pemilik 2 November 2026: dua Shorts, beberapa ukuran pilihan, sisanya otomatis.
+  const base = Array.from({ length: 40 }, (_, i) => {
+    if (i === 3 || i === 13) return { type: "embed", vertical: true };
+    if (i === 9) return { type: "embed", vertical: false };
+    if (i === 6) return { type: "photo", size: "wide" };
+    if (i === 17) return { type: "photo", size: "tall" };
+    return { type: "photo" };
+  });
+  for (let n = 1; n <= base.length; n++) {
+    const items = arrangeGallery(base.slice(0, n));
+    for (const columns of [4, 2]) {
+      const sizes = fitGallery(items, columns);
+      assert.equal(denseLayout(sizes, columns).holes, 0, `${n} item, ${columns} kolom`);
+      items.forEach((item, i) => assert.ok(item.sizes.includes(sizes[i]), `${n} item, ${columns} kolom, item ${i} memakai ukuran yang boleh`));
+    }
+  }
+});
+
+test("galeri rapat: pola atas dipertahankan, hanya item akhir yang disesuaikan", async () => {
+  const { fitGallery, fitMosaic, denseLayout } = await import("../src/lib/gallery-layout.js");
+  const items = arrangeGallery(Array.from({ length: 13 }, () => ({ type: "photo" })));
+  const sizes = fitGallery(items, 4);
+  assert.deepEqual(sizes.slice(0, 12), MOSAIC, "12 item pertama tetap pola pemilik");
+  assert.equal(denseLayout(sizes, 4).holes, 0);
+  // Tombol tampilkan lagi: item yang sudah tampil tidak berubah bentuk saat kelompok berikutnya dibuka.
+  const base = arrangeGallery(
+    Array.from({ length: 30 }, (_, i) => (i === 3 || i === 14 ? { type: "embed", vertical: true } : i === 7 ? { type: "photo", size: "wide" } : { type: "photo" })),
+  );
+  for (const columns of [4, 2]) {
+    const first = fitGallery(base, columns, { count: 12 });
+    const second = fitGallery(base, columns, { count: 24 });
+    const all = fitGallery(base, columns, { count: 30 });
+    assert.deepEqual(second.slice(0, 12), first, `${columns} kolom, 12 pertama tetap`);
+    assert.deepEqual(all.slice(0, 24), second, `${columns} kolom, 24 pertama tetap`);
+    for (const sizes of [first, second, all]) assert.equal(denseLayout(sizes, columns).holes, 0);
+  }
+  // Ukuran tetap (pilihan tim, Shorts) tidak pernah diubah.
+  const fixed = arrangeGallery([{ type: "embed", vertical: true }, { type: "photo", size: "small" }]);
+  assert.deepEqual(fitMosaic(fixed.map((i) => i.size), fixed.map((i) => i.sizes), 4), ["tall", "small"]);
+});

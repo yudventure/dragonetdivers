@@ -1,36 +1,56 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { fitGallery } from "@/lib/gallery-layout";
 import { format } from "@/lib/i18n";
 import EmbedVideo from "./EmbedVideo";
 import LoopVideo from "./LoopVideo";
 import { ChevronIcon, CloseIcon } from "./icons";
 
-const SIZES = {
-  small: "",
-  wide: "col-span-2",
-  tall: "row-span-2",
+// Kelas petak per ukuran, terpisah untuk ponsel (2 kolom) dan layar md ke atas (4 kolom), karena galeri
+// dirapatkan sendiri-sendiri di tiap lebar (fitGallery di src/lib/gallery-layout.js).
+const NARROW = {
+  small: "col-span-1 row-span-1",
+  wide: "col-span-2 row-span-1",
+  tall: "col-span-1 row-span-2",
   big: "col-span-2 row-span-2",
+  full: "col-span-2 row-span-2",
 };
+const WIDE = {
+  small: "md:col-span-1 md:row-span-1",
+  wide: "md:col-span-2 md:row-span-1",
+  tall: "md:col-span-1 md:row-span-2",
+  big: "md:col-span-2 md:row-span-2",
+  full: "md:col-span-4 md:row-span-2",
+};
+const DESKTOP_PX = { small: 300, tall: 300, wide: 600, big: 600, full: 1200 };
 
 // Beranda menampilkan 12 item dulu (sisanya lewat tombol), jadi galeri yang diisi puluhan foto lewat
 // /admin/situs tidak memperlambat halaman; penampil layar penuh tetap bisa berpindah ke semua foto.
 const FIRST = 12;
 const MORE = 12;
 
-const tileSizes = (size) => (size === "big" || size === "wide" ? "(min-width: 768px) 600px, 100vw" : "(min-width: 768px) 300px, 50vw");
+const tileSizes = (narrow, wide) => `(min-width: 768px) ${DESKTOP_PX[wide] ?? 300}px, ${narrow === "small" || narrow === "tall" ? "50vw" : "100vw"}`;
 
-// Kisi galeri susunan mosaik (ukuran petak dari src/lib/gallery-layout.js, grid-flow-dense mengisi celah;
-// petak kecil kira-kira 3:2) dengan keterangan foto di kiri bawah, + penampil foto layar penuh. Penampil memakai
-// <dialog> (fokus dan Esc ditangani peramban), panah kiri/kanan berpindah foto, ketuk di luar foto
-// menutup. Gulir halaman dikunci dengan membekukan body (position: fixed), karena Safari di iPhone
-// mengabaikan overflow: hidden untuk sentuhan. t = teks galeri dalam bahasa halaman (src/content/ui.js).
+// Kisi galeri susunan mosaik (petak kecil kira-kira 3:2) dengan keterangan foto di kiri bawah, + penampil foto
+// layar penuh. Ukuran petak item yang tampil dirapatkan fitGallery untuk 4 kolom dan 2 kolom, jadi kisi selalu
+// penuh dan rata di bawah, juga setelah Tampilkan lagi (permintaan pemilik 2 November 2026: "rapihkan lagi
+// marginnya dan tambahkan tombol show less jika sudah mentok"); setelah semua item tampil ada tombol untuk
+// kembali ke 12 item, lalu halaman digulir ke awal galeri. Penampil memakai <dialog> (fokus dan Esc ditangani
+// peramban), panah kiri/kanan berpindah foto, ketuk di luar foto menutup. Gulir halaman dikunci dengan
+// membekukan body (position: fixed), karena Safari di iPhone mengabaikan overflow: hidden untuk sentuhan.
+// t = teks galeri dalam bahasa halaman (src/content/ui.js).
 export default function GalleryGrid({ items, t }) {
   const photos = items.filter((item) => item.type === "photo");
   const [open, setOpen] = useState(null);
   const [limit, setLimit] = useState(FIRST);
   const dialog = useRef(null);
+  const grid = useRef(null);
+  const shown = items.slice(0, limit);
+  const count = shown.length;
+  const narrow = useMemo(() => fitGallery(items, 2, { count, first: FIRST, more: MORE }), [items, count]);
+  const wide = useMemo(() => fitGallery(items, 4, { count, first: FIRST, more: MORE }), [items, count]);
   const isOpen = open != null;
 
   useEffect(() => {
@@ -49,14 +69,20 @@ export default function GalleryGrid({ items, t }) {
     };
   }, [isOpen]);
 
+  const showLess = () => {
+    setLimit(FIRST);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    grid.current?.closest("section")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  };
+
   const step = (delta) => setOpen((i) => (i == null ? i : (i + delta + photos.length) % photos.length));
   const photo = open == null ? null : photos[open];
 
   return (
     <>
-      <ul className="grid auto-rows-[33vw] grid-cols-2 gap-3 [grid-auto-flow:dense] md:auto-rows-[clamp(120px,14vw,185px)] md:grid-cols-4 md:gap-4">
-        {items.slice(0, limit).map((item, i) => (
-          <li key={item.url ?? item.alt ?? item.title ?? i} className={`relative overflow-hidden rounded-card bg-foam ${SIZES[item.size] ?? ""}`}>
+      <ul ref={grid} className="grid auto-rows-[33vw] grid-cols-2 gap-3 [grid-auto-flow:dense] md:auto-rows-[clamp(120px,14vw,185px)] md:grid-cols-4 md:gap-4">
+        {shown.map((item, i) => (
+          <li key={item.url ?? item.alt ?? item.title ?? i} className={`relative overflow-hidden rounded-card bg-foam ${NARROW[narrow[i]] ?? ""} ${WIDE[wide[i]] ?? ""}`}>
             {item.type === "photo" && (
               <button
                 type="button"
@@ -67,7 +93,7 @@ export default function GalleryGrid({ items, t }) {
                 <Image
                   src={item.image}
                   alt={item.alt}
-                  sizes={tileSizes(item.size)}
+                  sizes={tileSizes(narrow[i], wide[i])}
                   placeholder="blur"
                   className="size-full object-cover transition-transform duration-500 ease-brand group-hover:scale-105"
                 />
@@ -88,13 +114,13 @@ export default function GalleryGrid({ items, t }) {
           </li>
         ))}
       </ul>
-      {items.length > limit && (
+      {items.length > FIRST && (
         <button
           type="button"
-          onClick={() => setLimit((n) => n + MORE)}
+          onClick={() => (items.length > limit ? setLimit((n) => n + MORE) : showLess())}
           className="justify-self-center rounded-full border-[1.5px] border-teal px-6 py-3 font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal-soft"
         >
-          {format(t.more, { count: Math.min(MORE, items.length - limit) })}
+          {items.length > limit ? format(t.more, { count: Math.min(MORE, items.length - limit) }) : t.less}
         </button>
       )}
 
