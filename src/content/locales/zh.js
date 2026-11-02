@@ -67,7 +67,7 @@ export const ui = {
   services: {
     titleLead: "我们在四王群岛提供的全部服务，",
     titleRest: "小团出行，由本地向导带领。",
-    ask: "在 WhatsApp 上咨询",
+    waiver: "填写潜水表格",
     viewDetails: "查看详情",
     from: "起价",
   },

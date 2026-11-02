@@ -72,7 +72,7 @@ const en = {
   services: {
     titleLead: "Everything we offer in Raja Ampat,",
     titleRest: "in small groups with local guides.",
-    ask: "Ask on WhatsApp",
+    waiver: "Fill in the dive form",
     viewDetails: "View details",
     from: "From",
   },
@@ -583,7 +583,7 @@ const id = {
   services: {
     titleLead: "Semua yang kami tawarkan di Raja Ampat,",
     titleRest: "dalam grup kecil bersama pemandu lokal.",
-    ask: "Tanya lewat WhatsApp",
+    waiver: "Isi formulir selam",
     viewDetails: "Lihat detail",
     from: "Mulai dari",
   },
