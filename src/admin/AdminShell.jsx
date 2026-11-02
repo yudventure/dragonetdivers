@@ -27,6 +27,7 @@ const MENU = [
   { key: "kalender", label: "Kalender reservasi", icon: CalendarIcon, href: "/admin/kalender" },
   { key: "tamu", label: "Tamu", icon: UserIcon, href: "/admin/tamu" },
   { key: "pesanan", label: "Pesanan", icon: ReceiptIcon, href: "/admin/pesanan" },
+  { key: "formulir", label: "Formulir selam", icon: LifeBuoyIcon, href: "/admin/formulir" },
   {
     group: "Situs web",
     icon: GlobeIcon,
@@ -199,7 +200,7 @@ export default async function AdminShell({ admin, active, aside, children }) {
   const badges = { developer: developer.enabled ? "Aktif" : null };
   return (
     <div className="min-h-dvh bg-foam">
-      <header className="sticky top-0 z-20 bg-white/95 shadow-[0_1px_0_rgb(10_50_59/0.06),0_6px_20px_rgb(10_50_59/0.04)] backdrop-blur">
+      <header className="sticky top-0 z-20 bg-white/95 print:hidden shadow-[0_1px_0_rgb(10_50_59/0.06),0_6px_20px_rgb(10_50_59/0.04)] backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:h-[72px] sm:px-8">
           <a href="/admin" className="flex items-center gap-3">
             <Image src={logo} alt="" width={40} height={40} className="size-10" />
@@ -224,8 +225,8 @@ export default async function AdminShell({ admin, active, aside, children }) {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1400px] gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[280px_1fr] lg:gap-10 lg:py-10">
-        <nav aria-label="Menu admin" className="grid content-start gap-4 lg:sticky lg:top-28">
+      <div className="mx-auto grid max-w-[1400px] gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[280px_1fr] lg:gap-10 lg:py-10 print:block print:p-0">
+        <nav aria-label="Menu admin" className="grid content-start gap-4 lg:sticky lg:top-28 print:hidden">
           <details className="group/menu rounded-card bg-white ring-1 ring-mist lg:hidden">
             <summary className="flex h-12 cursor-pointer list-none items-center gap-3 px-4 font-semibold text-abyss [&::-webkit-details-marker]:hidden">
               <MenuIcon className="size-5" />

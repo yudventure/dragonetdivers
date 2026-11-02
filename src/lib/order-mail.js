@@ -6,6 +6,7 @@ import { uiText } from "../content/ui.js";
 import { formatMoney } from "./currency.js";
 import { badge, box, button, colors, esc, escKeep, FONT, heading, layout, paragraph, plainText, rows, table, title } from "./email-layout.js";
 import { format, intlLocale, localeHref } from "./i18n.js";
+import { diversIn } from "./waiver.js";
 
 export const ORDER_MAIL_KINDS = ["order", "reminder", "paid"];
 const TONE = { order: "waiting", reminder: "reminder", paid: "paid" };
@@ -114,6 +115,14 @@ export function orderMail(kind, { order, base, accounts = [], serviceTitles = {}
     proof && transfer && !paid ? `&nbsp; ${button(proof, t.proof, "secondary")}` : ""
   }</p>`;
   const already = kind === "reminder" ? paragraph(esc(k.paidAlready), `font-size:14px;color:${colors.slate};margin-top:10px;`) : "";
+  // Pesanan selam: tiap penyelam mengisi formulir selam (/waiver) sebelum menyelam pertama kali.
+  const waiverLink = kind !== "reminder" && diversIn(items) > 0 ? `${base}${localeHref(lang, "/waiver")}?order=${order.code}&t=${order.token}` : "";
+  const waiverBlock = waiverLink
+    ? box(
+        `<p style="margin:0 0 12px;font-family:${FONT};font-size:14px;line-height:1.6;color:${colors.abyss};">${esc(t.waiver)}</p>${button(waiverLink, t.waiverButton, "secondary")}`,
+        { bg: colors.tealWash, border: colors.tealWash },
+      )
+    : "";
 
   const body = `${title(k.title)}
 ${paragraph(esc(format(t.hello, values)))}
@@ -125,6 +134,7 @@ ${cashBlock}
 ${paypalLine}
 ${actions}
 ${already}
+${waiverBlock}
 ${heading(t.summary)}
 ${rows(details, keep)}
 ${heading(items.length > 1 ? t.packages : t.package)}
@@ -166,6 +176,7 @@ ${rows(amounts)}`;
     !paid && cash && address.length ? [t.findUs, ...address, ""] : [],
     `${paid || transfer || cash ? t.view : t.open}  ${link}`,
     kind === "reminder" ? ["", k.paidAlready] : [],
+    waiverLink ? ["", t.waiver, `${t.waiverButton}  ${waiverLink}`] : [],
     "",
     t.summary.toUpperCase(),
     details.map(pair),

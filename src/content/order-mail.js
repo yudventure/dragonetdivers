@@ -35,6 +35,8 @@ export const orderMailText = {
     helpText: "Reply to this email or write to {email}. We are happy to help.",
     chat: "Chat on WhatsApp",
     chatMessage: "Hi Dragonet Divers, I have a question about booking {code}.",
+    waiver: "Diving with us? Each diver fills in the dive form (medical questionnaire and liability release) before the first dive. It takes about five minutes.",
+    waiverButton: "Fill in the dive form",
     footer: "You received this email because you booked at {host}.",
     kinds: {
       order: {
@@ -108,6 +110,8 @@ export const orderMailText = {
     helpText: "Balas email ini atau kirim email ke {email}. Kami senang membantu.",
     chat: "Chat lewat WhatsApp",
     chatMessage: "Halo Dragonet Divers, saya mau tanya soal pesanan {code}.",
+    waiver: "Menyelam bersama kami? Setiap penyelam mengisi formulir selam (kuesioner medis dan pernyataan pelepasan tanggung jawab) sebelum menyelam pertama kali. Cukup sekitar lima menit.",
+    waiverButton: "Isi formulir selam",
     footer: "Kamu menerima email ini karena memesan di {host}.",
     kinds: {
       order: {
