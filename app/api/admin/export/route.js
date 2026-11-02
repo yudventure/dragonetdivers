@@ -3,10 +3,13 @@ import { categoryLabel, PAY_METHODS, yearReport } from "@/lib/modules/finance";
 import { ATTENDANCE, EMPLOYMENT } from "@/lib/modules/hr";
 import { METRICS, partner, post } from "@/lib/modules/pr";
 import { isMonth, monthLabel, monthRange, optionLabel } from "@/lib/records";
+import { site } from "@/lib/site";
+import { excelRow, SHEET_COLUMNS, SHEET_NAME, sheetValues } from "@/lib/waiver-sheet";
 import { workbook } from "@/lib/xlsx";
 import { currentAdmin } from "@/server/admin-auth";
 import { attendanceMonth, calendarMonth, financeRows, financeSettings, guestList, payrollMonth, refOptions } from "@/server/admin-data";
 import { listRecords } from "@/server/records";
+import { listWaivers } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +28,25 @@ const file = (name, sheets) =>
   });
 
 const TYPES = {
+  // Formulir selam, kolom sama dengan Google Sheets (src/lib/waiver-sheet.js), yang paling lama di atas.
+  async formulir() {
+    const waivers = (await listWaivers(5000)).reverse();
+    return [
+      {
+        name: SHEET_NAME,
+        brand: true,
+        filter: true,
+        freeze: { rows: 1, columns: 3 },
+        widths: SHEET_COLUMNS.map((c) => Math.round(c.width / 7)),
+        rows: [
+          SHEET_COLUMNS.map((c) => c.header),
+          ...waivers.map((w) =>
+            excelRow(sheetValues(w, { base: site.url })).map((cell, i) => (w.clearance && SHEET_COLUMNS[i].alert ? { value: cell, alert: true } : cell)),
+          ),
+        ],
+      },
+    ];
+  },
   async reservasi({ month }) {
     const { orders, reservations, partners } = await calendarMonth(month);
     const names = Object.fromEntries(refOptions(partners));

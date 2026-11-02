@@ -121,6 +121,16 @@ const ORIGINALS = [
   "src/admin/PrintButton.jsx",
   "src/admin/CopyText.jsx",
   "database/migrations/008_waivers.sql",
+  // Spreadsheet: Google Sheets otomatis lewat Apps Script dan unduh Excel.
+  "src/lib/waiver-sheet.js",
+  "src/server/waiver-sheet.js",
+  "src/admin/WaiverSheetPanel.jsx",
+  "app/api/admin/waiver-sheet/route.js",
+  "app/api/admin/export/route.js",
+  "src/lib/xlsx.js",
+  "database/migrations/010_waiver_sheet.sql",
+  "tests/waiver-sheet.test.js",
+  "tests/helpers/fake-sheets.js",
 ];
 for (const path of ORIGINALS) {
   mkdirSync(dirname(join(contoh, path)), { recursive: true });

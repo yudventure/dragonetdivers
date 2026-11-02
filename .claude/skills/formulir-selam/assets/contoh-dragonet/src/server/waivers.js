@@ -95,6 +95,17 @@ export async function listWaivers(limit = 500) {
   return rows.map((row) => fromRow(row));
 }
 
+/** Formulir dengan kode tertentu (tanpa tanda tangan), urut dari yang paling lama, untuk spreadsheet. */
+export async function listWaiversByCodes(codes) {
+  if (!codes.length) return [];
+  const rows = await query(
+    `SELECT code, order_code, locale, full_name, birth_date, nationality, email, phone, dive_date, clearance, minor, data, created_at
+     FROM waivers WHERE code IN (${codes.map(() => "?").join(", ")}) ORDER BY created_at, id`,
+    codes,
+  );
+  return rows.map((row) => fromRow(row));
+}
+
 /** Satu formulir lengkap dengan tanda tangan dan teks perjanjiannya. */
 export async function waiverByCode(code) {
   const [row] = await query("SELECT * FROM waivers WHERE code = ?", [code]);
