@@ -42,6 +42,10 @@ const OVERSCAN_PX = 80;
  *   dari awal sedikit sebelum habis menurut jam sendiri, tanpa layar akhir YouTube. Selama dijeda yang tampil
  *   sampulnya. Keluar layar: dijeda, mulai terlihat lagi: lanjut tanpa dimuat ulang.
  * - "Kurangi animasi" atau hemat data aktif: hanya sampul, tetap bisa diketuk.
+ * - Layar sentuh (ponsel, tablet): hanya sampul. Pemutar YouTube di layar sentuh memasang tombol jeda
+ *   sendiri di tengah video yang tidak bisa dimatikan dari halaman (laporan pemilik 2 November 2026,
+ *   tangkapan layar ponsel). Supaya video tetap bergerak tanpa tombol, tim mengunggah klip MP4 untuk
+ *   item ini di /admin/situs, yang diputar ClipLoop.jsx di semua perangkat.
  */
 export default function YouTubeLoop({ video, title, t }) {
   const box = useRef(null);
@@ -60,7 +64,8 @@ export default function YouTubeLoop({ video, title, t }) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const saveData = navigator.connection?.saveData === true;
-    setAuto(!reduce && !saveData);
+    const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    setAuto(!reduce && !saveData && !touch);
     setOrigin(window.location.origin);
     // Dimuat pertama kali saat separuh petak terlihat; sesudah itu diputar selama ada bagian yang terlihat.
     const observer = new IntersectionObserver(

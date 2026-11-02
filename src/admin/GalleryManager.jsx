@@ -3,22 +3,24 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ArrowIcon, CheckIcon, EyeIcon, EyeOffIcon, ImageIcon, PlayIcon, TrashIcon, UploadIcon } from "@/components/icons";
+import { CLIP_MAX, CLIP_MAX_MB, clipAdvice } from "@/lib/clips";
 import { prepareImage } from "@/lib/image-prep";
 import { PHOTO_RULES, photoAdvice, TILE_GUIDE, tileFor, VIDEO_GUIDE } from "@/lib/media-guide";
 import { SIZES } from "@/lib/modules/site";
 import { parseVideoUrl } from "@/lib/video-embed";
 import BulkPhotoUpload from "./BulkPhotoUpload";
 import { INPUT, removeRecord } from "./RecordManager";
-import { thumbUrl, uploadPhoto } from "./upload";
+import { discardClip, readVideo, thumbUrl, uploadClip, uploadPhoto, videoType } from "./upload";
 
 const ACCEPT = "image/*,.heic,.heif";
+const VIDEO_ACCEPT = "video/mp4,video/webm,video/quicktime,.mp4,.m4v,.mov,.webm";
 const BOX = "rounded-card bg-white ring-1 ring-mist shadow-[0_1px_2px_rgb(10_50_59/0.05)]";
 const SOLID = "inline-flex h-11 items-center justify-center gap-2 rounded-full bg-teal px-5 font-bold text-white hover:bg-teal-dark disabled:bg-mist disabled:text-slate";
 const OUTLINE = "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 font-bold text-teal ring-1 ring-teal hover:bg-teal-soft";
 const ICON_BUTTON = "grid size-9 place-items-center rounded-full text-slate hover:bg-foam hover:text-abyss disabled:opacity-30 disabled:hover:bg-transparent";
-const ADVICE_TONE = { good: "bg-success/10 text-success", fair: "bg-sunrise-wash text-ember", small: "bg-danger/10 text-danger" };
+const ADVICE_TONE = { good: "bg-success/10 text-success", fair: "bg-sunrise-wash text-ember", small: "bg-danger/10 text-danger", bad: "bg-danger/10 text-danger" };
 
-const blank = (type) => ({ type, mediaId: "", url: "", captionId: "", captionEn: "", size: "auto", order: 0, active: true });
+const blank = (type) => ({ type, mediaId: "", clipId: "", url: "", captionId: "", captionEn: "", size: "auto", order: 0, active: true });
 const SIZE_TEXT = {
   auto: { label: "Otomatis", text: "Mengikuti susunan mosaik beranda (besar, kecil, tinggi bergantian)" },
   ...Object.fromEntries(Object.entries(TILE_GUIDE).map(([key, g]) => [key, { label: g.label, text: `${g.shape}, minimal ${g.minWidth} × ${g.minHeight} px` }])),
@@ -110,7 +112,8 @@ function MediaGuide({ open }) {
             {[
               "Letakkan objek utama di tengah, karena foto dan video dipotong mengikuti bentuk petak.",
               "Unggah videonya dulu ke YouTube, TikTok, Instagram, atau Facebook, lalu tempel tautan dari tombol Bagikan.",
-              "Video YouTube dan TikTok diputar otomatis tanpa suara dan berulang di beranda. Video YouTube tampil tanpa tombol apa pun; diketuk, membuka kanal YouTube pemilik videonya.",
+              "Video YouTube dan TikTok diputar otomatis tanpa suara dan berulang di beranda. Diketuk, membuka kanal YouTube pemilik videonya.",
+              "Pemutar YouTube di ponsel selalu memunculkan tombol jeda, jadi di ponsel video YouTube hanya tampil sebagai gambar sampul. Unggah klip MP4 videonya di item yang sama supaya bergerak tanpa tombol di semua perangkat.",
             ].map((tip) => (
               <li key={tip} className="grid grid-cols-[18px_1fr] gap-2">
                 <CheckIcon className="mt-0.5 size-4 text-teal" />
@@ -177,7 +180,7 @@ function PhotoDrop({ busy, onFile }) {
 }
 
 /** Tampilan petak di beranda: foto atau gambar video dipotong mengikuti bentuk petaknya. */
-function TilePreview({ src, tile, video, busy, progress = 0 }) {
+function TilePreview({ src, tile, video, clip, busy, progress = 0, label = "Mengunggah" }) {
   const g = TILE_GUIDE[tile];
   return (
     <figure className="grid gap-2">
@@ -185,15 +188,23 @@ function TilePreview({ src, tile, video, busy, progress = 0 }) {
         className={`relative mx-auto w-full overflow-hidden rounded-card bg-foam ring-1 ring-mist ${tile === "tall" ? "max-w-[220px]" : tile === "small" ? "max-w-[320px]" : "max-w-[520px]"}`}
         style={{ aspectRatio: g.aspect }}
       >
-        <Thumb key={src} src={src} video={video} />
-        {video && src && (
+        {clip ? (
+          <video key={clip} src={clip} autoPlay muted loop playsInline className="size-full object-cover" />
+        ) : (
+          <Thumb key={src} src={src} video={video} />
+        )}
+        {video && src && !clip && (
           <span className="absolute inset-0 grid place-items-center">
             <span className="grid size-12 place-items-center rounded-full bg-abyss/70 text-white">
               <PlayIcon className="size-5" />
             </span>
           </span>
         )}
-        {busy && <span className="absolute inset-0 grid place-items-center bg-white/70 text-sm font-bold text-teal">Mengunggah {Math.round(progress * 100)}%</span>}
+        {busy && (
+          <span className="absolute inset-0 grid place-items-center bg-white/70 text-sm font-bold text-teal">
+            {label} {Math.round(progress * 100)}%
+          </span>
+        )}
       </div>
       <figcaption className="text-center text-xs text-slate">Tampilan di beranda, petak {g.label}</figcaption>
     </figure>
@@ -204,6 +215,7 @@ function TilePreview({ src, tile, video, busy, progress = 0 }) {
 function ItemForm({ initial, onDone, onCancel }) {
   const [value, setValue] = useState(initial);
   const [local, setLocal] = useState(null); // { url, width, height } foto yang baru dipilih
+  const [clipNotes, setClipNotes] = useState([]);
   const [busy, setBusy] = useState("");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
@@ -240,6 +252,43 @@ function ItemForm({ initial, onDone, onCancel }) {
     } finally {
       setBusy("");
     }
+  }
+
+  // Klip MP4 untuk item video: dibaca dulu di peramban (ukuran, durasi), lalu diunggah per 1 MiB (./upload.js).
+  async function uploadVideo(file) {
+    setError("");
+    const mime = videoType(file);
+    if (!mime) return setError("Pakai video MP4, WebM, atau MOV.");
+    if (file.size > CLIP_MAX) return setError(`Video maksimal ${CLIP_MAX_MB} MB. Potong videonya lebih pendek atau ekspor ulang dengan resolusi 720p.`);
+    setBusy("clip");
+    setProgress(0);
+    const meta = await readVideo(file);
+    if (!meta) {
+      setBusy("");
+      return setError("Peramban tidak bisa memutar video ini. Ekspor ulang sebagai MP4 (H.264), lalu unggah lagi.");
+    }
+    setClipNotes(clipAdvice({ mime, bytes: file.size, ...meta }));
+    try {
+      const saved = await uploadClip(file, { mime, ...meta }, { onProgress: setProgress });
+      if (value.clipId && value.clipId !== initial.clipId) discardClip(value.clipId);
+      set("clipId", saved.id);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  function removeVideo() {
+    if (value.clipId && value.clipId !== initial.clipId) discardClip(value.clipId);
+    set("clipId", "");
+    setClipNotes([]);
+  }
+
+  // Klip yang baru diunggah tapi formnya dibatalkan ikut dibuang.
+  function cancel() {
+    if (value.clipId && value.clipId !== initial.clipId) discardClip(value.clipId);
+    onCancel();
   }
 
   async function save(event) {
@@ -321,7 +370,16 @@ function ItemForm({ initial, onDone, onCancel }) {
                     Tautan belum dikenali. Pakai tautan lengkap, bukan tautan pendek seperti vt.tiktok.com.
                   </p>
                 ))}
-              <TilePreview src={video?.thumbnail ?? null} tile={tile} video />
+              <TilePreview
+                src={video?.thumbnail ?? null}
+                tile={tile}
+                video
+                clip={value.clipId ? `/api/clips/${value.clipId}` : null}
+                busy={busy === "clip"}
+                progress={progress}
+                label="Mengunggah video"
+              />
+              <ClipField clipId={value.clipId} notes={clipNotes} busy={busy === "clip"} onFile={uploadVideo} onRemove={removeVideo} />
             </div>
           )}
         </div>
@@ -382,12 +440,82 @@ function ItemForm({ initial, onDone, onCancel }) {
         <button type="submit" disabled={Boolean(busy) || (value.type === "photo" && !value.mediaId) || (value.type === "embed" && !video)} className={SOLID}>
           {busy === "save" ? "Menyimpan…" : initial.id ? "Simpan perubahan" : "Simpan ke galeri"}
         </button>
-        <button type="button" onClick={onCancel} className="inline-flex h-11 items-center rounded-full px-5 font-semibold text-slate hover:text-abyss">
+        <button type="button" onClick={cancel} className="inline-flex h-11 items-center rounded-full px-5 font-semibold text-slate hover:text-abyss">
           Batal
         </button>
         {value.type === "photo" && !value.mediaId && <span className="text-sm text-slate">Unggah fotonya dulu.</span>}
       </div>
     </form>
+  );
+}
+
+/**
+ * Klip MP4 untuk item video (src/lib/clips.js): diputar sendiri dan berulang tanpa tombol di semua perangkat.
+ * Tanpa klip, ponsel hanya menampilkan sampul YouTube (pemutar YouTube di ponsel memunculkan tombol jeda).
+ */
+function ClipField({ clipId, notes, busy, onFile, onRemove }) {
+  const input = useRef(null);
+  const [over, setOver] = useState(false);
+  const pick = () => input.current?.click();
+  return (
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && !busy) onFile(file);
+      }}
+      className={`grid gap-3 rounded-card p-4 ring-1 transition-colors duration-200 ease-brand ${over ? "bg-teal-wash ring-2 ring-teal" : "bg-foam ring-mist"}`}
+    >
+      <div className="grid gap-1">
+        <span className="text-sm font-semibold text-abyss">Klip video untuk diputar di website</span>
+        <span className="text-xs text-slate">
+          Video ini diputar sendiri dan berulang tanpa tombol play atau pause di semua perangkat, termasuk ponsel. Tanpa klip, ponsel hanya
+          menampilkan gambar sampul, karena pemutar YouTube di ponsel selalu memunculkan tombol jeda. Diketuk, petak tetap membuka tautan di atas.
+        </span>
+        <span className="text-xs text-slate">MP4 (H.264) paling aman · maks. {CLIP_MAX_MB} MB · ideal 10 sampai 30 detik, 720p, tanpa perlu suara</span>
+      </div>
+      {clipId && !busy && (
+        <p className="inline-flex w-fit items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-sm font-semibold text-success">
+          <CheckIcon className="size-4" />
+          Klip terpasang, berputar tanpa tombol
+        </p>
+      )}
+      {notes.map((note) => (
+        <p key={note.message} className={`rounded-input px-3 py-2 text-sm font-semibold ${ADVICE_TONE[note.level]}`}>
+          {note.message}
+        </p>
+      ))}
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" onClick={pick} disabled={busy} className={`${OUTLINE} h-10 bg-white text-sm`}>
+          <UploadIcon className="size-4" />
+          {busy ? "Mengunggah video…" : clipId ? "Ganti video" : "Unggah video MP4"}
+        </button>
+        {clipId && !busy && (
+          <button type="button" onClick={onRemove} className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-danger hover:bg-danger/10">
+            <TrashIcon className="size-4" />
+            Lepas video
+          </button>
+        )}
+      </div>
+      <input
+        ref={input}
+        type="file"
+        accept={VIDEO_ACCEPT}
+        className="sr-only"
+        tabIndex={-1}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onFile(file);
+          e.target.value = "";
+        }}
+      />
+    </div>
   );
 }
 
@@ -442,7 +570,7 @@ export default function GalleryManager({ items }) {
     router.refresh();
   };
   const remove = (item) =>
-    window.confirm("Hapus item galeri ini? Fotonya ikut terhapus dan tidak bisa dikembalikan.") && run(`del:${item.id}`, () => removeRecord("gallery", item.id));
+    window.confirm(`Hapus item galeri ini? ${item.type === "photo" ? "Fotonya" : "Klip videonya"} ikut terhapus dan tidak bisa dikembalikan.`) && run(`del:${item.id}`, () => removeRecord("gallery", item.id));
   const toggle = (item) => run(`vis:${item.id}`, () => saveItem({ ...item, active: !item.active }));
   // Tukar posisi lalu beri nomor urut baru (10, 20, ...) pada item yang urutannya berubah.
   const move = (index, step) =>
@@ -548,7 +676,8 @@ export default function GalleryManager({ items }) {
                   </span>
                   <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-abyss/75 px-2 py-0.5 text-[11px] font-bold text-white">
                     {item.type === "photo" ? <ImageIcon className="size-3.5" /> : <PlayIcon className="size-3.5" />}
-                    {item.type === "photo" ? "Foto" : (video?.label ?? "Video")} · petak {TILE_GUIDE[tile].label}
+                    {item.type === "photo" ? "Foto" : (video?.label ?? "Video")}
+                    {item.type === "embed" && item.clipId ? " + klip MP4" : ""} · petak {TILE_GUIDE[tile].label}
                     {(item.size ?? "auto") === "auto" && item.active ? " (otomatis)" : ""}
                   </span>
                 </div>
