@@ -1,0 +1,774 @@
+{
+  "en": {
+    "waiver": {
+      "meta": "Dive form",
+      "eyebrow": "Dive form",
+      "title": "Registration, medical questionnaire and liability release",
+      "intro": "Each diver fills in their own form before the first dive with us. It takes about five minutes, at home or at the dive center.",
+      "forOrder": "For booking {code}",
+      "binding": "The agreement below is binding in English. Please read it before you sign.",
+      "bindingTranslated": "The agreement below is binding in English. A translation follows the English text. Please read it before you sign.",
+      "terms": "Read the full agreement",
+      "english": "English (binding)",
+      "translation": "Translation",
+      "sections": {
+        "details": "Your details",
+        "diver": "Diver profile and insurance",
+        "medical": "Diver medical questionnaire",
+        "sign": "Signature"
+      },
+      "fields": {
+        "fullName": "Full name (as in passport)",
+        "birthDate": "Date of birth",
+        "age": "Age",
+        "address": "Home address",
+        "nationality": "Nationality",
+        "date": "Date of your first dive with us",
+        "emergency": "Emergency contact name and phone",
+        "email": "Email (we send you a copy)",
+        "phone": "Phone or WhatsApp",
+        "room": "Where you stay in Raja Ampat",
+        "notCertified": "I am not certified yet (I am joining a dive course)",
+        "certAgency": "Certification agency",
+        "certAgencyHint": "For example SSI or PADI",
+        "certLevel": "Certification level",
+        "certLevelHint": "For example Open Water Diver",
+        "certNumber": "Certification number",
+        "lastDive": "Date of your last dive",
+        "loggedDives": "Number of logged dives",
+        "insurance": "Do you have dive accident insurance?",
+        "insurer": "Insurance provider",
+        "guardian": "Name of parent or guardian",
+        "guardianNote": "The participant is under 18, so a parent or guardian completes and signs this form."
+      },
+      "optional": "optional",
+      "yes": "Yes",
+      "no": "No",
+      "medical": {
+        "intro": "Recreational scuba diving requires good physical and mental health. Please answer every question honestly. When you answer Yes, a few more questions appear. At the end you see whether you need a physician's approval before you dive. If you are pregnant or trying to become pregnant, do not dive.",
+        "questions": [
+          "I have had problems with my lungs, breathing, heart and/or blood affecting my normal physical or mental performance.",
+          "I am over 45 years of age.",
+          "I struggle to perform moderate exercise (for example, walk 1.6 km in 14 minutes, or swim 200 m without resting), or I have been unable to take part in normal physical activity due to fitness or health reasons within the past 12 months.",
+          "I have had problems with my eyes, ears, or nasal passages or sinuses.",
+          "I have had surgery within the last 12 months, or I have ongoing problems related to past surgery.",
+          "I have lost consciousness, had migraine headaches, seizures, stroke, significant head injury, or suffer from persistent neurologic injury or disease.",
+          "I am currently being treated (or have needed treatment within the last five years) for psychological problems, personality disorder, panic attacks, or drug or alcohol addiction, or I have been diagnosed with a learning or developmental disability.",
+          "I have had back problems, hernia, ulcers, or diabetes.",
+          "I have had stomach or intestinal problems, including recent diarrhoea.",
+          "I am taking prescription medications (except birth control or anti-malarial drugs other than mefloquine or Lariam)."
+        ],
+        "more": "Please also answer these",
+        "boxIntro": {
+          "A": "I have or have had",
+          "B": "I am over 45 years of age and",
+          "C": "I have or have had",
+          "D": "I have or have had",
+          "E": "I have or have had",
+          "F": "I have or have had",
+          "G": "I have had"
+        },
+        "boxes": {
+          "A": [
+            "Chest surgery, heart surgery, heart valve surgery, an implantable medical device (for example a stent, pacemaker or neurostimulator), pneumothorax, and/or chronic lung disease.",
+            "Asthma, wheezing, severe allergies, hay fever or congested airways within the last 12 months that limit my physical activity or exercise.",
+            "A problem or illness involving my heart such as angina, chest pain on exertion, heart failure, immersion pulmonary edema, heart attack or stroke, or I am taking medication for any heart condition.",
+            "Recurrent bronchitis and currently coughing within the past 12 months, or I have been diagnosed with emphysema.",
+            "Symptoms affecting my lungs, breathing, heart and/or blood in the last 30 days that impair my physical or mental performance."
+          ],
+          "B": [
+            "I currently smoke or inhale nicotine by other means.",
+            "I have a high cholesterol level.",
+            "I have high blood pressure.",
+            "A close blood relative died suddenly or of heart disease or stroke before the age of 50, or I have a family history of heart disease before age 50 (including abnormal heart rhythms, coronary artery disease or cardiomyopathy)."
+          ],
+          "C": [
+            "Sinus surgery within the last 6 months.",
+            "Ear disease or ear surgery, hearing loss, or problems with balance.",
+            "Recurrent sinusitis within the past 12 months.",
+            "Eye surgery within the past 3 months."
+          ],
+          "D": [
+            "Head injury with loss of consciousness within the past 5 years.",
+            "Persistent neurologic injury or disease.",
+            "Recurring migraine headaches within the past 12 months, or I take medication to prevent them.",
+            "Blackouts or fainting (full or partial loss of consciousness) within the last 5 years.",
+            "Epilepsy, seizures, or convulsions, or I take medication to prevent them."
+          ],
+          "E": [
+            "Behavioural health, mental or psychological problems requiring medical or psychiatric treatment.",
+            "Major depression, suicidal thoughts, panic attacks, or uncontrolled bipolar disorder requiring medication or psychiatric treatment.",
+            "A mental health condition or a learning or developmental disorder that requires ongoing care or special accommodation.",
+            "An addiction to drugs or alcohol requiring treatment within the last 5 years."
+          ],
+          "F": [
+            "Recurrent back problems in the last 6 months that limit my everyday activity.",
+            "Back or spinal surgery within the last 12 months.",
+            "Diabetes, controlled by medication or diet, or gestational diabetes within the last 12 months.",
+            "An uncorrected hernia that limits my physical abilities.",
+            "Active or untreated ulcers, problem wounds, or ulcer surgery within the last 6 months."
+          ],
+          "G": [
+            "Ostomy surgery, and I do not have medical clearance to swim or do physical activity.",
+            "Dehydration requiring medical treatment within the last 7 days.",
+            "Active or untreated stomach or intestinal ulcers, or ulcer surgery within the last 6 months.",
+            "Frequent heartburn, regurgitation, or gastroesophageal reflux disease (GERD).",
+            "Active or uncontrolled ulcerative colitis or Crohn's disease.",
+            "Bariatric surgery within the last 12 months."
+          ]
+        },
+        "clearance": "Based on your answers, you need a physician's approval before you dive.",
+        "noClearance": "Based on your answers, you do not need a physician's approval.",
+        "declaration": "I declare that the medical information above is true and complete to the best of my knowledge."
+      },
+      "sign": {
+        "hint": "Sign with your finger or mouse",
+        "clear": "Clear",
+        "confirm": "Type your full name to confirm",
+        "confirmGuardian": "Parent or guardian, type your full name to confirm",
+        "agree": "I have read and understood the agreement above, I agree to it, and I am signing voluntarily.",
+        "agreeNoTerms": "I confirm that the information in this form is true and complete, and I am signing voluntarily.",
+        "submit": "Sign and send",
+        "sending": "Sending…"
+      },
+      "done": {
+        "title": "Thank you, your form is signed",
+        "text": "Your form number is {code}. We keep it on file, so there is nothing to print or bring.",
+        "clearanceTitle": "Physician's approval needed",
+        "clearance": "One or more answers need a physician's approval before you dive. Please ask a doctor to complete the physician's evaluation of the Diver Medical form and bring it with you, or send it to us before your dive.",
+        "noClearance": "No physician's approval needed. See you at the dive center.",
+        "copy": "We sent a copy to {email}.",
+        "another": "Fill in a form for another diver",
+        "back": "Back to your booking",
+        "chat": "Questions? Chat with us on WhatsApp",
+        "chatMessage": "Hi {operator}, I have a question about my dive form {code}."
+      },
+      "errors": {
+        "fullName": "Please write your full name as in your passport.",
+        "birthDate": "Please choose your date of birth. Divers must be at least 8 years old.",
+        "address": "The address is too long.",
+        "nationality": "Please write your nationality.",
+        "date": "Please choose the date of your first dive with us.",
+        "emergency": "Please write the name and phone number of an emergency contact.",
+        "email": "This email address does not look right.",
+        "phone": "This phone number does not look right.",
+        "room": "This is too long.",
+        "certAgency": "Please write your certification agency, or tick that you are not certified yet.",
+        "certLevel": "Please write your certification level.",
+        "certNumber": "This number is too long.",
+        "lastDive": "The date of your last dive cannot be in the future.",
+        "loggedDives": "Please write the number of logged dives as a whole number.",
+        "insurer": "This is too long.",
+        "guardian": "Please write the name of the parent or guardian.",
+        "medical": "Please answer every medical question with Yes or No.",
+        "declaration": "Please confirm that your medical information is true.",
+        "signature": "Please sign in the box.",
+        "confirmName": "Please type the same full name as above.",
+        "agree": "Please tick that you agree.",
+        "busy": "Too many forms were sent from this device. Please try again in an hour.",
+        "server": "The form could not be sent. Please try again, or write to {email}."
+      },
+      "mail": {
+        "subject": "Your dive form {code}",
+        "title": "Your dive form is signed",
+        "hello": "Hi {name},",
+        "intro": "Thank you for filling in your dive form. Here is a summary for your records.",
+        "code": "Form number",
+        "date": "First dive",
+        "signedAt": "Signed on",
+        "medical": "Medical questionnaire",
+        "footer": "You received this email because you filled in a dive form at {host}."
+      }
+    },
+    "order": {
+      "waiverTitle": "Dive forms",
+      "waiverText": "Each diver fills in the medical questionnaire and liability release before the first dive. {done} of {total} done.",
+      "waiverDone": "All dive forms are in. Thank you!",
+      "waiverButton": "Fill in a dive form"
+    },
+    "orderMail": {
+      "waiver": "Diving with us? Each diver fills in the dive form (medical questionnaire and liability release) before the first dive. It takes about five minutes.",
+      "waiverButton": "Fill in the dive form"
+    },
+    "footerLink": "Dive form"
+  },
+  "id": {
+    "waiver": {
+      "meta": "Formulir selam",
+      "eyebrow": "Formulir selam",
+      "title": "Pendaftaran, kuesioner medis, dan pernyataan pelepasan tanggung jawab",
+      "intro": "Setiap penyelam mengisi formulirnya sendiri sebelum menyelam pertama kali bersama kami. Cukup sekitar lima menit, bisa di rumah atau di dive center.",
+      "forOrder": "Untuk pesanan {code}",
+      "binding": "Perjanjian di bawah ini berlaku dalam bahasa Inggris. Baca dulu sebelum kamu tanda tangan.",
+      "bindingTranslated": "Perjanjian di bawah ini berlaku dalam bahasa Inggris. Terjemahannya ada setelah teks bahasa Inggris. Baca dulu sebelum kamu tanda tangan.",
+      "terms": "Baca perjanjian lengkap",
+      "english": "English (yang berlaku)",
+      "translation": "Terjemahan",
+      "sections": {
+        "details": "Data diri",
+        "diver": "Profil penyelam dan asuransi",
+        "medical": "Kuesioner medis penyelam",
+        "sign": "Tanda tangan"
+      },
+      "fields": {
+        "fullName": "Nama lengkap (sesuai paspor)",
+        "birthDate": "Tanggal lahir",
+        "age": "Umur",
+        "address": "Alamat rumah",
+        "nationality": "Kewarganegaraan",
+        "date": "Tanggal menyelam pertama bersama kami",
+        "emergency": "Nama dan nomor telepon kontak darurat",
+        "email": "Email (kami kirimkan salinannya)",
+        "phone": "Telepon atau WhatsApp",
+        "room": "Tempat menginap di Raja Ampat",
+        "notCertified": "Saya belum punya sertifikat selam (ikut kursus selam)",
+        "certAgency": "Agensi sertifikasi",
+        "certAgencyHint": "Misalnya SSI atau PADI",
+        "certLevel": "Tingkat sertifikasi",
+        "certLevelHint": "Misalnya Open Water Diver",
+        "certNumber": "Nomor sertifikat",
+        "lastDive": "Tanggal menyelam terakhir",
+        "loggedDives": "Jumlah penyelaman tercatat (logbook)",
+        "insurance": "Apakah kamu punya asuransi kecelakaan selam?",
+        "insurer": "Nama penyedia asuransi",
+        "guardian": "Nama orang tua atau wali",
+        "guardianNote": "Peserta berumur di bawah 18 tahun, jadi orang tua atau wali yang mengisi dan menandatangani formulir ini."
+      },
+      "optional": "opsional",
+      "yes": "Ya",
+      "no": "Tidak",
+      "medical": {
+        "intro": "Menyelam rekreasi membutuhkan kesehatan fisik dan mental yang baik. Jawab setiap pertanyaan dengan jujur. Bila kamu menjawab Ya, beberapa pertanyaan lanjutan akan muncul. Di akhir kamu melihat apakah perlu persetujuan dokter sebelum menyelam. Bila sedang hamil atau berencana hamil, jangan menyelam.",
+        "questions": [
+          "Saya pernah mengalami masalah paru-paru, pernapasan, jantung, dan/atau darah yang memengaruhi kemampuan fisik atau mental saya sehari-hari.",
+          "Umur saya di atas 45 tahun.",
+          "Saya kesulitan melakukan olahraga sedang (misalnya berjalan 1,6 km dalam 14 menit, atau berenang 200 m tanpa berhenti), atau dalam 12 bulan terakhir saya tidak bisa melakukan aktivitas fisik biasa karena alasan kebugaran atau kesehatan.",
+          "Saya pernah mengalami masalah mata, telinga, atau saluran hidung atau sinus.",
+          "Saya menjalani operasi dalam 12 bulan terakhir, atau masih punya masalah akibat operasi sebelumnya.",
+          "Saya pernah pingsan, mengalami migrain, kejang, stroke, cedera kepala serius, atau menderita cedera atau penyakit saraf yang menetap.",
+          "Saya sedang menjalani perawatan (atau pernah membutuhkan perawatan dalam lima tahun terakhir) untuk masalah psikologis, gangguan kepribadian, serangan panik, atau kecanduan obat atau alkohol, atau saya pernah didiagnosis memiliki disabilitas belajar atau perkembangan.",
+          "Saya pernah mengalami masalah punggung, hernia, tukak (maag atau luka), atau diabetes.",
+          "Saya pernah mengalami masalah lambung atau usus, termasuk diare baru-baru ini.",
+          "Saya sedang minum obat resep dokter (kecuali alat kontrasepsi atau obat antimalaria selain meflokuin atau Lariam)."
+        ],
+        "more": "Jawab juga pertanyaan berikut",
+        "boxIntro": {
+          "A": "Saya sedang atau pernah mengalami",
+          "B": "Umur saya di atas 45 tahun dan",
+          "C": "Saya sedang atau pernah mengalami",
+          "D": "Saya sedang atau pernah mengalami",
+          "E": "Saya sedang atau pernah mengalami",
+          "F": "Saya sedang atau pernah mengalami",
+          "G": "Saya pernah mengalami"
+        },
+        "boxes": {
+          "A": [
+            "Operasi dada, operasi jantung, operasi katup jantung, alat medis tertanam (misalnya stent, alat pacu jantung, atau neurostimulator), pneumotoraks, dan/atau penyakit paru kronis.",
+            "Asma, mengi, alergi berat, demam jerami (hay fever), atau saluran napas tersumbat dalam 12 bulan terakhir yang membatasi aktivitas fisik atau olahraga saya.",
+            "Masalah atau penyakit jantung seperti angina, nyeri dada saat beraktivitas, gagal jantung, edema paru saat berada di air, serangan jantung, atau stroke, atau saya minum obat untuk penyakit jantung.",
+            "Bronkitis berulang dan masih batuk dalam 12 bulan terakhir, atau saya pernah didiagnosis emfisema.",
+            "Gejala pada paru-paru, pernapasan, jantung, dan/atau darah dalam 30 hari terakhir yang mengganggu kemampuan fisik atau mental saya."
+          ],
+          "B": [
+            "Saya merokok atau mengisap nikotin dengan cara lain.",
+            "Kadar kolesterol saya tinggi.",
+            "Tekanan darah saya tinggi.",
+            "Kerabat dekat sedarah meninggal mendadak atau karena penyakit jantung atau stroke sebelum umur 50 tahun, atau ada riwayat penyakit jantung dalam keluarga sebelum umur 50 tahun (termasuk gangguan irama jantung, penyakit jantung koroner, atau kardiomiopati)."
+          ],
+          "C": [
+            "Operasi sinus dalam 6 bulan terakhir.",
+            "Penyakit atau operasi telinga, gangguan pendengaran, atau gangguan keseimbangan.",
+            "Sinusitis berulang dalam 12 bulan terakhir.",
+            "Operasi mata dalam 3 bulan terakhir."
+          ],
+          "D": [
+            "Cedera kepala sampai pingsan dalam 5 tahun terakhir.",
+            "Cedera atau penyakit saraf yang menetap.",
+            "Migrain berulang dalam 12 bulan terakhir, atau saya minum obat untuk mencegahnya.",
+            "Pingsan atau hampir pingsan (kehilangan kesadaran penuh atau sebagian) dalam 5 tahun terakhir.",
+            "Epilepsi, kejang, atau konvulsi, atau saya minum obat untuk mencegahnya."
+          ],
+          "E": [
+            "Masalah kesehatan perilaku, mental, atau psikologis yang membutuhkan perawatan medis atau psikiatris.",
+            "Depresi berat, pikiran bunuh diri, serangan panik, atau gangguan bipolar yang tidak terkendali yang membutuhkan obat atau perawatan psikiatris.",
+            "Gangguan kesehatan mental atau gangguan belajar atau perkembangan yang membutuhkan perawatan rutin atau penyesuaian khusus.",
+            "Kecanduan obat atau alkohol yang membutuhkan perawatan dalam 5 tahun terakhir."
+          ],
+          "F": [
+            "Masalah punggung berulang dalam 6 bulan terakhir yang membatasi aktivitas sehari-hari saya.",
+            "Operasi punggung atau tulang belakang dalam 12 bulan terakhir.",
+            "Diabetes yang dikendalikan dengan obat atau diet, atau diabetes kehamilan dalam 12 bulan terakhir.",
+            "Hernia yang belum ditangani dan membatasi kemampuan fisik saya.",
+            "Tukak atau luka yang aktif atau belum diobati, atau operasi tukak dalam 6 bulan terakhir."
+          ],
+          "G": [
+            "Operasi stoma, dan saya belum mendapat izin dokter untuk berenang atau beraktivitas fisik.",
+            "Dehidrasi yang membutuhkan penanganan medis dalam 7 hari terakhir.",
+            "Tukak lambung atau usus yang aktif atau belum diobati, atau operasi tukak dalam 6 bulan terakhir.",
+            "Sering mengalami nyeri ulu hati, makanan naik kembali, atau penyakit asam lambung (GERD).",
+            "Kolitis ulseratif atau penyakit Crohn yang aktif atau tidak terkendali.",
+            "Operasi bariatrik (operasi pengecilan lambung) dalam 12 bulan terakhir."
+          ]
+        },
+        "clearance": "Berdasarkan jawabanmu, kamu perlu persetujuan dokter sebelum menyelam.",
+        "noClearance": "Berdasarkan jawabanmu, kamu tidak perlu persetujuan dokter.",
+        "declaration": "Saya menyatakan bahwa informasi medis di atas benar dan lengkap sejauh yang saya ketahui."
+      },
+      "sign": {
+        "hint": "Tanda tangan dengan jari atau mouse",
+        "clear": "Hapus",
+        "confirm": "Ketik nama lengkapmu untuk konfirmasi",
+        "confirmGuardian": "Orang tua atau wali, ketik nama lengkapmu untuk konfirmasi",
+        "agree": "Saya sudah membaca dan memahami perjanjian di atas, menyetujuinya, dan menandatanganinya secara sukarela.",
+        "agreeNoTerms": "Saya menyatakan bahwa isi formulir ini benar dan lengkap, dan saya menandatanganinya secara sukarela.",
+        "submit": "Tanda tangani dan kirim",
+        "sending": "Mengirim…"
+      },
+      "done": {
+        "title": "Terima kasih, formulirmu sudah ditandatangani",
+        "text": "Nomor formulirmu {code}. Kami menyimpannya, jadi tidak ada yang perlu dicetak atau dibawa.",
+        "clearanceTitle": "Perlu persetujuan dokter",
+        "clearance": "Ada jawaban yang memerlukan persetujuan dokter sebelum kamu menyelam. Minta dokter mengisi bagian evaluasi dokter pada formulir Diver Medical, lalu bawa saat datang atau kirimkan kepada kami sebelum menyelam.",
+        "noClearance": "Tidak perlu persetujuan dokter. Sampai jumpa di dive center.",
+        "copy": "Salinannya sudah kami kirim ke {email}.",
+        "another": "Isi formulir untuk penyelam lain",
+        "back": "Kembali ke pesananmu",
+        "chat": "Ada pertanyaan? Chat kami di WhatsApp",
+        "chatMessage": "Halo {operator}, saya mau bertanya tentang formulir selam {code}."
+      },
+      "errors": {
+        "fullName": "Tulis nama lengkapmu sesuai paspor.",
+        "birthDate": "Pilih tanggal lahirmu. Penyelam minimal berumur 8 tahun.",
+        "address": "Alamatnya terlalu panjang.",
+        "nationality": "Tulis kewarganegaraanmu.",
+        "date": "Pilih tanggal menyelam pertamamu bersama kami.",
+        "emergency": "Tulis nama dan nomor telepon kontak darurat.",
+        "email": "Alamat email ini sepertinya belum benar.",
+        "phone": "Nomor telepon ini sepertinya belum benar.",
+        "room": "Isiannya terlalu panjang.",
+        "certAgency": "Tulis agensi sertifikasimu, atau centang bahwa kamu belum punya sertifikat.",
+        "certLevel": "Tulis tingkat sertifikasimu.",
+        "certNumber": "Nomornya terlalu panjang.",
+        "lastDive": "Tanggal menyelam terakhir tidak boleh di masa depan.",
+        "loggedDives": "Tulis jumlah penyelaman sebagai angka bulat.",
+        "insurer": "Isiannya terlalu panjang.",
+        "guardian": "Tulis nama orang tua atau wali.",
+        "medical": "Jawab setiap pertanyaan medis dengan Ya atau Tidak.",
+        "declaration": "Centang bahwa informasi medismu benar.",
+        "signature": "Tanda tangani di dalam kotak.",
+        "confirmName": "Ketik nama lengkap yang sama dengan di atas.",
+        "agree": "Centang bahwa kamu setuju.",
+        "busy": "Terlalu banyak formulir terkirim dari perangkat ini. Coba lagi satu jam lagi.",
+        "server": "Formulir belum terkirim. Coba lagi, atau kirim email ke {email}."
+      },
+      "mail": {
+        "subject": "Formulir selam {code}",
+        "title": "Formulir selammu sudah ditandatangani",
+        "hello": "Halo {name},",
+        "intro": "Terima kasih sudah mengisi formulir selam. Berikut ringkasannya untuk arsipmu.",
+        "code": "Nomor formulir",
+        "date": "Menyelam pertama",
+        "signedAt": "Ditandatangani",
+        "medical": "Kuesioner medis",
+        "footer": "Kamu menerima email ini karena mengisi formulir selam di {host}."
+      }
+    },
+    "order": {
+      "waiverTitle": "Formulir selam",
+      "waiverText": "Setiap penyelam mengisi kuesioner medis dan pernyataan pelepasan tanggung jawab sebelum menyelam pertama kali. {done} dari {total} sudah diisi.",
+      "waiverDone": "Semua formulir selam sudah masuk. Terima kasih!",
+      "waiverButton": "Isi formulir selam"
+    },
+    "orderMail": {
+      "waiver": "Menyelam bersama kami? Setiap penyelam mengisi formulir selam (kuesioner medis dan pernyataan pelepasan tanggung jawab) sebelum menyelam pertama kali. Cukup sekitar lima menit.",
+      "waiverButton": "Isi formulir selam"
+    },
+    "footerLink": "Formulir selam"
+  },
+  "zh": {
+    "waiver": {
+      "meta": "潜水表格",
+      "eyebrow": "潜水表格",
+      "title": "登记、潜水员健康问卷与免责声明",
+      "intro": "每位潜水员在首次与我们潜水前填写自己的表格。大约需要五分钟，在家或在潜水中心填写均可。",
+      "forOrder": "用于预订 {code}",
+      "binding": "以下协议以英文版本为准。签署前请仔细阅读。",
+      "bindingTranslated": "以下协议以英文版本为准。英文原文之后附有译文。签署前请仔细阅读。",
+      "terms": "阅读完整协议",
+      "english": "英文（以此为准）",
+      "translation": "译文",
+      "sections": {
+        "details": "您的信息",
+        "diver": "潜水员资料与保险",
+        "medical": "潜水员健康问卷",
+        "sign": "签名"
+      },
+      "fields": {
+        "fullName": "全名（与护照一致）",
+        "birthDate": "出生日期",
+        "age": "年龄",
+        "address": "家庭住址",
+        "nationality": "国籍",
+        "date": "首次与我们潜水的日期",
+        "emergency": "紧急联系人姓名及电话",
+        "email": "电子邮箱（我们会把副本发给您）",
+        "phone": "电话或 WhatsApp",
+        "room": "您在四王群岛的住处",
+        "notCertified": "我尚未考取潜水证（我将参加潜水课程）",
+        "certAgency": "认证机构",
+        "certAgencyHint": "例如 SSI 或 PADI",
+        "certLevel": "认证级别",
+        "certLevelHint": "例如 Open Water Diver",
+        "certNumber": "潜水证编号",
+        "lastDive": "最近一次潜水的日期",
+        "loggedDives": "潜水日志中记录的潜水次数",
+        "insurance": "您是否有潜水意外保险？",
+        "insurer": "保险公司",
+        "guardian": "父母或监护人姓名",
+        "guardianNote": "参与者未满 18 岁，因此须由父母或监护人填写并签署本表格。"
+      },
+      "optional": "选填",
+      "yes": "是",
+      "no": "否",
+      "medical": {
+        "intro": "休闲水肺潜水需要良好的身心健康。请如实回答每一个问题。如果您回答“是”，会出现几个补充问题。最后您会看到潜水前是否需要医生批准。如果您已怀孕或正在备孕，请勿潜水。",
+        "questions": [
+          "我曾有肺部、呼吸、心脏和/或血液方面的问题，影响了我正常的身体或精神状态。",
+          "我的年龄超过 45 岁。",
+          "我难以进行中等强度的运动（例如 14 分钟内步行 1.6 公里，或不停歇地游泳 200 米），或在过去 12 个月内因体能或健康原因无法参加正常的体力活动。",
+          "我的眼睛、耳朵、鼻腔或鼻窦曾有过问题。",
+          "我在过去 12 个月内做过手术，或仍有与以往手术相关的问题。",
+          "我曾失去意识、患偏头痛、癫痫发作、中风、严重头部损伤，或患有持续性神经损伤或神经系统疾病。",
+          "我目前正在接受（或在过去五年内曾需要接受）心理问题、人格障碍、惊恐发作或药物或酒精成瘾方面的治疗，或曾被诊断患有学习障碍或发育障碍。",
+          "我曾有背部问题、疝气、溃疡或糖尿病。",
+          "我曾有胃部或肠道问题，包括近期腹泻。",
+          "我正在服用处方药（避孕药，以及甲氟喹或 Lariam 以外的抗疟药除外）。"
+        ],
+        "more": "也请回答以下问题",
+        "boxIntro": {
+          "A": "我现在或曾经有",
+          "B": "我的年龄超过 45 岁，并且",
+          "C": "我现在或曾经有",
+          "D": "我现在或曾经有",
+          "E": "我现在或曾经有",
+          "F": "我现在或曾经有",
+          "G": "我曾有"
+        },
+        "boxes": {
+          "A": [
+            "胸部手术、心脏手术、心脏瓣膜手术、植入式医疗器械（例如支架、心脏起搏器或神经刺激器）、气胸，和/或慢性肺部疾病。",
+            "过去 12 个月内有哮喘、喘息、严重过敏、花粉症或呼吸道阻塞，并因此限制了我的体力活动或运动。",
+            "心脏方面的问题或疾病，例如心绞痛、劳累时胸痛、心力衰竭、浸没性肺水肿、心脏病发作或中风，或我正在服用治疗任何心脏疾病的药物。",
+            "反复发作的支气管炎，且过去 12 个月内仍在咳嗽，或曾被诊断患有肺气肿。",
+            "过去 30 天内出现影响肺部、呼吸、心脏和/或血液的症状，并损害了我的身体或精神状态。"
+          ],
+          "B": [
+            "我目前吸烟，或以其他方式吸入尼古丁。",
+            "我的胆固醇偏高。",
+            "我患有高血压。",
+            "有血缘近亲在 50 岁之前猝死或死于心脏病或中风，或我有 50 岁之前患心脏病的家族史（包括心律异常、冠状动脉疾病或心肌病）。"
+          ],
+          "C": [
+            "过去 6 个月内做过鼻窦手术。",
+            "耳部疾病或耳部手术、听力损失，或平衡方面的问题。",
+            "过去 12 个月内反复发作的鼻窦炎。",
+            "过去 3 个月内做过眼部手术。"
+          ],
+          "D": [
+            "过去 5 年内头部受伤并失去意识。",
+            "持续性神经损伤或神经系统疾病。",
+            "过去 12 个月内反复发作偏头痛，或我正在服药预防偏头痛。",
+            "过去 5 年内曾昏厥或晕倒（完全或部分失去意识）。",
+            "癫痫、癫痫发作或抽搐，或我正在服药预防发作。"
+          ],
+          "E": [
+            "需要医疗或精神科治疗的行为健康、精神或心理问题。",
+            "重度抑郁、自杀念头、惊恐发作，或需要药物或精神科治疗的未受控制的双相情感障碍。",
+            "需要持续照护或特殊安排的精神健康问题，或学习障碍或发育障碍。",
+            "过去 5 年内需要治疗的药物或酒精成瘾。"
+          ],
+          "F": [
+            "过去 6 个月内反复出现背部问题，限制了我的日常活动。",
+            "过去 12 个月内做过背部或脊柱手术。",
+            "通过药物或饮食控制的糖尿病，或过去 12 个月内患过妊娠糖尿病。",
+            "未经矫治且限制我身体能力的疝气。",
+            "活动性或未经治疗的溃疡、难以愈合的伤口，或过去 6 个月内做过溃疡手术。"
+          ],
+          "G": [
+            "造口手术，且尚未获得医生许可进行游泳或体力活动。",
+            "过去 7 天内因脱水需要医疗处理。",
+            "活动性或未经治疗的胃溃疡或肠溃疡，或过去 6 个月内做过溃疡手术。",
+            "经常烧心、反流，或患有胃食管反流病（GERD）。",
+            "活动性或未受控制的溃疡性结肠炎或克罗恩病。",
+            "过去 12 个月内做过减重手术。"
+          ]
+        },
+        "clearance": "根据您的回答，潜水前您需要获得医生批准。",
+        "noClearance": "根据您的回答，您不需要医生批准。",
+        "declaration": "我声明，据我所知，以上健康信息真实完整。"
+      },
+      "sign": {
+        "hint": "用手指或鼠标签名",
+        "clear": "清除",
+        "confirm": "输入您的全名以确认",
+        "confirmGuardian": "请父母或监护人输入自己的全名以确认",
+        "agree": "我已阅读并理解上述协议，同意其内容，并自愿签署。",
+        "agreeNoTerms": "我确认本表格中的信息真实完整，并自愿签署。",
+        "submit": "签名并提交",
+        "sending": "正在提交…"
+      },
+      "done": {
+        "title": "谢谢您，表格已签署",
+        "text": "您的表格编号是 {code}。我们会存档保管，您无需打印或携带任何文件。",
+        "clearanceTitle": "需要医生批准",
+        "clearance": "您有一项或多项回答需要在潜水前获得医生批准。请让医生填写 Diver Medical 表格中的医生评估部分，并在前来时随身携带，或在潜水前发送给我们。",
+        "noClearance": "无需医生批准。我们潜水中心见。",
+        "copy": "我们已将副本发送至 {email}。",
+        "another": "为另一位潜水员填写表格",
+        "back": "返回您的预订",
+        "chat": "有疑问？通过 WhatsApp 和我们聊聊",
+        "chatMessage": "您好 {operator}，我想咨询一下潜水表格 {code} 的事。"
+      },
+      "errors": {
+        "fullName": "请填写与护照一致的全名。",
+        "birthDate": "请选择您的出生日期。潜水员须年满 8 岁。",
+        "address": "地址太长了。",
+        "nationality": "请填写您的国籍。",
+        "date": "请选择您首次与我们潜水的日期。",
+        "emergency": "请填写紧急联系人的姓名和电话号码。",
+        "email": "这个电子邮箱地址似乎不正确。",
+        "phone": "这个电话号码似乎不正确。",
+        "room": "内容太长了。",
+        "certAgency": "请填写您的认证机构，或勾选您尚未考取潜水证。",
+        "certLevel": "请填写您的认证级别。",
+        "certNumber": "编号太长了。",
+        "lastDive": "最近一次潜水的日期不能晚于今天。",
+        "loggedDives": "请以整数填写潜水次数。",
+        "insurer": "内容太长了。",
+        "guardian": "请填写父母或监护人的姓名。",
+        "medical": "请用“是”或“否”回答每一个健康问题。",
+        "declaration": "请确认您的健康信息属实。",
+        "signature": "请在框内签名。",
+        "confirmName": "请输入与上方相同的全名。",
+        "agree": "请勾选表示您同意。",
+        "busy": "此设备提交的表格过多。请一小时后再试。",
+        "server": "表格未能提交。请重试，或发邮件至 {email}。"
+      },
+      "mail": {
+        "subject": "您的潜水表格 {code}",
+        "title": "您的潜水表格已签署",
+        "hello": "{name}，您好！",
+        "intro": "感谢您填写潜水表格。以下是摘要，供您存档。",
+        "code": "表格编号",
+        "date": "首次潜水",
+        "signedAt": "签署时间",
+        "medical": "健康问卷",
+        "footer": "您收到此邮件，是因为您在 {host} 填写了潜水表格。"
+      }
+    },
+    "order": {
+      "waiverTitle": "潜水表格",
+      "waiverText": "每位潜水员在首次潜水前都需填写健康问卷和免责声明。{total} 份中已完成 {done} 份。",
+      "waiverDone": "所有潜水表格均已提交。谢谢您！",
+      "waiverButton": "填写潜水表格"
+    },
+    "orderMail": {
+      "waiver": "要和我们一起潜水吗？每位潜水员在首次潜水前都需填写潜水表格（健康问卷和免责声明），大约需要五分钟。",
+      "waiverButton": "填写潜水表格"
+    },
+    "footerLink": "潜水表格"
+  },
+  "ko": {
+    "waiver": {
+      "meta": "다이빙 신청서",
+      "eyebrow": "다이빙 신청서",
+      "title": "등록, 의료 질문지 및 면책 동의서",
+      "intro": "다이버마다 저희와 첫 다이빙을 하기 전에 각자 신청서를 작성해 주세요. 5분 정도 걸리고, 집에서나 다이브 센터에서 작성할 수 있어요.",
+      "forOrder": "예약 코드 {code}",
+      "binding": "아래 동의서는 영어 원문 기준으로 효력이 있어요. 서명하기 전에 꼭 읽어 주세요.",
+      "bindingTranslated": "아래 동의서는 영어 원문 기준으로 효력이 있어요. 번역문은 영어 원문 다음에 있어요. 서명하기 전에 꼭 읽어 주세요.",
+      "terms": "동의서 전문 읽기",
+      "english": "영어 (효력 있는 원문)",
+      "translation": "번역문",
+      "sections": {
+        "details": "인적 사항",
+        "diver": "다이버 프로필 및 보험",
+        "medical": "다이버 의료 질문지",
+        "sign": "서명"
+      },
+      "fields": {
+        "fullName": "성명 (여권과 동일하게)",
+        "birthDate": "생년월일",
+        "age": "나이",
+        "address": "자택 주소",
+        "nationality": "국적",
+        "date": "저희와 함께하는 첫 다이빙 날짜",
+        "emergency": "비상 연락처 이름과 전화번호",
+        "email": "이메일 (사본을 보내 드려요)",
+        "phone": "전화 또는 WhatsApp",
+        "room": "라자암팟 숙소",
+        "notCertified": "아직 자격증이 없어요 (다이빙 코스에 참가해요)",
+        "certAgency": "자격증 발급 단체",
+        "certAgencyHint": "예를 들어 SSI 또는 PADI",
+        "certLevel": "자격 레벨",
+        "certLevelHint": "예를 들어 Open Water Diver",
+        "certNumber": "자격증 번호",
+        "lastDive": "마지막 다이빙 날짜",
+        "loggedDives": "로그북에 기록된 다이빙 횟수",
+        "insurance": "다이빙 사고 보험이 있으세요?",
+        "insurer": "보험사",
+        "guardian": "부모 또는 보호자 이름",
+        "guardianNote": "참가자가 18세 미만이므로 부모 또는 보호자가 이 신청서를 작성하고 서명해 주세요."
+      },
+      "optional": "선택",
+      "yes": "예",
+      "no": "아니요",
+      "medical": {
+        "intro": "레저 스쿠버 다이빙을 하려면 신체와 정신 건강이 좋아야 해요. 모든 질문에 솔직하게 답해 주세요. '예'라고 답하면 추가 질문이 몇 개 나타나요. 마지막에 다이빙 전에 의사의 승인이 필요한지 확인할 수 있어요. 임신 중이거나 임신을 계획하고 있다면 다이빙하지 마세요.",
+        "questions": [
+          "폐, 호흡, 심장 및/또는 혈액 문제로 평소의 신체적 또는 정신적 활동에 지장을 받은 적이 있어요.",
+          "나이가 45세를 넘었어요.",
+          "적당한 운동(예를 들어 1.6km를 14분 안에 걷기, 또는 쉬지 않고 200m 수영하기)을 하기 어렵거나, 지난 12개월 동안 체력 또는 건강 문제로 일상적인 신체 활동에 참여하지 못한 적이 있어요.",
+          "눈, 귀, 비강 또는 부비동에 문제가 있었던 적이 있어요.",
+          "지난 12개월 안에 수술을 받았거나, 과거 수술과 관련된 문제가 지금도 계속되고 있어요.",
+          "의식을 잃은 적이 있거나, 편두통, 발작, 뇌졸중, 심각한 머리 부상을 겪은 적이 있거나, 지속적인 신경 손상 또는 신경 질환이 있어요.",
+          "현재 심리적 문제, 성격 장애, 공황 발작, 약물 또는 알코올 중독으로 치료를 받고 있거나 지난 5년 안에 치료가 필요했던 적이 있어요. 또는 학습 장애나 발달 장애 진단을 받은 적이 있어요.",
+          "허리 문제, 탈장, 궤양 또는 당뇨병이 있었던 적이 있어요.",
+          "최근의 설사를 포함해 위나 장에 문제가 있었던 적이 있어요.",
+          "처방약을 복용하고 있어요 (피임약, 그리고 메플로퀸(Lariam) 외의 말라리아 예방약은 제외)."
+        ],
+        "more": "다음 질문에도 답해 주세요",
+        "boxIntro": {
+          "A": "다음에 해당하거나 해당한 적이 있어요",
+          "B": "45세가 넘었고 다음에 해당해요",
+          "C": "다음에 해당하거나 해당한 적이 있어요",
+          "D": "다음에 해당하거나 해당한 적이 있어요",
+          "E": "다음에 해당하거나 해당한 적이 있어요",
+          "F": "다음에 해당하거나 해당한 적이 있어요",
+          "G": "다음에 해당한 적이 있어요"
+        },
+        "boxes": {
+          "A": [
+            "흉부 수술, 심장 수술, 심장 판막 수술, 체내 이식형 의료기기(예를 들어 스텐트, 심박조율기 또는 신경자극기), 기흉 및/또는 만성 폐질환.",
+            "지난 12개월 안에 신체 활동이나 운동을 제한한 천식, 천명(쌕쌕거림), 심한 알레르기, 건초열 또는 기도 막힘.",
+            "협심증, 운동 시 흉통, 심부전, 침수성 폐부종, 심장마비 또는 뇌졸중 같은 심장 문제나 질환, 또는 심장 질환 치료제 복용.",
+            "지난 12개월 안에 반복된 기관지염과 현재의 기침, 또는 폐기종 진단.",
+            "지난 30일 안에 폐, 호흡, 심장 및/또는 혈액에 나타나 신체적 또는 정신적 활동을 떨어뜨린 증상."
+          ],
+          "B": [
+            "현재 담배를 피우거나 다른 방법으로 니코틴을 흡입해요.",
+            "콜레스테롤 수치가 높아요.",
+            "혈압이 높아요.",
+            "가까운 혈연 가족이 50세 이전에 돌연사했거나 심장병 또는 뇌졸중으로 사망했어요. 또는 50세 이전의 심장병 가족력(부정맥, 관상동맥 질환, 심근병증 포함)이 있어요."
+          ],
+          "C": [
+            "지난 6개월 안에 받은 부비동 수술.",
+            "귀 질환 또는 귀 수술, 청력 손실, 또는 평형 감각 문제.",
+            "지난 12개월 안에 반복된 부비동염.",
+            "지난 3개월 안에 받은 눈 수술."
+          ],
+          "D": [
+            "지난 5년 안에 의식을 잃을 정도의 머리 부상.",
+            "지속적인 신경 손상 또는 신경 질환.",
+            "지난 12개월 안에 반복된 편두통, 또는 편두통 예방약 복용.",
+            "지난 5년 안에 있었던 의식 소실 또는 실신(의식을 완전히 또는 일부 잃음).",
+            "뇌전증, 발작 또는 경련, 또는 이를 예방하는 약 복용."
+          ],
+          "E": [
+            "의학적 또는 정신과적 치료가 필요한 행동 건강, 정신적 또는 심리적 문제.",
+            "약물이나 정신과 치료가 필요한 중증 우울증, 자살 생각, 공황 발작 또는 조절되지 않는 양극성 장애.",
+            "지속적인 관리나 특별한 배려가 필요한 정신 건강 질환, 또는 학습 장애나 발달 장애.",
+            "지난 5년 안에 치료가 필요했던 약물 또는 알코올 중독."
+          ],
+          "F": [
+            "지난 6개월 동안 일상 활동을 제한한 반복적인 허리 문제.",
+            "지난 12개월 안에 받은 허리 또는 척추 수술.",
+            "약이나 식단으로 조절하는 당뇨병, 또는 지난 12개월 안의 임신성 당뇨병.",
+            "신체 능력을 제한하는, 교정되지 않은 탈장.",
+            "활동성이거나 치료되지 않은 궤양, 잘 낫지 않는 상처, 또는 지난 6개월 안에 받은 궤양 수술."
+          ],
+          "G": [
+            "장루 수술 (수영이나 신체 활동에 대한 의사의 허가를 아직 받지 않은 경우).",
+            "지난 7일 안에 치료가 필요했던 탈수.",
+            "활동성이거나 치료되지 않은 위궤양 또는 장궤양, 또는 지난 6개월 안에 받은 궤양 수술.",
+            "잦은 속쓰림, 역류, 또는 위식도 역류 질환(GERD).",
+            "활동성이거나 조절되지 않는 궤양성 대장염 또는 크론병.",
+            "지난 12개월 안에 받은 비만 수술."
+          ]
+        },
+        "clearance": "답변에 따르면 다이빙 전에 의사의 승인이 필요해요.",
+        "noClearance": "답변에 따르면 의사의 승인은 필요하지 않아요.",
+        "declaration": "위 의료 정보는 제가 아는 한 사실이며 빠진 내용이 없음을 확인해요."
+      },
+      "sign": {
+        "hint": "손가락이나 마우스로 서명해 주세요",
+        "clear": "지우기",
+        "confirm": "확인을 위해 성명을 입력해 주세요",
+        "confirmGuardian": "부모 또는 보호자께서 확인을 위해 성명을 입력해 주세요",
+        "agree": "위 동의서를 읽고 이해했으며, 이에 동의하고 자발적으로 서명해요.",
+        "agreeNoTerms": "이 신청서의 정보가 사실이며 빠진 내용이 없음을 확인하고, 자발적으로 서명해요.",
+        "submit": "서명하고 보내기",
+        "sending": "보내는 중…"
+      },
+      "done": {
+        "title": "감사합니다. 신청서 서명이 완료됐어요",
+        "text": "저희가 신청서(번호 {code})를 보관하니 따로 인쇄하거나 챙겨 오실 필요가 없어요.",
+        "clearanceTitle": "의사 승인 필요",
+        "clearance": "다이빙 전에 의사의 승인이 필요한 답변이 하나 이상 있어요. 의사에게 Diver Medical 양식의 의사 평가 부분을 작성해 달라고 요청하신 뒤, 오실 때 가져오시거나 다이빙 전에 저희에게 보내 주세요.",
+        "noClearance": "의사 승인은 필요하지 않아요. 다이브 센터에서 만나요.",
+        "copy": "사본을 {email} 주소로 보내 드렸어요.",
+        "another": "다른 다이버의 신청서 작성하기",
+        "back": "내 예약으로 돌아가기",
+        "chat": "궁금한 점이 있으세요? WhatsApp으로 채팅하기",
+        "chatMessage": "안녕하세요, {operator}. 다이빙 신청서 {code} 관련해서 질문이 있어요."
+      },
+      "errors": {
+        "fullName": "여권과 같은 성명을 입력해 주세요.",
+        "birthDate": "생년월일을 선택해 주세요. 다이버는 만 8세 이상이어야 해요.",
+        "address": "주소가 너무 길어요.",
+        "nationality": "국적을 입력해 주세요.",
+        "date": "저희와 함께하는 첫 다이빙 날짜를 선택해 주세요.",
+        "emergency": "비상 연락처의 이름과 전화번호를 입력해 주세요.",
+        "email": "이메일 주소가 올바르지 않은 것 같아요.",
+        "phone": "전화번호가 올바르지 않은 것 같아요.",
+        "room": "입력한 내용이 너무 길어요.",
+        "certAgency": "자격증 발급 단체를 입력하시거나, 아직 자격증이 없다고 체크해 주세요.",
+        "certLevel": "자격 레벨을 입력해 주세요.",
+        "certNumber": "번호가 너무 길어요.",
+        "lastDive": "마지막 다이빙 날짜는 미래일 수 없어요.",
+        "loggedDives": "로그북에 기록된 다이빙 횟수를 정수로 입력해 주세요.",
+        "insurer": "입력한 내용이 너무 길어요.",
+        "guardian": "부모 또는 보호자 이름을 입력해 주세요.",
+        "medical": "모든 의료 질문에 예 또는 아니요로 답해 주세요.",
+        "declaration": "의료 정보가 사실임을 확인해 주세요.",
+        "signature": "칸 안에 서명해 주세요.",
+        "confirmName": "위와 같은 성명을 입력해 주세요.",
+        "agree": "동의한다고 체크해 주세요.",
+        "busy": "이 기기에서 신청서가 너무 많이 전송됐어요. 한 시간 뒤에 다시 시도해 주세요.",
+        "server": "신청서를 보내지 못했어요. 다시 시도하시거나 {email} 주소로 이메일 주세요."
+      },
+      "mail": {
+        "subject": "다이빙 신청서 {code}",
+        "title": "다이빙 신청서 서명이 완료됐어요",
+        "hello": "안녕하세요, {name} 님.",
+        "intro": "다이빙 신청서를 작성해 주셔서 감사해요. 보관용 요약을 보내 드려요.",
+        "code": "신청서 번호",
+        "date": "첫 다이빙",
+        "signedAt": "서명 일시",
+        "medical": "의료 질문지",
+        "footer": "{host} 웹사이트에서 다이빙 신청서를 작성하셔서 이 이메일을 받으셨어요."
+      }
+    },
+    "order": {
+      "waiverTitle": "다이빙 신청서",
+      "waiverText": "다이버마다 첫 다이빙 전에 의료 질문지와 면책 동의서를 작성해 주세요. {total}명 중 {done}명이 작성했어요.",
+      "waiverDone": "다이빙 신청서가 모두 접수됐어요. 감사합니다!",
+      "waiverButton": "다이빙 신청서 작성하기"
+    },
+    "orderMail": {
+      "waiver": "저희와 다이빙하시나요? 다이버마다 첫 다이빙 전에 다이빙 신청서(의료 질문지와 면책 동의서)를 작성해 주세요. 5분 정도 걸려요.",
+      "waiverButton": "다이빙 신청서 작성하기"
+    },
+    "footerLink": "다이빙 신청서"
+  }
+}
