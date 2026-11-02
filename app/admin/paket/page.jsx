@@ -3,9 +3,11 @@ import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import PackageManager from "@/admin/PackageManager";
 import PriceListImport from "@/admin/PriceListImport";
 import ServiceVisibility from "@/admin/ServiceVisibility";
+import { serviceArt } from "@/components/service-art";
 import { PRICE_LIST } from "@/content/price-list";
 import { missingPackages } from "@/lib/packages";
 import { servicesIn } from "@/lib/services";
+import { serviceImageOf } from "@/lib/site-settings";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { allPackages, ensurePriceList } from "@/server/packages";
@@ -22,7 +24,7 @@ export default async function PackagesPage() {
   if (database.ok) await ensurePriceList();
   const packages = database.ok ? await allPackages().catch(() => []) : [];
   // Layanan yang disimpan (tidak tampil di website) tetap punya daftar paketnya di sini.
-  const { hiddenServices } = await getSiteSettings({ fresh: database.ok });
+  const { hiddenServices, serviceImages } = await getSiteSettings({ fresh: database.ok });
   const services = servicesIn("id").map(({ slug, title }) => ({ slug, title, hidden: hiddenServices.includes(slug) }));
   // Daftar harga pemilik: paket yang belum ada bisa ditambahkan sekali klik (src/content/price-list.js).
   const missing = new Set(missingPackages(PRICE_LIST.packages, packages));
@@ -44,7 +46,13 @@ export default async function PackagesPage() {
       <DatabaseNotice database={database} />
       {database.ok && (
         <ServiceVisibility
-          services={services.map(({ slug, title }) => ({ slug, title, count: packages.filter((p) => p.service === slug).length }))}
+          services={services.map(({ slug, title }) => ({
+            slug,
+            title,
+            count: packages.filter((p) => p.service === slug).length,
+            art: serviceArt[slug].src,
+            image: serviceImageOf(serviceImages[slug]),
+          }))}
           hidden={hiddenServices}
         />
       )}

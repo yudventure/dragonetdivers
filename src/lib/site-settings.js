@@ -1,13 +1,14 @@
 // Isian /admin/kontak: WhatsApp, email, alamat, tautan Google Maps, akun media sosial yang tampil di
 // website, showUsd (pilihan dolar AS di website; mati = semua harga hanya dalam Rupiah), dan hiddenServices
-// (layanan yang disimpan, diatur di /admin/paket), dan googleVerification (kode tag HTML Google Search
-// Console, diatur di /admin/google, src/lib/seo.js). Disimpan di tabel settings baris "site"
+// (layanan yang disimpan, diatur di /admin/paket), serviceImages (foto kartu layanan pengganti ilustrasi
+// bawaan, juga diatur di /admin/paket), dan googleVerification (kode tag HTML Google Search Console, diatur
+// di /admin/google, src/lib/seo.js). Disimpan di tabel settings baris "site"
 // (src/server/site-settings.js) dan dibaca src/lib/site.js.
 // Isian kosong berarti memakai isian lama dari hPanel atau nilai bawaan. Fungsi murni, diuji di
 // tests/site-settings.test.js.
 import { cleanEmail, cleanWhatsApp } from "./checkout.js";
 import { googleVerificationsOf, isDnsVerification, MAX_GOOGLE_CODES } from "./seo.js";
-import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES } from "./services.js";
+import { cleanHiddenServices, DEFAULT_HIDDEN_SERVICES, services } from "./services.js";
 import { NETWORKS, socialUrl } from "./site.js";
 
 export const ADDRESS_LINES = 3;
@@ -19,6 +20,7 @@ export const DEFAULT_SITE_SETTINGS = {
   ...Object.fromEntries(NETWORKS.map((n) => [n.id, ""])),
   showUsd: false,
   hiddenServices: DEFAULT_HIDDEN_SERVICES,
+  serviceImages: {},
   googleVerification: "",
 };
 
@@ -80,6 +82,7 @@ export function validateSiteSettings(input) {
   }
   out.showUsd = input.showUsd === true;
   out.hiddenServices = cleanHiddenServices(input.hiddenServices);
+  out.serviceImages = cleanServiceImages(input.serviceImages);
   out.googleVerification = cleanGoogleVerification(input.googleVerification);
   return out;
 }
@@ -98,6 +101,34 @@ export function cleanGoogleVerification(value) {
     throw new SiteSettingsError("Ini kode untuk DNS (properti Domain). Untuk kolom ini pilih Awalan URL di Search Console, lalu cara verifikasi Tag HTML.", "googleVerification");
   }
   throw new SiteSettingsError("Kode belum dikenali. Di Search Console buka cara verifikasi Tag HTML, lalu salin seluruh tag yang diawali <meta name=\"google-site-verification\".", "googleVerification");
+}
+
+const size = (value) => {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0 && n <= 20_000 ? n : null;
+};
+
+/**
+ * Foto kartu layanan dari /admin/paket (permintaan pemilik 2 November 2026, "tambahkan tombol ganti foto"):
+ * { slug: { id, width, height, blur } }, foto di tabel media. Hanya slug layanan yang dikenal dan id foto
+ * yang sah; layanan tanpa foto memakai ilustrasi bawaan (src/components/service-art.js).
+ */
+export function cleanServiceImages(value) {
+  const out = {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) return out;
+  for (const { slug } of services) {
+    const image = value[slug];
+    if (!image || typeof image !== "object" || !/^[a-f0-9]{24}$/.test(image.id)) continue;
+    const blur = typeof image.blur === "string" && /^data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+$/.test(image.blur) && image.blur.length <= 600 ? image.blur : "";
+    out[slug] = { id: image.id, width: size(image.width), height: size(image.height), blur };
+  }
+  return out;
+}
+
+/** Foto layanan dalam bentuk gambar next/image ({ src, width, height, blurDataURL }), atau null. */
+export function serviceImageOf(image) {
+  if (!image?.id) return null;
+  return { src: `/api/media/${image.id}`, width: image.width || 1600, height: image.height || 1067, ...(image.blur ? { blurDataURL: image.blur } : {}) };
 }
 
 /** Simpanan lama atau rusak tetap menghasilkan bentuk lengkap (isian yang salah dikosongkan). */

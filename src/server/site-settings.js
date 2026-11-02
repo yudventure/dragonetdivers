@@ -1,7 +1,7 @@
 import "server-only";
 import { cleanHiddenServices, shownServicesIn } from "@/lib/services";
 import { SITE_STATE } from "@/lib/site";
-import { DEFAULT_SITE_SETTINGS, normalizeSiteSettings } from "@/lib/site-settings";
+import { cleanServiceImages, DEFAULT_SITE_SETTINGS, normalizeSiteSettings, serviceImageOf } from "@/lib/site-settings";
 import { isDatabaseConfigured } from "./db-config.js";
 import { getSetting, saveSetting } from "./settings";
 
@@ -51,9 +51,34 @@ export async function saveSiteSettings(value) {
   state.at = state.savedAt = Date.now();
 }
 
-/** Layanan yang tampil di website dalam satu bahasa (yang disimpan di /admin/paket tidak ikut). */
+/** Layanan yang tampil di website dalam satu bahasa (yang disimpan di /admin/paket tidak ikut), dengan foto kartunya bila ada. */
 export async function shownServices(lang) {
-  return shownServicesIn(lang, (await getSiteSettings()).hiddenServices);
+  const settings = await getSiteSettings();
+  return shownServicesIn(lang, settings.hiddenServices).map((service) => withServiceImage(service, settings));
+}
+
+function withServiceImage(service, settings) {
+  const image = serviceImageOf(settings.serviceImages?.[service.slug]);
+  return image ? { ...service, image } : service;
+}
+
+/** Satu layanan dengan foto kartunya dari /admin/paket bila ada (tanpa foto: ilustrasi bawaan). */
+export async function serviceWithImage(service) {
+  return service ? withServiceImage(service, await getSiteSettings()) : service;
+}
+
+/**
+ * Pasang (image = { id, width, height, blur }) atau lepas (null) foto kartu satu layanan tanpa mengubah
+ * isian lain. Mengembalikan id foto lama, supaya pemanggil bisa menghapusnya dari tabel media.
+ */
+export async function saveServiceImage(slug, image) {
+  const stored = await storedSiteSettings();
+  const old = stored.serviceImages[slug]?.id ?? null;
+  const next = { ...stored.serviceImages };
+  if (image) next[slug] = image;
+  else delete next[slug];
+  await saveSiteSettings({ ...stored, serviceImages: cleanServiceImages(next) });
+  return old;
 }
 
 /** Apakah layanan ini tampil di website (bukan layanan yang disimpan). */

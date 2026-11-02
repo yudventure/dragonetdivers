@@ -20,9 +20,9 @@ export default async function SiteHeader({ lang, path = "/", overlay = false }) 
   const booking = whatsappLink(t.whatsapp.general);
   const home = localeHref(lang, "/");
   const homeLabel = format(nav.home, { name: site.name });
-  const services = (await shownServices(lang)).map(({ slug, title, summary }) => {
+  const services = (await shownServices(lang)).map(({ slug, title, summary, image }) => {
     const servicePath = `/services/${slug}`;
-    return { slug, title, summary, href: localeHref(lang, servicePath), current: path === servicePath };
+    return { slug, title, summary, image: image ?? null, href: localeHref(lang, servicePath), current: path === servicePath };
   });
   const links = [
     { href: localeHref(lang, "/#dive-sites"), label: nav.diveSites },

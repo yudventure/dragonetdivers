@@ -17,7 +17,7 @@ import { whatsappLink } from "@/lib/site";
 import { serviceSlots } from "@/server/admin-data";
 import { paymentOptions } from "@/server/checkout";
 import { activePackages } from "@/server/packages";
-import { isServiceShown, shownServices } from "@/server/site-settings";
+import { isServiceShown, serviceWithImage, shownServices } from "@/server/site-settings";
 
 // Halaman detail layanan: /services/fun-dives, /id/services/fun-dives, dst. (isi di src/lib/services.js).
 // Dirender per permintaan supaya paket dan harga dari /admin/paket langsung tampil (tidak tertahan cache
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }) {
 export default async function ServicePage({ params }) {
   await connection();
   const { lang, slug } = await params;
-  const service = serviceBySlug(slug, lang);
+  const service = await serviceWithImage(serviceBySlug(slug, lang));
   if (!service || !(await isServiceShown(slug))) notFound();
   const t = uiText(lang);
   const text = t.servicePage;
