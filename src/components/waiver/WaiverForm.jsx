@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { addDays } from "@/lib/date-picker";
 import { format } from "@/lib/i18n";
 import { ageOn, boxItems, cleanWaiver, MEDICAL, medicalQuestions, needsClearance, WaiverError } from "@/lib/waiver";
 import { CheckIcon, ChatIcon } from "../icons";
+import DatePicker from "../DatePicker";
 import SignaturePad from "./SignaturePad";
 
 const FIELD = "h-12 w-full rounded-input border border-line-strong bg-white px-3 text-abyss outline-none focus:border-teal focus:ring-3 focus:ring-lagoon/40";
@@ -116,7 +118,7 @@ function Agreement({ blocks }) {
  * dikirim ke /api/waiver. t = ui.waiver bahasa halaman; enMedical = teks medis English (selain di halaman
  * English) yang tampil kecil di bawah tiap pertanyaan.
  */
-export default function WaiverForm({ lang, t, enMedical, agreement, order, today, contact }) {
+export default function WaiverForm({ lang, t, dateText, enMedical, agreement, order, today, contact }) {
   const [values, setValues] = useState(BLANK);
   const [date, setDate] = useState(order?.date || today);
   const [notCertified, setNotCertified] = useState(false);
@@ -138,6 +140,12 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
   const fieldError = (name) => (error?.field === name ? error.message : null);
   const invalid = (name) => (error?.field === name ? { "aria-invalid": true, "aria-describedby": `waiver-${name}-error` } : {});
 
+  // Kolom tanggal (DatePicker) mengirim teks YYYY-MM-DD, bukan kejadian input.
+  const setValue = (name, value) => {
+    setValues((v) => ({ ...v, [name]: value }));
+    if (error?.field === name) setError(null);
+  };
+  const year = Number(today.slice(0, 4));
   const set = (name) => (e) => {
     setValues((v) => ({ ...v, [name]: e.target.value }));
     if (error?.field === name) setError(null);
@@ -272,11 +280,25 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
         </Field>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field id="waiver-birthDate" label={t.fields.birthDate} required error={fieldError("birthDate")}>
-            <input id="waiver-birthDate" type="date" max={today} value={values.birthDate} onChange={set("birthDate")} autoComplete="bday" className={FIELD} {...invalid("birthDate")} />
+            <DatePicker
+              id="waiver-birthDate"
+              value={values.birthDate}
+              onChange={(v) => setValue("birthDate", v)}
+              min={`${year - 100}-01-01`}
+              max={`${year - 8}${today.slice(4)}`}
+              start={`${year - 30}${today.slice(4)}`}
+              today={today}
+              lang={lang}
+              t={dateText}
+              required
+              className={FIELD}
+              {...invalid("birthDate")}
+            />
           </Field>
           <Field id="waiver-age" label={t.fields.age}>
-            <output id="waiver-age" className={`${FIELD} flex items-center bg-foam`}>
-              {age ?? "–"}
+            {/* Dihitung sendiri dari tanggal lahir, tidak diketik. */}
+            <output id="waiver-age" htmlFor="waiver-birthDate" aria-live="polite" className={`${FIELD} flex items-center bg-foam`}>
+              {age === null ? <span className="truncate text-sm text-slate">{t.fields.ageAuto}</span> : <span className="font-semibold">{format(t.fields.ageYears, { age })}</span>}
             </output>
           </Field>
         </div>
@@ -288,7 +310,19 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
             <input id="waiver-nationality" value={values.nationality} onChange={set("nationality")} maxLength={80} autoComplete="country-name" className={FIELD} {...invalid("nationality")} />
           </Field>
           <Field id="waiver-date" label={t.fields.date} required error={fieldError("date")}>
-            <input id="waiver-date" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} className={FIELD} {...invalid("date")} />
+            <DatePicker
+              id="waiver-date"
+              value={date}
+              onChange={setDate}
+              min={today}
+              max={addDays(today, 400)}
+              today={today}
+              lang={lang}
+              t={dateText}
+              required
+              className={FIELD}
+              {...invalid("date")}
+            />
           </Field>
         </div>
         <Field id="waiver-emergency" label={t.fields.emergency} required error={fieldError("emergency")}>
@@ -335,7 +369,18 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
               <input id="waiver-loggedDives" type="number" inputMode="numeric" min={0} max={99999} value={values.loggedDives} onChange={set("loggedDives")} className={FIELD} {...invalid("loggedDives")} />
             </Field>
             <Field id="waiver-lastDive" label={t.fields.lastDive} optional={t.optional} error={fieldError("lastDive")}>
-              <input id="waiver-lastDive" type="date" max={today} value={values.lastDive} onChange={set("lastDive")} className={FIELD} {...invalid("lastDive")} />
+              <DatePicker
+                id="waiver-lastDive"
+                value={values.lastDive}
+                onChange={(v) => setValue("lastDive", v)}
+                min="1950-01-01"
+                max={today}
+                today={today}
+                lang={lang}
+                t={dateText}
+                className={FIELD}
+                {...invalid("lastDive")}
+              />
             </Field>
           </div>
         )}

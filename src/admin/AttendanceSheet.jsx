@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import DatePicker from "@/components/DatePicker";
 import { ATTENDANCE } from "@/lib/modules/hr";
+import { ADMIN_DATE_TEXT } from "./date-text";
 import { INPUT } from "./RecordManager";
 
 const SMALL = "h-10 w-full rounded-input border border-line-strong bg-white px-2 text-sm text-abyss outline-none focus:border-teal focus:ring-3 focus:ring-lagoon/40";
@@ -31,10 +33,18 @@ export default function AttendanceSheet({ date, employees, saved }) {
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm font-semibold text-abyss">
-          Tanggal
-          <input type="date" value={date} onChange={(e) => e.target.value && router.push(`/admin/absensi?tanggal=${e.target.value}`)} className={`${INPUT} h-10 w-auto`} />
-        </label>
+        <div className="flex items-center gap-2 text-sm font-semibold text-abyss">
+          <label htmlFor="absensi-tanggal">Tanggal</label>
+          <DatePicker
+            id="absensi-tanggal"
+            value={date}
+            onChange={(v) => v && router.push(`/admin/absensi?tanggal=${v}`)}
+            required
+            lang="id"
+            t={ADMIN_DATE_TEXT}
+            className={`${INPUT} h-10 w-56 font-normal`}
+          />
+        </div>
         <button
           type="button"
           onClick={() => setRows((r) => Object.fromEntries(Object.entries(r).map(([id, row]) => [id, { ...row, status: "hadir" }])))}

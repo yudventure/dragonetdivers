@@ -104,6 +104,10 @@ copyFileSync(join(repo, "src/components/waiver/SignaturePad.jsx"), join(out, "Si
 // 6. Berkas asli Dragonet, dengan jalur yang sama, sebagai contoh lengkap.
 const ORIGINALS = [
   "src/components/waiver/WaiverForm.jsx",
+  "src/components/DatePicker.jsx",
+  "src/lib/date-picker.js",
+  "tests/date-picker.test.js",
+  "src/admin/WaiverPhotoPicker.jsx",
   "src/components/waiver/SignaturePad.jsx",
   "app/[lang]/waiver/page.jsx",
   "app/api/waiver/route.js",
