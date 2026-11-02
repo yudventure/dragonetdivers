@@ -45,7 +45,7 @@ export default async function Gallery({ lang }) {
 
   return (
     <section id="gallery" aria-labelledby="gallery-title" className="scroll-mt-24 bg-white">
-      <div className="gutter mx-auto grid max-w-[1200px] gap-8 pt-16 md:pt-24">
+      <div className="gutter mx-auto grid max-w-[1200px] gap-8 pt-16 pb-16 md:pt-24 md:pb-24">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="grid content-start gap-3">
             <p className="eyebrow">{t.eyebrow}</p>

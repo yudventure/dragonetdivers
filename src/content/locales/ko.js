@@ -99,6 +99,7 @@ export const ui = {
     illustrations: "지금 보이는 이미지와 영상은 AI 일러스트예요. 댐피어 해협에서 직접 찍은 사진과 영상을 곧 올릴게요.",
     openPhoto: "사진 크게 보기, {alt}",
     more: "{count}개 더 보기",
+    less: "접기",
     photo: "사진",
     close: "닫기",
     previous: "이전 사진",

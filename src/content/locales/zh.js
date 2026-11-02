@@ -99,6 +99,7 @@ export const ui = {
     illustrations: "目前这里的图片和短片均为 AI 生成的示意图。我们在丹皮尔海峡亲自拍摄的照片和视频即将上线。",
     openPhoto: "查看照片（{alt}）",
     more: "再显示 {count} 项",
+    less: "收起",
     photo: "照片",
     close: "关闭",
     previous: "上一张",
