@@ -164,8 +164,10 @@ test("teks perjanjian: paragraf dan judul bernomor, English wajib bila ada terje
     { heading: false, text: "2. I understand the risks." },
   ]);
   assert.deepEqual(agreementBlocks(""), []);
-  assert.deepEqual(cleanAgreement({ en: " Terms \r\n\r\nMore ", id: "" }), { en: "Terms\n\nMore", id: "" });
+  assert.deepEqual(cleanAgreement({ en: " Terms \r\n\r\nMore ", id: "" }), { en: "Terms\n\nMore", id: "", zh: "", ko: "" });
+  assert.deepEqual(cleanAgreement({ en: "A", zh: " 条款 ", ko: 5 }), { en: "A", id: "", zh: "条款", ko: "" });
   assert.throws(() => cleanAgreement({ en: "", id: "Syarat" }), (e) => e.field === "english");
+  assert.throws(() => cleanAgreement({ en: "", ko: "약관" }), (e) => e.field === "english");
   assert.throws(() => cleanAgreement({ en: "x".repeat(40_001) }), (e) => e.field === "length");
 });
 
@@ -205,26 +207,34 @@ test("email salinan formulir dan tautan formulir di email pesanan selam", async 
   assert.ok(!orderMail("order", { order: trip, base }).html.includes("/waiver"), "trip pulau tanpa formulir");
 });
 
-test("terjemahan Indonesia perjanjian: susunan sama dengan English, dipakai selama teks English bawaan", async () => {
-  const { defaultAgreement, defaultAgreementId } = await import("../src/content/waiver-agreement.js");
-  const en = agreementBlocks(defaultAgreement);
-  const id = agreementBlocks(defaultAgreementId);
-  assert.equal(id.length, en.length, "jumlah paragraf dan judul sama");
-  assert.deepEqual(
-    id.map((b) => b.heading),
-    en.map((b) => b.heading),
-  );
-  assert.deepEqual(
-    id.filter((b) => b.heading).map((b) => b.text.split(".")[0]),
-    ["1", "2", "3", "4", "5", "6", "7"],
-  );
-  assert.ok(defaultAgreementId.startsWith("Dragonet Divers Raja Ampat menyelenggarakan Kegiatan"));
-  assert.match(defaultAgreementId, /"Pihak yang Dibebaskan"/);
-  assert.ok(!/[;:]/.test(defaultAgreementId.replace(/"[^"]*"/g, "")), "tanpa titik dua dan titik koma");
-  const defaults = { en: defaultAgreement, id: defaultAgreementId };
-  assert.deepEqual(agreementTexts({ en: "", id: "" }, defaults), defaults);
+test("perjanjian bawaan empat bahasa: susunan sama dengan English, tanpa titik dua dan titik koma", async () => {
+  const { defaultAgreements } = await import("../src/content/waiver-agreement.js");
+  const en = agreementBlocks(defaultAgreements.en);
+  for (const lang of ["id", "zh", "ko"]) {
+    const blocks = agreementBlocks(defaultAgreements[lang]);
+    assert.equal(blocks.length, en.length, `${lang}: jumlah paragraf dan judul sama`);
+    assert.deepEqual(blocks.map((b) => b.heading), en.map((b) => b.heading), lang);
+    assert.deepEqual(blocks.filter((b) => b.heading).map((b) => b.text.split(".")[0]), ["1", "2", "3", "4", "5", "6", "7"], lang);
+    assert.ok(defaultAgreements[lang].startsWith("Dragonet Divers Raja Ampat"), lang);
+    assert.ok(!/[;:；：—]/.test(defaultAgreements[lang].replace(/"[^"]*"/g, "")), `${lang}: tanpa titik dua dan titik koma`);
+    assert.ok(!/Turtle|\$\{/.test(defaultAgreements[lang]), lang);
+  }
+  assert.match(defaultAgreements.id, /"Pihak yang Dibebaskan"/);
+  assert.match(defaultAgreements.zh, /"被免责方"/);
+  assert.match(defaultAgreements.ko, /"면책 당사자"/);
+});
+
+test("perjanjian dalam bahasa halaman: terjemahan bawaan selama English bawaan, English bila belum ada", async () => {
+  const { agreementFor } = await import("../src/lib/waiver.js");
+  const defaults = { en: "EN", id: "ID", zh: "ZH", ko: "KO" };
+  assert.deepEqual(agreementTexts({ en: "", id: "", zh: "", ko: "" }, defaults), defaults);
   assert.deepEqual(agreementTexts(null, defaults), defaults);
-  assert.deepEqual(agreementTexts({ en: "Custom", id: "" }, defaults), { en: "Custom", id: "" }, "teks English sendiri tanpa terjemahan bawaan");
-  assert.deepEqual(agreementTexts({ en: "Custom", id: "Kustom" }, defaults), { en: "Custom", id: "Kustom" });
-  assert.deepEqual(agreementTexts({ en: "", id: "Terjemahan tim" }, defaults), { en: defaultAgreement, id: "Terjemahan tim" });
+  assert.deepEqual(agreementTexts({ en: "", id: "Terjemahan tim" }, defaults), { ...defaults, id: "Terjemahan tim" });
+  assert.deepEqual(agreementTexts({ en: "Custom", id: "" }, defaults), { en: "Custom", id: "", zh: "", ko: "" }, "English buatan tim tanpa terjemahan bawaan");
+  assert.deepEqual(agreementTexts({ en: "Custom", ko: "커스텀" }, defaults), { en: "Custom", id: "", zh: "", ko: "커스텀" });
+  const texts = { en: "EN", id: "ID", zh: "", ko: "KO" };
+  assert.deepEqual(agreementFor(texts, "id"), { lang: "id", text: "ID" });
+  assert.deepEqual(agreementFor(texts, "en"), { lang: "en", text: "EN" });
+  assert.deepEqual(agreementFor(texts, "zh"), { lang: "en", text: "EN" }, "bahasa tanpa teks memakai English");
+  assert.deepEqual(agreementFor(texts, "xx"), { lang: "en", text: "EN" });
 });

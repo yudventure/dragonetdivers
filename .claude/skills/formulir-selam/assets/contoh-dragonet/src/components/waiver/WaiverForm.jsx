@@ -254,21 +254,14 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
     <form ref={top} onSubmit={submit} noValidate className="grid scroll-mt-28 gap-5" key={round}>
       <section aria-labelledby="waiver-terms" className={CARD}>
         <p className="rounded-input bg-sunrise-wash px-4 py-3 text-sm text-ember ring-1 ring-sunrise">
-          {agreement.translation.length ? t.bindingTranslated : t.binding}
+          {agreement.fallback ? t.englishOnly : t.read}
         </p>
         <details open className="group rounded-input bg-foam ring-1 ring-mist">
           <summary id="waiver-terms" className="cursor-pointer px-4 py-3 font-bold text-teal-dark">
             {t.terms}
           </summary>
-          <div className="grid max-h-[26rem] gap-3 overflow-y-auto overscroll-contain px-4 pb-4" tabIndex={0}>
-            {agreement.translation.length > 0 && <p className="text-xs font-bold tracking-[0.12em] text-slate uppercase">{t.english}</p>}
-            <Agreement blocks={agreement.en} />
-            {agreement.translation.length > 0 && (
-              <>
-                <p className="border-t border-mist pt-4 text-xs font-bold tracking-[0.12em] text-slate uppercase">{t.translation}</p>
-                <Agreement blocks={agreement.translation} />
-              </>
-            )}
+          <div lang={agreement.lang} className="grid max-h-[26rem] gap-3 overflow-y-auto overscroll-contain px-4 pb-4" tabIndex={0}>
+            <Agreement blocks={agreement.blocks} />
           </div>
         </details>
       </section>
@@ -479,7 +472,7 @@ export default function WaiverForm({ lang, t, enMedical, agreement, order, today
             className="mt-0.5 size-5 shrink-0 accent-teal"
             {...invalid("agree")}
           />
-          {agreement.en.length ? t.sign.agree : t.sign.agreeNoTerms}
+          {agreement.blocks.length ? t.sign.agree : t.sign.agreeNoTerms}
         </label>
         {fieldError("agree") && (
           <p id="waiver-agree-error" role="alert" className="text-sm font-semibold text-danger">

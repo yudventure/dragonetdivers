@@ -56,14 +56,16 @@ test("teks formulir: tanpa titik dua, titik koma, dan tanda pisah panjang (atura
   }
 });
 
-test("perjanjian: bagian 1 sampai 7, terjemahan Indonesia berbentuk sama, nama operator sebagai {operator}", () => {
+test("perjanjian: bagian 1 sampai 7, semua bahasa berbentuk sama dengan English, nama operator sebagai {operator}", () => {
   const en = agreementBlocks(perjanjian.en);
-  const id = agreementBlocks(perjanjian.id);
   const numbers = (blocks) => blocks.filter((b) => b.heading).map((b) => b.text.split(".")[0]);
   assert.deepEqual(numbers(en), ["1", "2", "3", "4", "5", "6", "7"]);
-  assert.deepEqual(id.map((b) => b.heading), en.map((b) => b.heading));
   assert.ok(perjanjian.en.startsWith("{operator} hosts Activities"));
-  assert.ok(perjanjian.id.startsWith("{operator} menyelenggarakan Kegiatan"));
-  assert.ok(!/Dragonet|Turtle/.test(perjanjian.en + perjanjian.id));
-  assert.ok(!/[;:]/.test(perjanjian.id.replace(/"[^"]*"/g, "")), "terjemahan tanpa titik dua dan titik koma");
+  for (const lang of Object.keys(perjanjian).filter((l) => l !== "en")) {
+    const blocks = agreementBlocks(perjanjian[lang]);
+    assert.deepEqual(blocks.map((b) => b.heading), en.map((b) => b.heading), lang);
+    assert.ok(perjanjian[lang].startsWith("{operator}"), lang);
+    assert.ok(!/[;:；：—]/.test(perjanjian[lang].replace(/"[^"]*"/g, "")), `${lang}: tanpa titik dua dan titik koma`);
+  }
+  assert.ok(!/Dragonet|Turtle/.test(Object.values(perjanjian).join("")));
 });

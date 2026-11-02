@@ -4,10 +4,11 @@ import { saveAgreement } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
 
-// Teks perjanjian formulir selam dari /admin/formulir ({ en, id }; en kosong = kembali ke teks bawaan
-// src/content/waiver-agreement.js). Disimpan di settings baris "waiver" dan langsung dipakai /waiver.
+// Teks perjanjian formulir selam dari /admin/formulir ({ en, id, zh, ko }; semua kosong = kembali ke teks bawaan
+// src/content/waiver-agreement.js). Disimpan di settings baris "waiver" dan langsung dipakai /waiver, yang
+// menampilkan teks bahasa halaman (English bila bahasa itu kosong).
 const MESSAGES = {
-  english: "Isi teks English dulu. Terjemahan Indonesia hanya pelengkap, yang berlaku teks English.",
+  english: "Isi teks English dulu. Halaman yang bahasanya belum diisi memakai teks English.",
   length: "Teks terlalu panjang (paling banyak 40.000 huruf per bahasa).",
 };
 

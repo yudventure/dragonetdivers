@@ -5,17 +5,26 @@ import { useState } from "react";
 import { INPUT } from "./RecordManager";
 
 const BOX = "grid content-start gap-4 rounded-card bg-white p-5 shadow-[0_1px_2px_rgb(10_50_59/0.05)] ring-1 ring-mist sm:p-6";
+const LANGS = [
+  ["en", "English", "Wajib. Dipakai juga di halaman yang bahasanya dikosongkan."],
+  ["id", "Bahasa Indonesia", "Tampil di /id/waiver."],
+  ["zh", "Mandarin", "Tampil di /zh/waiver."],
+  ["ko", "Korea", "Tampil di /ko/waiver."],
+];
+const EMPTY = { en: "", id: "", zh: "", ko: "" };
 
 /**
- * Teks perjanjian formulir selam (/admin/formulir). English berlaku dan wajib; terjemahan Indonesia opsional
- * (tampil di /id/waiver di bawah teks English). Paragraf dipisah baris kosong, "1. Judul" menjadi judul.
- * Kosongkan English lalu simpan untuk kembali ke teks bawaan (src/content/waiver-agreement.js).
+ * Teks perjanjian formulir selam (/admin/formulir), satu kolom per bahasa website. Tamu membaca dan
+ * menyetujui teks dalam bahasa halaman yang sedang aktif (keputusan pemilik 2 November 2026); bahasa yang
+ * dikosongkan memakai teks English. Paragraf dipisah baris kosong, "1. Judul" menjadi judul. Teks yang sama
+ * dengan bawaan disimpan kosong, jadi tetap mengikuti teks bawaan (src/content/waiver-agreement.js).
  */
 export default function WaiverAgreementForm({ initial, fallback, custom }) {
   const router = useRouter();
-  const [en, setEn] = useState(initial.en || fallback.en);
-  const [id, setId] = useState(custom ? initial.id : fallback.id);
+  const start = custom ? { ...EMPTY, ...initial, en: initial.en || fallback.en } : { ...fallback };
+  const [texts, setTexts] = useState(start);
   const [state, setState] = useState({ busy: false, ok: false, message: "" });
+  const set = (lang, value) => setTexts((current) => ({ ...current, [lang]: value }));
 
   async function save(value) {
     setState({ busy: true, ok: false, message: "" });
@@ -26,11 +35,9 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
     }).catch(() => null);
     const result = await response?.json().catch(() => ({}));
     if (!response?.ok) return setState({ busy: false, ok: false, message: result?.error || "Belum tersimpan. Coba lagi." });
-    if (!value.en && !value.id) {
-      setEn(fallback.en);
-      setId(fallback.id);
-    }
-    setState({ busy: false, ok: true, message: value.en ? "Tersimpan. Formulir berikutnya memakai teks ini." : "Kembali ke teks bawaan." });
+    const reset = LANGS.every(([lang]) => !value[lang]);
+    if (reset) setTexts({ ...fallback });
+    setState({ busy: false, ok: true, message: reset ? "Memakai teks bawaan." : "Tersimpan. Formulir berikutnya memakai teks ini." });
     router.refresh();
   }
 
@@ -40,28 +47,35 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
       onSubmit={(e) => {
         e.preventDefault();
         // Teks yang sama dengan bawaan disimpan kosong, supaya tetap mengikuti teks bawaan.
-        const same = en.trim() === fallback.en.trim() && id.trim() === fallback.id.trim();
-        save(same ? { en: "", id: "" } : { en, id });
+        const same = LANGS.every(([lang]) => (texts[lang] ?? "").trim() === (fallback[lang] ?? "").trim());
+        save(same ? EMPTY : texts);
       }}
     >
       <div className="grid gap-1">
         <h2 className="text-xl text-abyss">Teks perjanjian</h2>
         <p className="text-sm text-slate">
-          Tamu membacanya sebelum tanda tangan. Teks bahasa Inggris yang berlaku. Pisahkan paragraf dengan baris kosong; baris seperti
-          &quot;1. Agreement Parties&quot; tampil sebagai judul. Formulir yang sudah ditandatangani tetap menyimpan teks lamanya.
+          Tamu membaca dan menyetujui perjanjian dalam bahasa halaman yang sedang dibukanya. Bahasa yang dikosongkan memakai teks English. Pisahkan
+          paragraf dengan baris kosong; baris seperti &quot;1. Agreement Parties&quot; tampil sebagai judul. Formulir yang sudah ditandatangani tetap
+          menyimpan teks yang dibaca tamu saat itu.
         </p>
         <p className="text-sm font-semibold text-teal">
-          {custom ? "Memakai teks yang disimpan tim." : "Memakai teks bawaan (dari form Turtle Dive, nama Dragonet Divers) dengan terjemahan Indonesia."}
+          {custom ? "Memakai teks yang disimpan tim." : "Memakai teks bawaan (dari form Turtle Dive, nama Dragonet Divers) dalam English, Indonesia, Mandarin, dan Korea."}
         </p>
       </div>
-      <label className="grid gap-1.5">
-        <span className="text-sm font-semibold text-abyss">English (berlaku)</span>
-        <textarea value={en} onChange={(e) => setEn(e.target.value)} rows={14} className={`${INPUT} h-auto py-2.5 text-sm leading-relaxed`} />
-      </label>
-      <label className="grid gap-1.5">
-        <span className="text-sm font-semibold text-abyss">Terjemahan Bahasa Indonesia (opsional)</span>
-        <textarea value={id} onChange={(e) => setId(e.target.value)} rows={14} className={`${INPUT} h-auto py-2.5 text-sm leading-relaxed`} placeholder="Tampil di /id/waiver di bawah teks bahasa Inggris." />
-      </label>
+      {LANGS.map(([lang, label, hint]) => (
+        <label key={lang} className="grid gap-1.5">
+          <span className="text-sm font-semibold text-abyss">{label}</span>
+          <textarea
+            value={texts[lang] ?? ""}
+            onChange={(e) => set(lang, e.target.value)}
+            rows={lang === "en" ? 14 : 10}
+            lang={lang}
+            className={`${INPUT} h-auto py-2.5 text-sm leading-relaxed`}
+            placeholder={lang === "en" ? "" : "Kosongkan untuk memakai teks English."}
+          />
+          <span className="text-xs text-slate">{hint}</span>
+        </label>
+      ))}
       <div className="flex flex-wrap gap-2">
         <button
           type="submit"
@@ -74,7 +88,7 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
           <button
             type="button"
             disabled={state.busy}
-            onClick={() => save({ en: "", id: "" })}
+            onClick={() => save(EMPTY)}
             className="inline-flex h-11 items-center justify-center rounded-full px-4 text-sm font-bold text-teal ring-1 ring-teal hover:bg-teal-soft disabled:opacity-50"
           >
             Kembalikan teks bawaan

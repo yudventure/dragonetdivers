@@ -8,7 +8,7 @@
 // - assets/formulir-selam/waiver.js        logika murni (src/lib/waiver.js) tanpa impor modul Dragonet lain
 // - assets/formulir-selam/waiver.test.js   uji logikanya (tests/waiver.test.js tanpa uji yang butuh modul lain)
 // - assets/formulir-selam/teks.json        teks formulir en, id, zh, ko (nama dive center jadi {operator})
-// - assets/formulir-selam/perjanjian.json  teks perjanjian en dan id ({operator})
+// - assets/formulir-selam/perjanjian.json  teks perjanjian en, id, zh, ko ({operator})
 // - assets/formulir-selam/skema.sql        tabel waivers (migrasi 008)
 // - assets/formulir-selam/SignaturePad.jsx kotak tanda tangan
 // - assets/contoh-dragonet/...             berkas asli Dragonet untuk dibaca dan disesuaikan
@@ -93,9 +93,9 @@ for (const lang of ["en", "id", "zh", "ko"]) {
 }
 write(join(out, "teks.json"), `${JSON.stringify(teks, null, 2)}\n`);
 
-// 4. Teks perjanjian (English berlaku, terjemahan Indonesia untuk dipahami).
-const { defaultAgreement, defaultAgreementId } = await import(pathToFileURL(join(repo, "src/content/waiver-agreement.js")));
-write(join(out, "perjanjian.json"), `${JSON.stringify(neutral({ en: defaultAgreement, id: defaultAgreementId }), null, 2)}\n`);
+// 4. Teks perjanjian empat bahasa (tamu membaca dan menyetujui teks bahasa halaman).
+const { defaultAgreements } = await import(pathToFileURL(join(repo, "src/content/waiver-agreement.js")));
+write(join(out, "perjanjian.json"), `${JSON.stringify(neutral(defaultAgreements), null, 2)}\n`);
 
 // 5. Skema dan kotak tanda tangan.
 copyFileSync(join(repo, "database/migrations/008_waivers.sql"), join(out, "skema.sql"));

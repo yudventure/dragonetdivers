@@ -1,11 +1,11 @@
-import { defaultAgreement, defaultAgreementId } from "@/content/waiver-agreement";
+import { defaultAgreements } from "@/content/waiver-agreement";
 import { uiText } from "@/content/ui";
 import { sameText } from "@/lib/admin-session";
 import { witToday } from "@/lib/checkout";
 import { format, isLocale } from "@/lib/i18n";
 import { createThrottle } from "@/lib/login-throttle";
 import { contact, site, whatsappNumber } from "@/lib/site";
-import { agreementTexts, cleanWaiver, diversIn, SIGNATURE_MAX, waiverCode, WaiverError } from "@/lib/waiver";
+import { agreementFor, agreementTexts, cleanWaiver, diversIn, SIGNATURE_MAX, waiverCode, WaiverError } from "@/lib/waiver";
 import { waiverMail } from "@/lib/waiver-mail";
 import { readJson, sameOrigin } from "@/server/admin-auth";
 import { mailConfigured, sendMail } from "@/server/mailer";
@@ -45,8 +45,8 @@ export async function POST(request) {
     console.error(`[formulir] teks perjanjian tidak terbaca: ${error.code ?? error.message}`);
     return fail("server", 503);
   }
-  const texts = agreementTexts(agreement, { en: defaultAgreement, id: defaultAgreementId });
-  const agreed = lang === "id" && texts.id ? `${texts.en}\n\n---\n\n${texts.id}` : texts.en;
+  // Salinan yang disimpan = teks yang tamu baca dan setujui (bahasa halaman, atau English bila belum ada).
+  const agreed = agreementFor(agreementTexts(agreement, defaultAgreements), lang).text;
 
   let waiver;
   try {

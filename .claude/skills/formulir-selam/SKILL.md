@@ -1,6 +1,6 @@
 ---
 name: formulir-selam
-description: Formulir selam online (dive waiver) dari Dragonet Divers Raja Ampat, siap dipasang di situs lain milik pemilik yang sama, terutama DAMPIER (thedampier.com) dan Zanclus. Isinya data diri, profil penyelam dan asuransi, kuesioner medis 10 pertanyaan dengan kotak lanjutan A sampai G (Diver Medical Participant Questionnaire 2020) yang menandai perlu persetujuan dokter, perjanjian Assumption of Risk, Liability Release & Hold Harmless (English berlaku, terjemahan Indonesia), tanda tangan jari, wali untuk di bawah 18 tahun, salinan email, penempatan di halaman dan email pesanan, admin daftar, cetak, dan editor perjanjian. Teks English, Indonesia, Mandarin, Korea. Pakai SETIAP KALI pemilik meminta waiver, liability release, formulir selam, kuesioner medis, surat pernyataan, tanda tangan online, "formulir seperti di Dragonet", atau memasangnya di DAMPIER, Zanclus, atau situs lain, walau kata "skill" tidak disebut.
+description: Formulir selam online (dive waiver) dari Dragonet Divers Raja Ampat, siap dipasang di situs lain milik pemilik yang sama, terutama DAMPIER (thedampier.com) dan Zanclus. Isinya data diri, profil penyelam dan asuransi, kuesioner medis 10 pertanyaan dengan kotak lanjutan A sampai G (Diver Medical Participant Questionnaire 2020) yang menandai perlu persetujuan dokter, perjanjian Assumption of Risk, Liability Release & Hold Harmless yang tampil dalam bahasa halaman, tanda tangan jari, wali untuk di bawah 18 tahun, salinan email, penempatan di halaman dan email pesanan, admin daftar, cetak, dan editor perjanjian. Teks English, Indonesia, Mandarin, Korea. Pakai SETIAP KALI pemilik meminta waiver, liability release, formulir selam, kuesioner medis, surat pernyataan, tanda tangan online, "formulir seperti di Dragonet", atau memasangnya di DAMPIER, Zanclus, atau situs lain, walau kata "skill" tidak disebut.
 ---
 
 # Formulir selam (dive waiver)
@@ -19,7 +19,7 @@ yang sama (DAMPIER lebih dulu) bisa memasangnya tanpa menulis ulang.
 | `assets/formulir-selam/waiver.test.js` | Uji logika (`node --test`). |
 | `assets/formulir-selam/aset.test.js` | Uji teks: semua bahasa sama bentuk dengan English, jumlah pertanyaan medis cocok, tanpa titik dua dan titik koma. |
 | `assets/formulir-selam/teks.json` | Teks formulir en, id, zh, ko (label, pertanyaan medis, galat, email, kartu pesanan, tautan footer). Nama dive center tertulis `{operator}`. |
-| `assets/formulir-selam/perjanjian.json` | Teks perjanjian English (berlaku) dan terjemahan Indonesia, bagian 1 sampai 7, nama tertulis `{operator}`. |
+| `assets/formulir-selam/perjanjian.json` | Teks perjanjian English (asli dari pemilik) dan terjemahan Indonesia, Mandarin, Korea dengan susunan sama, bagian 1 sampai 7, nama tertulis `{operator}`. |
 | `assets/formulir-selam/skema.sql` | Tabel `waivers` MySQL (plus perbesar `settings.value`). |
 | `assets/formulir-selam/SignaturePad.jsx` | Kotak tanda tangan (pointer events, retina, ikut skala saat ponsel diputar). Hanya React + kelas Tailwind. |
 | `assets/contoh-dragonet/` | Berkas asli Dragonet dengan jalur yang sama: halaman, formulir, API, penyimpanan, email, admin. Dibaca dan disesuaikan, tidak disalin buta. |
@@ -61,8 +61,11 @@ Baca `references/memasang.md` untuk rinciannya. Intinya:
   resminya sebelum tayang di situs baru (lihat
   `references/kuesioner-medis.md`). Katakan terus terang ke pemilik bila
   belum dicocokkan.
-- **English berlaku secara hukum.** Terjemahan hanya untuk dipahami dan
-  ditampilkan di bawah teks English, bukan menggantikannya.
+- **Perjanjian tampil dalam bahasa halaman** (keputusan pemilik 2 November
+  2026, "sesuaikan saja dengan bahasa yang sedang aktif"). Tamu membaca dan
+  menyetujui teks bahasa yang sedang dibukanya, dan teks itulah yang
+  disalin ke formulirnya. Bahasa tanpa teks memakai English dengan kalimat
+  `englishOnly`. Terjemahan bukan terjemahan tersumpah, katakan ke pemilik.
 - **Jawaban medis tidak pernah diputuskan situs.** Situs hanya menandai
   "perlu persetujuan dokter". Keputusan boleh menyelam ada pada dokter dan
   instruktur.

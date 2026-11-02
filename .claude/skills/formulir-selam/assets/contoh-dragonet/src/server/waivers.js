@@ -3,14 +3,15 @@ import { query } from "./db";
 import { getSetting, saveSetting } from "./settings";
 
 // Formulir selam di database (tabel waivers, migrasi 008) dan teks perjanjian dari /admin/formulir
-// (settings baris "waiver": { en, id, updatedAt }). Logika murni di src/lib/waiver.js.
+// (settings baris "waiver": { en, id, zh, ko, updatedAt }). Logika murni di src/lib/waiver.js.
 
-export const DEFAULT_AGREEMENT = { en: "", id: "", updatedAt: "" };
+export const DEFAULT_AGREEMENT = { en: "", id: "", zh: "", ko: "", updatedAt: "" };
 
 export const getAgreement = () => getSetting("waiver", DEFAULT_AGREEMENT);
 
-export async function saveAgreement({ en, id }) {
-  const value = { en, id, updatedAt: new Date().toISOString() };
+/** Simpan teks perjanjian yang sudah dibersihkan (cleanAgreement): { en, id, zh, ko }. */
+export async function saveAgreement({ en, id, zh, ko }) {
+  const value = { en, id, zh, ko, updatedAt: new Date().toISOString() };
   await saveSetting("waiver", value);
   return value;
 }
