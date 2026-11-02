@@ -15,6 +15,8 @@ import { refreshOrder } from "@/server/checkout";
 import { orderByCode } from "@/server/orders";
 import { getPayments } from "@/server/payment-settings";
 import { isServiceShown } from "@/server/site-settings";
+import { diversIn } from "@/lib/waiver";
+import { waiverCounts } from "@/server/waivers";
 
 // Halaman status pesanan tamu: /order/DD-261021-K7Q2M?t=<token> (link dari checkout, kembali dari
 // Midtrans/PayPal). Token rahasia di alamat mencegah orang lain membuka pesanan dengan menebak kode.
@@ -61,6 +63,9 @@ export default async function OrderPage({ params, searchParams }) {
   const again = (await isServiceShown(order.service)) ? `/services/${order.service}#packages` : "/#services";
   const proof = whatsappLink(format(t.proofMessage, { code: order.code }));
   const path = `/order/${order.code}?t=${order.token}`;
+  // Formulir selam: pesanan dengan layanan selam yang masih berlaku, tiap penyelam mengisi satu (/waiver).
+  const divers = ["pending", "paid"].includes(order.status) ? diversIn(order.items) : 0;
+  const waivers = divers ? ((await waiverCounts([order.code]).catch(() => ({})))[order.code] ?? 0) : 0;
 
   const details = [
     [t.code, order.code],
@@ -113,6 +118,22 @@ export default async function OrderPage({ params, searchParams }) {
                 ))}
               </ul>
             </div>
+
+            {divers > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-4 rounded-card bg-teal-soft p-5">
+                <div className="grid max-w-[52ch] gap-1">
+                  <p className="font-display text-lg font-semibold text-abyss">{t.waiverTitle}</p>
+                  <p className="text-sm text-abyss">{waivers >= divers ? t.waiverDone : format(t.waiverText, { done: waivers, total: divers })}</p>
+                </div>
+                <Link
+                  href={localeHref(lang, `/waiver?order=${order.code}&t=${order.token}`)}
+                  className="inline-flex h-11 items-center gap-2 rounded-full border-[1.5px] border-teal bg-white px-5 font-bold text-teal transition-colors duration-200 ease-brand hover:bg-teal hover:text-white"
+                >
+                  {t.waiverButton}
+                  <ArrowIcon className="size-[18px]" />
+                </Link>
+              </div>
+            )}
 
             {accounts.length > 0 && (
               <ul className="grid gap-3">
