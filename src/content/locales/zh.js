@@ -318,11 +318,9 @@ export const ui = {
     title: "登记、潜水员健康问卷与免责声明",
     intro: "每位潜水员在首次与我们潜水前填写自己的表格。大约需要五分钟，在家或在潜水中心填写均可。",
     forOrder: "用于预订 {code}",
-    binding: "以下协议以英文版本为准。签署前请仔细阅读。",
-    bindingTranslated: "以下协议以英文版本为准。英文原文之后附有译文。签署前请仔细阅读。",
+    read: "签署前请仔细阅读以下协议。",
+    englishOnly: "本协议目前仅提供英文版本。签署前请仔细阅读。",
     terms: "阅读完整协议",
-    english: "英文（以此为准）",
-    translation: "译文",
     sections: { details: "您的信息", diver: "潜水员资料与保险", medical: "潜水员健康问卷", sign: "签名" },
     fields: {
       fullName: "全名（与护照一致）",

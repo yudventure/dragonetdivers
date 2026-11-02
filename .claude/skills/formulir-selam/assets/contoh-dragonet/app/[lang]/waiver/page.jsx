@@ -3,12 +3,12 @@ import SiteHeader from "@/components/SiteHeader";
 import { Wave } from "@/components/icons";
 import WaiverForm from "@/components/waiver/WaiverForm";
 import { uiText } from "@/content/ui";
-import { defaultAgreement, defaultAgreementId } from "@/content/waiver-agreement";
+import { defaultAgreements } from "@/content/waiver-agreement";
 import { sameText } from "@/lib/admin-session";
 import { isOrderCode, witToday } from "@/lib/checkout";
 import { format, localeHref } from "@/lib/i18n";
 import { contact, whatsappNumber } from "@/lib/site";
-import { agreementBlocks, agreementTexts, diversIn, firstDiveDate } from "@/lib/waiver";
+import { agreementBlocks, agreementFor, agreementTexts, diversIn, firstDiveDate } from "@/lib/waiver";
 import { orderByCode } from "@/server/orders";
 import { getSiteSettings } from "@/server/site-settings";
 import { DEFAULT_AGREEMENT, getAgreement } from "@/server/waivers";
@@ -41,7 +41,8 @@ export default async function WaiverPage({ params, searchParams }) {
     console.error(`[formulir] teks perjanjian tidak terbaca: ${error.code ?? error.message}`);
     return DEFAULT_AGREEMENT;
   });
-  const agreement = agreementTexts(saved, { en: defaultAgreement, id: defaultAgreementId });
+  // Perjanjian dalam bahasa halaman; English bila bahasa ini belum punya teks.
+  const shown = agreementFor(agreementTexts(saved, defaultAgreements), lang);
   const order = await linkedOrder(lang, code, token);
   const path = order ? `/waiver?order=${order.code}&t=${order.token}` : "/waiver";
   const today = witToday();
@@ -64,10 +65,7 @@ export default async function WaiverPage({ params, searchParams }) {
             lang={lang}
             t={t}
             enMedical={lang === "en" ? null : uiText("en").waiver.medical}
-            agreement={{
-              en: agreementBlocks(agreement.en),
-              translation: lang === "id" ? agreementBlocks(agreement.id) : [],
-            }}
+            agreement={{ blocks: agreementBlocks(shown.text), lang: shown.lang, fallback: shown.lang !== lang }}
             order={order}
             today={today}
             contact={{ email: contact.email, whatsapp: whatsappNumber() }}

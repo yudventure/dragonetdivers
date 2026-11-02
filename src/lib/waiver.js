@@ -196,24 +196,36 @@ export function agreementBlocks(value) {
     });
 }
 
+/** Bahasa teks perjanjian (sama dengan bahasa website). */
+export const AGREEMENT_LANGS = ["en", "id", "zh", "ko"];
+
 /**
- * Teks perjanjian yang berlaku: simpanan tim (settings baris "waiver") atau teks bawaan. Terjemahan Indonesia
- * bawaan hanya dipakai selama teks English juga bawaan, supaya terjemahan selalu sepasang dengan teksnya.
+ * Teks perjanjian per bahasa: simpanan tim (settings baris "waiver") atau teks bawaan. Terjemahan bawaan hanya
+ * dipakai selama teks English juga bawaan, supaya terjemahan selalu sepasang dengan teks English-nya; setelah
+ * tim menyimpan English sendiri, bahasa yang belum diterjemahkan tim kosong (formulir memakai English).
  */
 export function agreementTexts(saved, defaults) {
-  const en = saved?.en || defaults.en;
-  const id = saved?.en ? saved.id || "" : saved?.id || defaults.id || "";
-  return { en, id };
+  const custom = Boolean(saved?.en);
+  return Object.fromEntries(
+    AGREEMENT_LANGS.map((lang) => [lang, lang === "en" ? saved?.en || defaults.en : saved?.[lang] || (custom ? "" : defaults[lang] || "")]),
+  );
 }
 
-/** Isian teks perjanjian dari admin (English wajib bila ada terjemahan; kosong = teks bawaan). */
+/**
+ * Teks yang ditampilkan dan disetujui di halaman berbahasa lang (permintaan pemilik 2 November 2026: perjanjian
+ * "sesuaikan saja dengan bahasa yang sedang aktif"): { lang, text }, English bila bahasa itu belum punya teks.
+ */
+export function agreementFor(texts, lang) {
+  return texts[lang] ? { lang, text: texts[lang] } : { lang: "en", text: texts.en };
+}
+
+/** Isian teks perjanjian dari admin (English wajib bila ada terjemahan; semua kosong = teks bawaan). */
 export function cleanAgreement(input) {
   const clean = (value) => (typeof value === "string" ? value.replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n").trim() : "");
-  const en = clean(input?.en);
-  const id = clean(input?.id);
-  if (en.length > AGREEMENT_MAX || id.length > AGREEMENT_MAX) throw new WaiverError("length");
-  if (!en && id) throw new WaiverError("english");
-  return { en, id };
+  const out = Object.fromEntries(AGREEMENT_LANGS.map((lang) => [lang, clean(input?.[lang])]));
+  if (Object.values(out).some((text) => text.length > AGREEMENT_MAX)) throw new WaiverError("length");
+  if (!out.en && AGREEMENT_LANGS.some((lang) => out[lang])) throw new WaiverError("english");
+  return out;
 }
 
 /** Layanan yang termasuk menyelam (pesanan yang tamunya perlu mengisi formulir). */

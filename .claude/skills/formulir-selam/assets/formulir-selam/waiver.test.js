@@ -165,7 +165,9 @@ test("teks perjanjian: paragraf dan judul bernomor, English wajib bila ada terje
     { heading: false, text: "2. I understand the risks." },
   ]);
   assert.deepEqual(agreementBlocks(""), []);
-  assert.deepEqual(cleanAgreement({ en: " Terms \r\n\r\nMore ", id: "" }), { en: "Terms\n\nMore", id: "" });
+  assert.deepEqual(cleanAgreement({ en: " Terms \r\n\r\nMore ", id: "" }), { en: "Terms\n\nMore", id: "", zh: "", ko: "" });
+  assert.deepEqual(cleanAgreement({ en: "A", zh: " 条款 ", ko: 5 }), { en: "A", id: "", zh: "条款", ko: "" });
   assert.throws(() => cleanAgreement({ en: "", id: "Syarat" }), (e) => e.field === "english");
+  assert.throws(() => cleanAgreement({ en: "", ko: "약관" }), (e) => e.field === "english");
   assert.throws(() => cleanAgreement({ en: "x".repeat(40_001) }), (e) => e.field === "length");
 });

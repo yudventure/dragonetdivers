@@ -67,8 +67,8 @@ yang dibaca per bahasa).
 
 ## 3. Teks perjanjian
 
-`perjanjian.json` berisi `en` (berlaku secara hukum) dan `id` (terjemahan).
-Baca `perjanjian.md` dulu.
+`perjanjian.json` berisi `en` (teks asli dari pemilik) dan terjemahan `id`,
+`zh`, `ko` dengan susunan blok yang sama. Baca `perjanjian.md` dulu.
 
 - Ganti `{operator}` dengan nama penyelenggara kegiatan yang **ditetapkan
   pemilik** (nama dagang dan, bila ada, nama badan hukumnya). Jangan
@@ -77,13 +77,13 @@ Baca `perjanjian.md` dulu.
   penyelenggara bukan SSI Training Center, dan tanyakan ke pemilik
   agensinya (SSI, PADI, lainnya).
 - Simpan sebagai teks bawaan di kode. Tim bisa menggantinya dari admin
-  (langkah 6). `agreementTexts(simpanan, bawaan)` memilih yang berlaku dan
+  (langkah 6). `agreementTexts(simpanan, bawaan)` memberi teks per bahasa dan
   tidak memasangkan teks English buatan tim dengan terjemahan bawaan.
-- DAMPIER memakai id sebagai bahasa utama, tetapi teks yang berlaku tetap
-  English. Halaman berbahasa Indonesia menampilkan English lalu terjemahan
-  di bawahnya. Bahasa lain (zh, ru) cukup English dengan kalimat
-  `bindingTranslated` atau `binding`, kecuali pemilik memberi terjemahan
-  resmi.
+- Halaman menampilkan teks bahasa yang sedang aktif lewat
+  `agreementFor(teks, lang)` (keputusan pemilik 2 November 2026). Bahasa
+  tanpa teks memakai English dengan kalimat `englishOnly`. DAMPIER perlu
+  terjemahan Rusia (`ru`) dengan susunan blok yang sama, dan
+  `AGREEMENT_LANGS` di `waiver.js` disesuaikan dengan bahasa situs.
 
 ## 4. Penyimpanan
 
@@ -95,12 +95,12 @@ kolomnya.
   di bawah umur, waktu).
 - `data` = isian lengkap hasil `cleanWaiver` tanpa tanda tangan (JSON).
 - `agreement` = **salinan teks perjanjian yang disetujui**, apa adanya saat
-  ditandatangani. Untuk tamu berbahasa Indonesia, English lalu `---` lalu
-  terjemahannya. Perubahan teks di admin tidak boleh mengubah formulir lama.
+  ditandatangani, dalam bahasa yang tamu baca (kolom `locale`). Perubahan
+  teks di admin tidak boleh mengubah formulir lama.
 - `signature` = PNG base64 dari kanvas (paling besar `SIGNATURE_MAX`).
 - `ip` dan `user_agent` sebagai bukti tambahan penandatanganan.
 - Baris terakhir `skema.sql` memperbesar `settings.value` ke MEDIUMTEXT
-  karena teks perjanjian dua bahasa bisa melebihi 64 KB. Lewati bila situs
+  karena teks perjanjian empat bahasa bisa melebihi 64 KB. Lewati bila situs
   menyimpan pengaturan dengan cara lain.
 
 Fungsi penyimpanan Dragonet ada di

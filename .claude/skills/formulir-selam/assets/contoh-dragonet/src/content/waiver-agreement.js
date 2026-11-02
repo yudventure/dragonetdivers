@@ -2,7 +2,8 @@
 // waiver Turtle Dive Homestay milik pemilik (teks lengkap dikirim pemilik 2 November 2026) dengan nama tuan rumah
 // diganti Dragonet Divers Raja Ampat; isi lainnya kata demi kata. Dipakai formulir /waiver selama tim belum
 // menyimpan teks lain di /admin/formulir. Paragraf dipisah baris kosong; baris "1. Judul" tampil sebagai judul
-// (agreementBlocks di src/lib/waiver.js). Berlaku dalam bahasa Inggris.
+// (agreementBlocks di src/lib/waiver.js). Formulir menampilkan perjanjian dalam bahasa halaman (keputusan pemilik
+// 2 November 2026); halaman tanpa terjemahan memakai teks English ini.
 export const defaultAgreement = `Dragonet Divers Raja Ampat hosts Activities, including but not limited to snorkeling, freediving, breath-hold diving, scuba diving, technical diving, dive instruction, aquatic life interactions, land and underwater exploration, travel (in air, on land and over water), boating, fishing, lodging, food, beverages and all related activities (herein referred to as "Activities"). These Activities are inherently dangerous and may result in property loss, illness, injury, and death. In consideration of being allowed to participate in the Activities, I HEREBY AGREE TO BE LEGALLY BOUND BY THE TERMS AND CONDITIONS OF THIS ASSUMPTION OF RISK, LIABILITY RELEASE & HOLD HARMLESS AGREEMENT (herein referred to as "Agreement").
 
 1. Agreement Parties
@@ -36,7 +37,7 @@ I understand this Agreement is a contract giving up My legal rights. This Agreem
 I HAVE FULLY READ, UNDERSTAND AND AGREE TO BE LEGALLY BOUND BY THIS AGREEMENT. I UNDERSTAND THAT BY SIGNING THIS AGREEMENT, I AM GIVING UP LEGAL RIGHTS FOR MYSELF AND ALL OTHERS WHO MAY HAVE A CLAIM ON MY OR THEIR BEHALF AGAINST THE RELEASED PARTIES.`;
 
 // Terjemahan Bahasa Indonesia (permintaan pemilik 2 November 2026: "tambahkan juga perjanjian untuk bahasa
-// indonesia"). Tampil di /id/waiver di bawah teks bahasa Inggris; yang berlaku tetap teks bahasa Inggris. Dipakai
+// indonesia"). Tampil di /id/waiver sebagai teks perjanjian (bahasa halaman). Dipakai
 // selama tim belum menyimpan teks sendiri di /admin/formulir (agreementTexts di src/lib/waiver.js).
 export const defaultAgreementId = `Dragonet Divers Raja Ampat menyelenggarakan Kegiatan, termasuk namun tidak terbatas pada snorkeling, freediving, menyelam dengan menahan napas, scuba diving, technical diving, instruksi selam, interaksi dengan biota laut, penjelajahan darat dan bawah air, perjalanan (di udara, di darat, dan di atas air), berperahu, memancing, penginapan, makanan, minuman, serta semua kegiatan terkait (selanjutnya disebut "Kegiatan"). Kegiatan ini pada dasarnya berbahaya dan dapat mengakibatkan kehilangan harta benda, sakit, cedera, dan kematian. Sebagai imbalan atas izin untuk ikut serta dalam Kegiatan, SAYA DENGAN INI SETUJU UNTUK TERIKAT SECARA HUKUM OLEH SYARAT DAN KETENTUAN PERJANJIAN PENERIMAAN RISIKO, PELEPASAN TANGGUNG JAWAB, DAN PEMBEBASAN DARI TUNTUTAN INI (selanjutnya disebut "Perjanjian").
 
@@ -69,3 +70,73 @@ Saya memahami dan setuju bahwa SSI memberikan lisensi kepada pusat pelatihan, pr
 Saya memahami bahwa Perjanjian ini adalah kontrak yang melepaskan hak hukum saya. Perjanjian ini berlaku penuh secara hukum sejak saya menandatanganinya, selama berlangsungnya semua Kegiatan, dan seterusnya sampai semua klaim dan tindakan hukum terhadap Pihak yang Dibebaskan yang timbul akibat keikutsertaan saya dalam Kegiatan selesai sepenuhnya. Saya setuju bahwa setiap tindakan hukum yang timbul akibat keikutsertaan saya dalam Kegiatan diatur oleh hukum Negara tempat Penyelenggara berada, dan bahwa Negara tersebut merupakan satu-satunya yurisdiksi dan tempat bagi setiap tindakan hukum. Jika ada bagian dari Perjanjian ini yang dinyatakan tidak dapat diberlakukan atau tidak sah, bagian tersebut akan dipisahkan, dan sisanya tetap berlaku penuh secara hukum. Saya setuju bahwa setiap fotokopi, salinan faks, atau pengisian, tanda tangan, atau konfirmasi elektronik atas Perjanjian ini memiliki kekuatan hukum penuh seolah-olah merupakan dokumen asli yang saya tandatangani. SAYA SECARA SUKARELA DAN BEBAS MENGADAKAN KONTRAK INI SEMATA-MATA BERDASARKAN KETENTUAN TERCETAK DALAM PERJANJIAN INI TANPA PERUBAHAN DAN TANPA BERGANTUNG PADA PERNYATAAN ATAU JAMINAN LAIN APA PUN.
 
 SAYA TELAH MEMBACA SELURUHNYA, MEMAHAMI, DAN SETUJU UNTUK TERIKAT SECARA HUKUM OLEH PERJANJIAN INI. SAYA MEMAHAMI BAHWA DENGAN MENANDATANGANI PERJANJIAN INI, SAYA MELEPASKAN HAK HUKUM UNTUK DIRI SAYA SENDIRI DAN SEMUA PIHAK LAIN YANG MUNGKIN MENGAJUKAN TUNTUTAN ATAS NAMA SAYA ATAU ATAS NAMA MEREKA TERHADAP PIHAK YANG DIBEBASKAN.`;
+
+// Terjemahan Mandarin (Tionghoa Sederhana) dan Korea dari teks English di atas, blok demi blok dengan susunan
+// yang sama (permintaan pemilik 2 November 2026: perjanjian "sesuaikan saja dengan bahasa yang sedang aktif").
+// Tampil di /zh/waiver dan /ko/waiver. Tanpa titik dua dan titik koma; Korea memakai gaya resmi 합니다.
+export const defaultAgreementZh = `Dragonet Divers Raja Ampat 举办各项活动，包括但不限于浮潜、自由潜水、屏气潜水、水肺潜水、技术潜水、潜水教学、与海洋生物互动、陆上及水下探索、旅行（空中、陆上及水上）、乘船、钓鱼、住宿、餐饮及所有相关活动（以下简称"活动"）。这些活动本身具有危险性，可能导致财产损失、疾病、受伤乃至死亡。作为获准参加活动的对价，本人特此同意受本风险承担、责任免除及免责协议（以下简称"协议"）的条款和条件的法律约束。
+
+1. 协议各方
+
+本人代表本人自己、本人的家属、继承人、受让人、代表以及所有可能代表本人提出索赔的人（以下简称"本人"或"参与者"），自愿与上述主办方订立本协议。主办方包括但不限于其所有者、高级职员、董事、赞助商、代理人、保险人、雇员、船长、船员、潜水专业人员、志愿者、船只（无论自有、经营、租赁或包租），以及与活动相关的所有其他人员和企业，无论是否明确列名（以下简称"被免责方"）。
+
+2. 参与者的责任与风险承担
+
+本人了解活动本身存在财产损失、疾病、受伤和死亡的风险。本人将遵循安全做法，保持警觉，并按照适用的 SSI 负责任潜水准则作出正确判断以降低风险，但本人知道财产损失、疾病、受伤和死亡的风险无法完全消除。本人特此同意对自己的健康、安全和行为承担全部责任。如本人选择进行水肺潜水，本人特此确认本人是持证且有能力的潜水员，或是在持证水肺潜水教练监督下的学员。本人全权负责在每次潜水前检查所用装备的功能和适用性，并在整个潜水过程中监控气体余量。本人将在自己的培训和能力范围内计划并进行所有潜水，并在气瓶压力不低于 500 psi 时返回潜水船。如本人选择在没有潜伴的情况下潜水，或在潜伴不在身边时继续潜水，本人了解并接受单独潜水所增加的风险。本人了解活动将使本人面临各种固有危险，包括但不限于恐慌、溺水、减压病、过度膨胀伤害、压力相关伤害、呼吸气体中毒、装备故障、他人的危险行为、感染、疾病、过敏反应、传染性疾病、海洋生物咬伤和蜇伤、危险的环境条件，以及与乘船活动相关的风险。乘船活动包括但不限于航行、登船、离船、住宿、接送、入水和出水，会使本人面临各种固有危险，包括但不限于意外晃动、滑倒、绊倒、跌落、危险的环境条件、火灾、装备故障、翻船、沉船、搁浅、弃船、碰撞、他人的危险行为、被船只撞击以及海上危险。本人了解，即使所有安全措施均已到位并被采用，仍存在财产损失、疾病、受伤和死亡的风险。尽管存在财产损失、疾病、受伤和死亡的风险，本人仍自愿选择参加活动，并承担与活动相关的一切风险，无论该等风险可否预见，亦无论是否由被免责方造成。
+
+3. 参与者的身体状况与紧急情况认知
+
+本人将在自己的证书级别、经验、技能和能力范围内参加活动。本人参加活动出于自愿，如本人感到身体不适、不愿意、没有能力或不胜任参加，或发现不安全的情况，本人将为自身安全采取适当行动和/或不参加活动。本人特此确认本人在身体、医疗和精神方面均适合参加活动。对于导致本人患病、受伤或死亡的任何身体状况，本人不会要求被免责方承担责任。本人不会持有或服用非法药物或不适合活动的药物。本人不会在酒精或药物（医生为本人开具或批准的药物除外）影响下参加活动。本人了解活动将在偏远地点进行，紧急救援、医疗救治和高压氧治疗可能因此延误。本人了解使用压缩气体潜水存在固有风险，包括但不限于过度膨胀伤害、减压伤害、栓塞和溺水。潜水伤害可能需要在高压氧舱中治疗。本人了解这些活动的地点在时间和距离上可能远离高压氧舱和医疗设施。尽管存在固有风险，本人明确选择在附近没有高压氧舱和医疗设施的情况下继续参加活动。本人明确承担这些风险，并特此免除被免责方因未能施救或未能提供适当紧急救援或医疗救治而承担的责任。本人授权被免责方在本人患病或受伤时为本人提供急救和医疗救治。本人同意独自承担并支付向本人提供的任何紧急救援和医疗救治的全部相关费用，包括但不限于被免责方提供的紧急供氧、急救用品、紧急救援、交通、餐食、住宿、特殊需要、高压氧治疗和/或医疗救治。本人了解拥有专门涵盖潜水和旅行相关紧急情况及医疗救治的个人保险的重要性，并了解投保是本人的责任。
+
+4. 责任免除
+
+作为获准参加活动的对价，本人特此同意永久免除被免责方因任何作为或不作为（包括但不限于任何人的过失，包括被免责方的过失）导致本人财产损失或损坏、患病、受伤和/或死亡而产生的一切责任。对于有缺陷的产品或第三方、供应商、供货商或承包商的行为，本人不会要求被免责方负责或承担责任。本人了解这是在法律允许的最大范围内对被免责方一切责任的完全且无条件的免除。
+
+5. 免责与赔偿
+
+本人同意使被免责方免于承担因本人参加活动而引起的一切索赔、诉因或诉讼，并就此对其作出赔偿。本人特此承诺，本人及本人的家属或（如本人身故）本人的遗产，将全额负责支付因本人参加活动而针对被免责方提出的任何索赔、诉因、诉讼或判决所产生的一切费用。费用包括抗辩费用以及支付所有判决、诉讼费、损害赔偿、调查费用、各阶段的律师费（包括诉前、审判、调解、仲裁和上诉阶段），以及被免责方为执行本协议而产生的一切其他开支。
+
+6. SSI 商标与独立经营
+
+本人了解并同意，SSI 授权培训中心、专业人员及其关联方使用各种 SSI 商标并开展经 SSI 认可的培训，但他们并非 SSI 或其母公司、子公司或关联公司的代理人、雇员或特许经营者。本人进一步了解，SSI 培训中心、SSI 专业人员及其关联方的业务是独立的，既不归 SSI 所有，也不由 SSI 经营或控制。SSI 虽然为 SSI 培训制定标准和教材，但不对 SSI 培训中心、SSI 专业人员、其关联企业和/或其相关员工的业务经营活动或对参与者的日常培训和/或监督负责，也无权加以控制。本人进一步代表本人了解并同意，如在活动期间发生受伤、患病或死亡，本人不会要求 SSI 对与本人参加活动相关的 SSI 培训中心、SSI 专业人员及其他关联企业或人员的作为、不作为或过失承担责任。
+
+7. 法律合同、适用法律与可分割性
+
+本人了解本协议是一份放弃本人法定权利的合同。本协议自本人签署之时起具有完全法律效力，在所有活动期间持续有效，并延续至因本人参加活动而针对被免责方提出的一切索赔和法律行动完全解决为止。本人同意，因本人参加活动而引起的任何法律行动均受主办方所在地的法律管辖，该地拥有任何法律行动的专属管辖权并为专属审理地。如本协议的任何部分被认定为不可执行或无效，则该部分应被分割，其余部分继续具有完全法律效力。本人同意，本协议的任何复印件、传真件或电子填写/签名/确认均具有与本人签署的原件同等的完全法律效力。本人完全基于本协议预先印制的条款，在未作修改且未依赖任何其他陈述或保证的情况下，自愿且自由地订立本合同。
+
+本人已完整阅读、理解并同意受本协议的法律约束。本人了解，签署本协议即表示本人为自己以及所有可能代表本人或代表其自身向被免责方提出索赔的人放弃法定权利。`;
+
+export const defaultAgreementKo = `Dragonet Divers Raja Ampat는 스노클링, 프리다이빙, 숨참기 잠수, 스쿠버 다이빙, 테크니컬 다이빙, 다이빙 교육, 해양 생물과의 교감, 육상 및 수중 탐험, 여행(항공, 육상, 해상), 보트 이용, 낚시, 숙박, 음식, 음료 및 이와 관련된 모든 활동을 포함하되 이에 국한되지 않는 활동(이하 "활동")을 주최합니다. 이러한 활동에는 본질적으로 위험이 따르며 재산 손실, 질병, 부상 및 사망을 초래할 수 있습니다. 활동에 참여하도록 허락받는 대가로, 본인은 이 위험 인수, 책임 면제 및 면책 동의서(이하 "동의서")의 조건에 법적으로 구속되는 것에 동의합니다.
+
+1. 동의서 당사자
+
+본인은 본인 자신, 본인의 가족, 상속인, 양수인, 대리인 및 본인을 대신하여 청구권을 가질 수 있는 모든 사람(이하 "본인" 또는 "참가자")을 대표하여, 위에서 언급한 주최자와 자발적으로 이 동의서를 체결합니다. 주최자에는 그 소유자, 임원, 이사, 후원자, 대리인, 보험사, 직원, 선장, 승무원, 다이빙 전문가, 자원봉사자, 보트(소유, 운영, 임대 또는 전세 여부와 관계없이) 및 명시적으로 기재되었는지 여부와 관계없이 활동과 관련된 기타 모든 사람과 사업체(이하 "면책 당사자")가 포함되며 이에 국한되지 않습니다.
+
+2. 참가자의 책임 및 위험 인수
+
+본인은 활동에 재산 손실, 질병, 부상 및 사망의 고유한 위험이 따른다는 것을 이해합니다. 본인은 위험을 줄이기 위해 안전 수칙을 따르고, 주의를 기울이며, 해당 SSI 책임 강령(SSI Responsible Code)에 따라 올바르게 판단하겠습니다. 그러나 재산 손실, 질병, 부상 및 사망의 위험을 완전히 없앨 수는 없다는 것을 알고 있습니다. 본인은 본인의 건강, 안전 및 행동에 대해 전적으로 책임질 것에 동의합니다. 본인이 스쿠버 다이빙을 하기로 선택하는 경우, 본인은 자격을 갖춘 유능한 다이버이거나 자격을 갖춘 스쿠버 강사의 감독을 받는 교육생임을 확인합니다. 본인은 매 다이빙 전에 사용하는 장비의 작동 상태와 적합성을 확인하고 다이빙 내내 기체 잔량을 확인할 전적인 책임이 있습니다. 본인은 모든 다이빙을 본인의 교육 수준과 능력 범위 안에서 계획하고 실시하며, 실린더 압력이 최소 500psi 남아 있을 때 다이빙 보트로 돌아오겠습니다. 본인이 버디 없이 다이빙하거나 버디가 없는 상태에서 다이빙을 계속하기로 선택하는 경우, 단독 다이빙에 따르는 높아진 위험을 이해하고 받아들입니다. 본인은 활동으로 인해 공황, 익사, 감압병, 과팽창 손상, 압력 관련 손상, 호흡 기체 중독, 장비 고장, 타인의 위험한 행위, 감염, 질병, 알레르기 반응, 전염성 질병, 해양 생물에 의한 물림과 쏘임, 위험한 환경 조건을 포함하되 이에 국한되지 않는 고유한 위험에 노출된다는 것을 이해합니다. 또한 이동, 승선, 하선, 숙박, 환승, 입수 및 출수를 포함하되 이에 국한되지 않는 보트 활동에도 위험이 따르며, 이로 인해 예상치 못한 움직임, 미끄러짐, 걸려 넘어짐, 추락, 위험한 환경 조건, 화재, 장비 고장, 전복, 침몰, 좌초, 선박 포기, 충돌, 타인의 위험한 행위, 보트와의 충돌, 바다의 위험을 포함하되 이에 국한되지 않는 고유한 위험에 노출된다는 것을 이해합니다. 본인은 모든 안전 조치가 마련되고 사용되는 경우에도 재산 손실, 질병, 부상 및 사망의 위험이 있다는 것을 이해합니다. 재산 손실, 질병, 부상 및 사망의 위험에도 불구하고, 본인은 자발적으로 활동에 참여하기로 선택하며, 예견 가능 여부와 면책 당사자에 의해 발생했는지 여부와 관계없이 활동과 관련된 모든 위험을 인수합니다.
+
+3. 참가자의 상태 및 응급 상황에 대한 인식
+
+본인은 본인의 자격 수준, 경험, 기술 및 능력 범위 안에서 활동에 참여하겠습니다. 본인의 활동 참여는 자발적이며, 몸이 좋지 않거나, 참여할 의사나 능력이 없거나, 참여할 역량이 부족하다고 느끼는 경우, 또는 안전하지 않은 상황을 알게 된 경우, 본인은 본인의 안전을 위해 적절한 조치를 취하거나 참여하지 않겠습니다. 본인은 신체적, 의학적, 정신적으로 활동에 참여하기에 적합함을 확인합니다. 본인은 본인에게 질병, 부상 또는 사망을 초래하는 어떠한 상태에 대해서도 면책 당사자에게 책임을 묻지 않겠습니다. 본인은 불법 약물이나 활동에 금기되는 약물을 소지하거나 복용하지 않겠습니다. 본인은 술이나 약물(의사가 본인에게 처방하거나 허락한 약은 제외)의 영향을 받은 상태에서 활동에 참여하지 않겠습니다. 본인은 활동이 외딴 장소에서 진행되어 응급 대응, 의료 처치 및 고압 산소 치료가 지연될 수 있음을 이해합니다. 본인은 압축 기체를 사용하는 다이빙에 과팽창 손상, 감압 손상, 색전증 및 익사를 포함하되 이에 국한되지 않는 고유한 위험이 따른다는 것을 이해합니다. 다이빙 손상은 고압 산소 챔버에서의 치료가 필요할 수 있습니다. 본인은 이러한 활동이 고압 산소 챔버와 의료 시설로부터 시간과 거리상 멀리 떨어진 장소에서 진행될 수 있음을 이해합니다. 고유한 위험에도 불구하고, 본인은 가까운 곳에 고압 산소 챔버와 의료 시설이 없는 상태에서 활동을 진행하기로 명시적으로 선택합니다. 본인은 이러한 위험을 명시적으로 인수하며, 구조하지 못하거나 적절한 응급 대응 또는 의료 처치를 제공하지 못한 것에 대해 면책 당사자의 책임을 면제합니다. 본인은 본인이 아프거나 다치는 경우 면책 당사자가 본인에게 응급 처치와 의료 처치를 제공하는 것을 허락합니다. 본인은 면책 당사자가 제공하는 응급 산소, 응급 처치 용품, 응급 대응, 이동, 식사, 숙박, 특별한 필요, 고압 산소 치료 및/또는 의료 처치를 포함하되 이에 국한되지 않는, 본인에게 제공되는 모든 응급 대응 및 의료 처치와 관련된 비용을 전적으로 책임지고 지불하는 것에 동의합니다. 본인은 다이빙 및 여행과 관련된 응급 상황과 의료 처치를 구체적으로 보장하는 개인 보험에 가입하는 것이 중요하며 이것이 본인의 책임임을 이해합니다.
+
+4. 책임 면제
+
+활동에 참여하도록 허락받는 대가로, 본인은 누구의 과실(면책 당사자의 과실 포함)을 포함하되 이에 국한되지 않는 어떠한 작위 또는 부작위로 인해 발생한 본인의 재산 손실이나 손상, 질병, 부상 및/또는 사망으로부터 발생하는 모든 책임에서 면책 당사자를 영구히 면제하는 것에 동의합니다. 본인은 결함 있는 제품이나 제3자, 판매자, 공급자 또는 계약자의 행위에 대해 면책 당사자에게 책임을 묻지 않겠습니다. 본인은 이것이 법이 허용하는 최대 범위에서 면책 당사자의 모든 책임을 완전하고 무조건적으로 면제하는 것임을 이해합니다.
+
+5. 면책 및 손해 배상
+
+본인은 본인의 활동 참여로 인해 발생하는 모든 청구, 소송 원인 또는 소송으로부터 면책 당사자를 면책하고 그 손해를 배상하는 것에 동의합니다. 본인은 본인의 활동 참여로 인해 면책 당사자를 상대로 제기되는 모든 청구, 소송 원인, 소송 또는 판결과 관련된 모든 비용을 본인이, 그리고 본인이 사망한 경우 본인의 가족 또는 유산이 전적으로 책임지고 지불할 것을 약속합니다. 비용에는 방어 비용과 모든 판결금, 소송 비용, 손해 배상금, 조사 비용, 소송 전 단계와 재판, 조정, 중재, 항소를 포함한 모든 단계의 변호사 비용, 그리고 이 동의서의 집행과 관련하여 면책 당사자가 부담하는 기타 모든 비용이 포함됩니다.
+
+6. SSI 상표 및 독립 운영
+
+본인은 SSI가 교육 센터, 전문가 및 그 계열사에 다양한 SSI 상표를 사용하고 SSI 승인 교육을 실시할 수 있도록 라이선스를 부여하지만, 이들이 SSI 또는 그 모회사, 자회사, 계열 법인의 대리인, 직원 또는 가맹점이 아니라는 것을 이해하고 동의합니다. 또한 본인은 SSI 교육 센터, SSI 전문가 및 그 계열사의 사업이 독립적이며 SSI가 소유, 운영 또는 통제하지 않는다는 것, 그리고 SSI가 SSI 교육의 기준과 교재를 정하지만 SSI 교육 센터, SSI 전문가, 그 계열 사업체 및/또는 관련 직원의 사업 운영이나 참가자에 대한 일상적인 교육 및/또는 감독에 대해 책임지지 않으며 이를 통제할 권한도 없다는 것을 이해합니다. 나아가 본인은 활동 중 부상, 질병 또는 사망이 발생하는 경우, 본인의 활동 참여와 관련된 SSI 교육 센터, SSI 전문가 및 기타 계열 사업체나 인원의 작위, 부작위 또는 과실에 대해 SSI에 책임을 묻지 않을 것을 본인을 대표하여 이해하고 동의합니다.
+
+7. 법적 계약, 준거법 및 분리 가능성
+
+본인은 이 동의서가 본인의 법적 권리를 포기하는 계약임을 이해합니다. 이 동의서는 본인이 서명한 때부터 모든 활동 기간 동안, 그리고 본인의 활동 참여로 인해 면책 당사자를 상대로 한 모든 청구와 법적 조치가 완전히 해결될 때까지 완전한 법적 효력을 가집니다. 본인은 본인의 활동 참여로 인해 발생하는 모든 법적 조치에 주최자가 소재한 지역의 법이 적용되며, 그 지역이 모든 법적 조치의 전속 관할지이자 재판지가 된다는 것에 동의합니다. 이 동의서의 일부가 집행 불가능하거나 무효로 판단되는 경우 해당 부분은 분리되며, 나머지 부분은 계속해서 완전한 법적 효력을 가집니다. 본인은 이 동의서의 사본, 팩스 사본 또는 전자 방식의 작성/서명/확인이 본인이 서명한 원본 문서와 동일한 완전한 법적 효력을 가진다는 것에 동의합니다. 본인은 다른 진술이나 보증에 의존하지 않고, 수정 없이 이 동의서에 미리 기재된 조건만을 근거로 자발적이고 자유롭게 이 계약을 체결합니다.
+
+본인은 이 동의서를 모두 읽고 이해했으며 이에 법적으로 구속되는 것에 동의합니다. 본인은 이 동의서에 서명함으로써 본인 자신과, 본인을 대신하거나 스스로 면책 당사자에게 청구권을 가질 수 있는 모든 사람의 법적 권리를 포기한다는 것을 이해합니다.`;
+
+/** Teks bawaan per bahasa halaman (agreementTexts di src/lib/waiver.js). */
+export const defaultAgreements = { en: defaultAgreement, id: defaultAgreementId, zh: defaultAgreementZh, ko: defaultAgreementKo };

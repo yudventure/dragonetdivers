@@ -24,7 +24,10 @@ Terjemahan Indonesia (`perjanjian.json` `id`) dibuat 2 November 2026 atas
 permintaan pemilik ("tambahkan juga perjanjian untuk bahasa indonesia"),
 blok per blok dengan susunan yang sama, istilah tetap "Kegiatan",
 "Perjanjian", "Peserta", "Pihak yang Dibebaskan", tanpa titik dua dan
-titik koma di luar kutipan.
+titik koma di luar kutipan. Terjemahan Mandarin (`zh`, istilah "活动",
+"协议", "参与者", "被免责方") dan Korea (`ko`, gaya resmi 합니다, istilah
+"활동", "동의서", "참가자", "면책 당사자") menyusul hari yang sama, setelah
+pemilik memutuskan perjanjian tampil dalam bahasa halaman.
 
 ## Yang perlu diputuskan pemilik untuk situs baru
 
@@ -45,19 +48,22 @@ titik koma di luar kutipan.
 
 ## Cara kerja di situs
 
-- **English berlaku.** Halaman menampilkan teks English dengan kalimat
-  "binding in English". Di halaman berbahasa Indonesia, terjemahan tampil di
-  bawahnya dengan judul "Terjemahan". Bahasa lain hanya English, kecuali
-  pemilik memberi terjemahan yang ia setujui.
-- **Teks bawaan di kode, teks tim di admin.** Editor admin memuat English dan
-  Indonesia. Kosong = teks bawaan. `agreementTexts(simpanan, bawaan)`
+- **Bahasa halaman.** Pemilik memutuskan pada 2 November 2026 bahwa
+  perjanjian "sesuaikan saja dengan bahasa yang sedang aktif". Halaman
+  menampilkan satu teks dalam bahasa yang sedang dibuka
+  (`agreementFor`). Bahasa yang belum punya teks memakai English dengan
+  kalimat `englishOnly`. Undang-Undang 24/2009 Pasal 31 mewajibkan Bahasa
+  Indonesia dalam perjanjian yang melibatkan pihak Indonesia, jadi teks
+  Indonesia untuk tamu Indonesia sejalan dengan aturan itu, tetapi
+  keputusan teks mana yang mengikat tetap urusan ahli hukum pemilik.
+- **Teks bawaan di kode, teks tim di admin.** Editor admin memuat satu kolom
+  per bahasa. Semua kosong = teks bawaan. `agreementTexts(simpanan, bawaan)`
   memakai simpanan tim bila ada, dan terjemahan bawaan hanya dipasangkan
   dengan English bawaan.
-- **Salinan disimpan bersama formulir.** Teks yang disetujui tamu disalin ke
-  kolom `agreement` saat ditandatangani (English, lalu `---` dan terjemahan
-  untuk tamu berbahasa Indonesia), jadi perubahan teks kemudian tidak
-  mengubah formulir yang sudah ditandatangani. Detail admin menampilkan
-  salinan ini.
+- **Salinan disimpan bersama formulir.** Teks yang dibaca dan disetujui tamu
+  (bahasa halaman) disalin ke kolom `agreement` saat ditandatangani, jadi
+  perubahan teks kemudian tidak mengubah formulir yang sudah ditandatangani.
+  Detail admin menampilkan salinan ini.
 - **Format teks.** Paragraf dipisah baris kosong. Paragraf satu baris yang
   diawali nomor ("1. Agreement Parties") atau `#` tampil sebagai judul
   (`agreementBlocks`).
