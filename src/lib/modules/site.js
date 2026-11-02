@@ -1,7 +1,10 @@
 // Situs web: galeri beranda yang diisi tim dari /admin/situs. Foto diunggah (tabel media) atau tautan
-// video (YouTube, Shorts, TikTok, Instagram, Facebook; dibaca src/lib/video-embed.js). Selama belum ada
-// item yang aktif, beranda memakai galeri bawaan di src/content/gallery.js.
+// video (YouTube, Shorts, TikTok, Instagram, Facebook; dibaca src/lib/video-embed.js). Item video boleh
+// membawa klip MP4 unggahan (clipId, tabel media_clips, src/lib/clips.js) yang diputar di petaknya tanpa
+// tombol apa pun; tautannya tetap tujuan saat petak diketuk. Selama belum ada item yang aktif, beranda
+// memakai galeri bawaan di src/content/gallery.js.
 import { parseVideoUrl } from "../video-embed.js";
+import { isClipId } from "../clips.js";
 import { RecordError } from "../records.js";
 
 export const SIZES = [
@@ -20,6 +23,7 @@ export const galleryItem = {
   fields: [
     { key: "type", label: "Jenis", type: "select", required: true, options: [["photo", "Foto"], ["embed", "Tautan video"]], default: "photo", list: true },
     { key: "mediaId", label: "Foto", type: "text", max: 24, hidden: true },
+    { key: "clipId", label: "Klip video", type: "text", max: 24, hidden: true },
     { key: "url", label: "Tautan video", type: "url", placeholder: "https://www.youtube.com/shorts/…", hint: "YouTube, Shorts, TikTok, Instagram, atau Facebook." },
     { key: "captionId", label: "Keterangan (Indonesia)", short: "Keterangan", type: "text", required: true, max: 120, list: true },
     { key: "captionEn", label: "Keterangan (English)", type: "text", required: true, max: 120 },
@@ -31,9 +35,11 @@ export const galleryItem = {
     if (r.type === "photo") {
       if (!/^[a-f0-9]{24}$/.test(r.mediaId)) throw new RecordError("Unggah fotonya dulu.", "mediaId");
       r.url = "";
+      r.clipId = "";
     } else {
       if (!r.url || !parseVideoUrl(r.url)) throw new RecordError("Tautan video tidak dikenali. Pakai tautan YouTube, Shorts, TikTok, Instagram, atau Facebook.", "url");
       r.mediaId = "";
+      if (r.clipId && !isClipId(r.clipId)) throw new RecordError("Klip video tidak ditemukan. Unggah ulang videonya.", "clipId");
     }
   },
 };
@@ -46,7 +52,8 @@ export function toGalleryItem(r) {
     const image = { src: `/api/media/${r.mediaId}`, width: r.width || 1600, height: r.height || 1200, blurDataURL: r.blur };
     return { type: "photo", image, alt: { en: r.captionEn, id: r.captionId }, size };
   }
-  return { type: "embed", url: r.url, title: { en: r.captionEn, id: r.captionId }, size };
+  const clip = r.clipId && r.clipWidth !== undefined ? { src: `/api/clips/${r.clipId}`, width: r.clipWidth, height: r.clipHeight } : undefined;
+  return { type: "embed", url: r.url, title: { en: r.captionEn, id: r.captionId }, size, ...(clip ? { clip } : {}) };
 }
 
 /** Item aktif, urut menurut kolom urutan lalu terbaru. */

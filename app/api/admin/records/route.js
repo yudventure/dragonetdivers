@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { RecordError } from "@/lib/records";
 import { schemaFor } from "@/lib/modules";
 import { guardAdmin, readJson } from "@/server/admin-auth";
+import { deleteClip } from "@/server/clips";
 import { deleteImage } from "@/server/media";
 import { countReferences, deleteRecord, getRecord, saveRecord, validId } from "@/server/records";
 
@@ -26,6 +27,8 @@ export async function POST(request) {
   const id = input.id ?? null;
   if (id !== null && !validId(schema, id)) return Response.json({ error: "Data tidak ditemukan." }, { status: 404 });
   try {
+    // Foto atau klip lama item galeri yang diganti ikut dihapus setelah tersimpan.
+    const before = schema.kind === "gallery" && id ? await getRecord(schema.kind, id) : null;
     const record = await saveRecord(schema, id, input.data, {
       by: admin.email,
       extra: async (clean) => {
@@ -34,6 +37,8 @@ export async function POST(request) {
         }
       },
     });
+    if (before?.clipId && before.clipId !== record.clipId) await deleteClip(before.clipId).catch(() => {});
+    if (before?.mediaId && before.mediaId !== record.mediaId) await deleteImage(before.mediaId).catch(() => {});
     for (const path of schema.revalidate ?? []) revalidatePath(path, "page");
     return Response.json({ ok: true, record });
   } catch (e) {
@@ -56,6 +61,7 @@ export async function DELETE(request) {
     const current = await getRecord(schema.kind, id);
     if (!current || !(await deleteRecord(schema.kind, id))) return Response.json({ error: "Data sudah tidak ada." }, { status: 404 });
     if (current.mediaId) await deleteImage(current.mediaId).catch(() => {}); // foto galeri ikut dihapus
+    if (current.clipId) await deleteClip(current.clipId).catch(() => {}); // klip video juga
     for (const path of schema.revalidate ?? []) revalidatePath(path, "page");
     return Response.json({ ok: true });
   } catch (e) {

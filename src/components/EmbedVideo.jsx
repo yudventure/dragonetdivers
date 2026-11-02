@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { format } from "@/lib/i18n";
 import { isTikTokOrigin, isTikTokPlaying, readTikTokEvent, TIKTOK_STATE, tiktokReaction } from "@/lib/video-embed";
 import { FacebookIcon, InstagramIcon, PlayIcon, TikTokIcon, YouTubeIcon } from "./icons";
+import ClipLoop from "./ClipLoop";
 import YouTubeLoop from "./YouTubeLoop";
 
 const PLATFORM_ICONS = { youtube: YouTubeIcon, tiktok: TikTokIcon, instagram: InstagramIcon, facebook: FacebookIcon };
@@ -24,6 +25,8 @@ const MAX_RESUMES = 3;
 // diputar begitu siap, diulang dari awal bila habis. Bila tetap tidak berjalan dalam STALL_MS, player
 // dimuat ulang dengan tombol putar TikTok dan bisa disentuh, jadi petaknya tidak pernah diam mati.
 export default function EmbedVideo({ video, title, t }) {
+  // Klip MP4 unggahan tim: video biasa tanpa tombol di semua perangkat (src/lib/clips.js).
+  if (video.clip) return <ClipLoop video={video} title={title} t={t} />;
   if (video.platform === "youtube") return <YouTubeLoop video={video} title={title} t={t} />;
   return <PlatformEmbed video={video} title={title} t={t} />;
 }

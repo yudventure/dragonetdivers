@@ -25,7 +25,11 @@ export default async function Gallery({ lang }) {
       if (lang === "en") console.warn(`Galeri: tautan video tidak dikenali, dilewati (${item.url}).`);
       return [];
     }
-    return [{ ...item, video, vertical: video.vertical }];
+    if (!item.clip) return [{ ...item, video, vertical: video.vertical }];
+    // Klip unggahan: bentuk petak mengikuti klipnya bila ukurannya diketahui.
+    const { width, height } = item.clip;
+    const vertical = width && height ? height > width : video.vertical;
+    return [{ ...item, video: { ...video, clip: item.clip }, vertical }];
   });
   // Video YouTube diketuk → kanal YouTube pemilik videonya (src/server/youtube-channel.js).
   const youtube = list.filter((item) => item.video?.platform === "youtube");
