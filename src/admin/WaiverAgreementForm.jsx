@@ -13,8 +13,8 @@ const BOX = "grid content-start gap-4 rounded-card bg-white p-5 shadow-[0_1px_2p
  */
 export default function WaiverAgreementForm({ initial, fallback, custom }) {
   const router = useRouter();
-  const [en, setEn] = useState(initial.en || fallback);
-  const [id, setId] = useState(initial.id);
+  const [en, setEn] = useState(initial.en || fallback.en);
+  const [id, setId] = useState(custom ? initial.id : fallback.id);
   const [state, setState] = useState({ busy: false, ok: false, message: "" });
 
   async function save(value) {
@@ -26,7 +26,10 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
     }).catch(() => null);
     const result = await response?.json().catch(() => ({}));
     if (!response?.ok) return setState({ busy: false, ok: false, message: result?.error || "Belum tersimpan. Coba lagi." });
-    if (!value.en) setEn(fallback);
+    if (!value.en && !value.id) {
+      setEn(fallback.en);
+      setId(fallback.id);
+    }
     setState({ busy: false, ok: true, message: value.en ? "Tersimpan. Formulir berikutnya memakai teks ini." : "Kembali ke teks bawaan." });
     router.refresh();
   }
@@ -36,7 +39,9 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
       className={BOX}
       onSubmit={(e) => {
         e.preventDefault();
-        save({ en: en === fallback && !custom ? "" : en, id });
+        // Teks yang sama dengan bawaan disimpan kosong, supaya tetap mengikuti teks bawaan.
+        const same = en.trim() === fallback.en.trim() && id.trim() === fallback.id.trim();
+        save(same ? { en: "", id: "" } : { en, id });
       }}
     >
       <div className="grid gap-1">
@@ -45,7 +50,9 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
           Tamu membacanya sebelum tanda tangan. Teks bahasa Inggris yang berlaku. Pisahkan paragraf dengan baris kosong; baris seperti
           &quot;1. Agreement Parties&quot; tampil sebagai judul. Formulir yang sudah ditandatangani tetap menyimpan teks lamanya.
         </p>
-        <p className="text-sm font-semibold text-teal">{custom ? "Memakai teks yang disimpan tim." : "Memakai teks bawaan (dari form Turtle Dive, nama Dragonet Divers)."}</p>
+        <p className="text-sm font-semibold text-teal">
+          {custom ? "Memakai teks yang disimpan tim." : "Memakai teks bawaan (dari form Turtle Dive, nama Dragonet Divers) dengan terjemahan Indonesia."}
+        </p>
       </div>
       <label className="grid gap-1.5">
         <span className="text-sm font-semibold text-abyss">English (berlaku)</span>
@@ -53,7 +60,7 @@ export default function WaiverAgreementForm({ initial, fallback, custom }) {
       </label>
       <label className="grid gap-1.5">
         <span className="text-sm font-semibold text-abyss">Terjemahan Bahasa Indonesia (opsional)</span>
-        <textarea value={id} onChange={(e) => setId(e.target.value)} rows={6} className={`${INPUT} h-auto py-2.5 text-sm leading-relaxed`} placeholder="Tampil di /id/waiver di bawah teks bahasa Inggris." />
+        <textarea value={id} onChange={(e) => setId(e.target.value)} rows={14} className={`${INPUT} h-auto py-2.5 text-sm leading-relaxed`} placeholder="Tampil di /id/waiver di bawah teks bahasa Inggris." />
       </label>
       <div className="flex flex-wrap gap-2">
         <button

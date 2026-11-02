@@ -4,7 +4,7 @@ import AdminShell, { DatabaseNotice, ModuleTitle } from "@/admin/AdminShell";
 import { CopyText } from "@/admin/CopyText";
 import WaiverAgreementForm from "@/admin/WaiverAgreementForm";
 import { Stats } from "@/admin/parts";
-import { defaultAgreement } from "@/content/waiver-agreement";
+import { defaultAgreement, defaultAgreementId } from "@/content/waiver-agreement";
 import { witToday } from "@/lib/checkout";
 import { localeNamesId } from "@/lib/i18n";
 import { site } from "@/lib/site";
@@ -107,7 +107,11 @@ export default async function WaiversPage() {
               </div>
             )}
           </section>
-          <WaiverAgreementForm initial={{ en: agreement.en, id: agreement.id }} fallback={defaultAgreement} custom={Boolean(agreement.en)} />
+          <WaiverAgreementForm
+            initial={{ en: agreement.en, id: agreement.id }}
+            fallback={{ en: defaultAgreement, id: defaultAgreementId }}
+            custom={Boolean(agreement.en || agreement.id)}
+          />
         </>
       )}
     </AdminShell>

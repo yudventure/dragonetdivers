@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   ageOn,
   agreementBlocks,
+  agreementTexts,
   BOXES,
   cleanAgreement,
   cleanWaiver,
@@ -202,4 +203,28 @@ test("email salinan formulir dan tautan formulir di email pesanan selam", async 
   assert.ok(!orderMail("reminder", { order: dive, base }).html.includes("/waiver"), "pengingat bayar tanpa formulir");
   const trip = { ...dive, items: [{ ...dive.items[0], service: "island-trips" }] };
   assert.ok(!orderMail("order", { order: trip, base }).html.includes("/waiver"), "trip pulau tanpa formulir");
+});
+
+test("terjemahan Indonesia perjanjian: susunan sama dengan English, dipakai selama teks English bawaan", async () => {
+  const { defaultAgreement, defaultAgreementId } = await import("../src/content/waiver-agreement.js");
+  const en = agreementBlocks(defaultAgreement);
+  const id = agreementBlocks(defaultAgreementId);
+  assert.equal(id.length, en.length, "jumlah paragraf dan judul sama");
+  assert.deepEqual(
+    id.map((b) => b.heading),
+    en.map((b) => b.heading),
+  );
+  assert.deepEqual(
+    id.filter((b) => b.heading).map((b) => b.text.split(".")[0]),
+    ["1", "2", "3", "4", "5", "6", "7"],
+  );
+  assert.ok(defaultAgreementId.startsWith("Dragonet Divers Raja Ampat menyelenggarakan Kegiatan"));
+  assert.match(defaultAgreementId, /"Pihak yang Dibebaskan"/);
+  assert.ok(!/[;:]/.test(defaultAgreementId.replace(/"[^"]*"/g, "")), "tanpa titik dua dan titik koma");
+  const defaults = { en: defaultAgreement, id: defaultAgreementId };
+  assert.deepEqual(agreementTexts({ en: "", id: "" }, defaults), defaults);
+  assert.deepEqual(agreementTexts(null, defaults), defaults);
+  assert.deepEqual(agreementTexts({ en: "Custom", id: "" }, defaults), { en: "Custom", id: "" }, "teks English sendiri tanpa terjemahan bawaan");
+  assert.deepEqual(agreementTexts({ en: "Custom", id: "Kustom" }, defaults), { en: "Custom", id: "Kustom" });
+  assert.deepEqual(agreementTexts({ en: "", id: "Terjemahan tim" }, defaults), { en: defaultAgreement, id: "Terjemahan tim" });
 });

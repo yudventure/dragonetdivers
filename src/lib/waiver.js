@@ -196,6 +196,16 @@ export function agreementBlocks(value) {
     });
 }
 
+/**
+ * Teks perjanjian yang berlaku: simpanan tim (settings baris "waiver") atau teks bawaan. Terjemahan Indonesia
+ * bawaan hanya dipakai selama teks English juga bawaan, supaya terjemahan selalu sepasang dengan teksnya.
+ */
+export function agreementTexts(saved, defaults) {
+  const en = saved?.en || defaults.en;
+  const id = saved?.en ? saved.id || "" : saved?.id || defaults.id || "";
+  return { en, id };
+}
+
 /** Isian teks perjanjian dari admin (English wajib bila ada terjemahan; kosong = teks bawaan). */
 export function cleanAgreement(input) {
   const clean = (value) => (typeof value === "string" ? value.replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n").trim() : "");
