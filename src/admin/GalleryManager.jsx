@@ -113,7 +113,7 @@ function MediaGuide({ open }) {
               "Letakkan objek utama di tengah, karena foto dan video dipotong mengikuti bentuk petak.",
               "Unggah videonya dulu ke YouTube, TikTok, Instagram, atau Facebook, lalu tempel tautan dari tombol Bagikan.",
               "Video YouTube dan TikTok diputar otomatis tanpa suara dan berulang di beranda. Diketuk, membuka kanal YouTube pemilik videonya.",
-              "Pemutar YouTube di ponsel selalu memunculkan tombol jeda, jadi di ponsel video YouTube hanya tampil sebagai gambar sampul. Unggah klip MP4 videonya di item yang sama supaya bergerak tanpa tombol di semua perangkat.",
+              "Opsional, unggah klip MP4 video yang sama di item itu supaya diputar langsung dari website, tidak bergantung pada pemutar YouTube.",
             ].map((tip) => (
               <li key={tip} className="grid grid-cols-[18px_1fr] gap-2">
                 <CheckIcon className="mt-0.5 size-4 text-teal" />
@@ -475,8 +475,8 @@ function ClipField({ clipId, notes, busy, onFile, onRemove }) {
       <div className="grid gap-1">
         <span className="text-sm font-semibold text-abyss">Klip video untuk diputar di website</span>
         <span className="text-xs text-slate">
-          Video ini diputar sendiri dan berulang tanpa tombol play atau pause di semua perangkat, termasuk ponsel. Tanpa klip, ponsel hanya
-          menampilkan gambar sampul, karena pemutar YouTube di ponsel selalu memunculkan tombol jeda. Diketuk, petak tetap membuka tautan di atas.
+          Opsional. Bila diisi, petak memutar klip ini langsung dari website (berulang tanpa suara dan tanpa tombol) sebagai pengganti pemutar
+          YouTube atau TikTok, jadi tidak bergantung pada perubahan tampilan pemutar mereka. Diketuk, petak tetap membuka tautan di atas.
         </span>
         <span className="text-xs text-slate">MP4 (H.264) paling aman · maks. {CLIP_MAX_MB} MB · ideal 10 sampai 30 detik, 720p, tanpa perlu suara</span>
       </div>
