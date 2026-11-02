@@ -1,11 +1,11 @@
-import { defaultAgreement } from "@/content/waiver-agreement";
+import { defaultAgreement, defaultAgreementId } from "@/content/waiver-agreement";
 import { uiText } from "@/content/ui";
 import { sameText } from "@/lib/admin-session";
 import { witToday } from "@/lib/checkout";
 import { format, isLocale } from "@/lib/i18n";
 import { createThrottle } from "@/lib/login-throttle";
 import { contact, site, whatsappNumber } from "@/lib/site";
-import { cleanWaiver, diversIn, SIGNATURE_MAX, waiverCode, WaiverError } from "@/lib/waiver";
+import { agreementTexts, cleanWaiver, diversIn, SIGNATURE_MAX, waiverCode, WaiverError } from "@/lib/waiver";
 import { waiverMail } from "@/lib/waiver-mail";
 import { readJson, sameOrigin } from "@/server/admin-auth";
 import { mailConfigured, sendMail } from "@/server/mailer";
@@ -45,8 +45,8 @@ export async function POST(request) {
     console.error(`[formulir] teks perjanjian tidak terbaca: ${error.code ?? error.message}`);
     return fail("server", 503);
   }
-  const english = agreement.en || defaultAgreement;
-  const agreed = lang === "id" && agreement.id ? `${english}\n\n---\n\n${agreement.id}` : english;
+  const texts = agreementTexts(agreement, { en: defaultAgreement, id: defaultAgreementId });
+  const agreed = lang === "id" && texts.id ? `${texts.en}\n\n---\n\n${texts.id}` : texts.en;
 
   let waiver;
   try {
