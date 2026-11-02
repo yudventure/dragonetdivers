@@ -1,6 +1,7 @@
 import { guardAdmin } from "@/server/admin-auth";
 import { deleteImage, isMediaId, MAX_UPLOAD, MediaError, saveImage } from "@/server/media";
 import { countReferences } from "@/server/records";
+import { storedSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,8 @@ export async function DELETE(request) {
   if (!isMediaId(id)) return Response.json({ error: "Foto tidak ditemukan." }, { status: 404 });
   try {
     if (await countReferences("gallery", "mediaId", id)) return Response.json({ error: "Foto ini dipakai di galeri." }, { status: 409 });
+    const { serviceImages } = await storedSiteSettings();
+    if (Object.values(serviceImages).some((image) => image.id === id)) return Response.json({ error: "Foto ini dipakai di kartu layanan." }, { status: 409 });
     await deleteImage(id);
     return Response.json({ ok: true });
   } catch (e) {

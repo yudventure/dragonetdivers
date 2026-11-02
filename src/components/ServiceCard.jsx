@@ -6,20 +6,32 @@ import { Price } from "./currency";
 import { ArrowIcon } from "./icons";
 import { serviceArt } from "./service-art";
 
-// Panel ilustrasi: gradasi laguna seperti gelembung + chip teks putih yang melayang.
+// Panel ilustrasi: gradasi laguna seperti gelembung + chip teks putih yang melayang. Bila tim memasang foto
+// kartu di /admin/paket (service.image dari shownServices / serviceWithImage), foto itu memenuhi panel.
 export function ServiceVisual({ service, className = "", sizes, priority = false, chips = true }) {
   const [first, second] = chips ? service.chips : [];
   return (
     <div
       className={`relative overflow-hidden bg-[radial-gradient(ellipse_at_50%_42%,var(--color-white)_0%,var(--color-lagoon-wash)_48%,color-mix(in_srgb,var(--color-lagoon)_30%,var(--color-white))_100%)] ${className}`}
     >
-      <Image
-        src={serviceArt[service.slug]}
-        alt=""
-        sizes={sizes}
-        priority={priority}
-        className="absolute inset-0 m-auto h-[74%] w-auto max-w-[80%] object-contain drop-shadow-[0_14px_18px_rgb(10_50_59/0.14)] transition-transform duration-300 ease-brand motion-safe:group-hover:scale-105"
-      />
+      {service.image ? (
+        <Image
+          src={service.image}
+          alt=""
+          sizes={sizes}
+          priority={priority}
+          placeholder={service.image.blurDataURL ? "blur" : "empty"}
+          className="absolute inset-0 size-full object-cover transition-transform duration-500 ease-brand motion-safe:group-hover:scale-105"
+        />
+      ) : (
+        <Image
+          src={serviceArt[service.slug]}
+          alt=""
+          sizes={sizes}
+          priority={priority}
+          className="absolute inset-0 m-auto h-[74%] w-auto max-w-[80%] object-contain drop-shadow-[0_14px_18px_rgb(10_50_59/0.14)] transition-transform duration-300 ease-brand motion-safe:group-hover:scale-105"
+        />
+      )}
       {first && <span className="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold text-teal shadow-float">{first}</span>}
       {second && <span className="absolute right-4 bottom-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold text-teal shadow-float">{second}</span>}
     </div>

@@ -191,9 +191,7 @@ function ServicesMenu({ t, services, allHref, active }) {
                   aria-current={service.current ? "page" : undefined}
                   className="group grid grid-cols-[48px_1fr] items-center gap-3 rounded-input p-2 transition-colors duration-200 ease-brand hover:bg-foam aria-[current=page]:bg-teal-soft"
                 >
-                  <span className="grid size-12 place-items-center rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-white)_0%,var(--color-lagoon-wash)_100%)]">
-                    <Image src={serviceArt[service.slug]} alt="" sizes="40px" className="size-10 object-contain" />
-                  </span>
+                  <ServiceThumb service={service} className="size-12" art="size-10" sizes="48px" />
                   <span className="grid">
                     <span className="font-display text-base font-semibold text-abyss group-hover:text-teal">{service.title}</span>
                     <span className="text-[13px] leading-snug text-slate">{service.summary}</span>
@@ -213,6 +211,19 @@ function ServicesMenu({ t, services, allHref, active }) {
         </div>
       )}
     </li>
+  );
+}
+
+/** Gambar kecil layanan di menu: foto kartu dari /admin/paket (bulat penuh) atau ilustrasi bawaan. */
+function ServiceThumb({ service, className, art, sizes }) {
+  return (
+    <span className={`grid place-items-center overflow-hidden rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-white)_0%,var(--color-lagoon-wash)_100%)] ${className}`}>
+      {service.image ? (
+        <Image src={service.image} alt="" sizes={sizes} className="size-full object-cover" />
+      ) : (
+        <Image src={serviceArt[service.slug]} alt="" sizes={sizes} className={`${art} object-contain`} />
+      )}
+    </span>
   );
 }
 
@@ -311,9 +322,7 @@ function MobileMenu({ lang, t, brand, home, homeLabel, services, allServicesHref
                       aria-current={service.current ? "page" : undefined}
                       className="flex items-center gap-3 rounded-input px-2 py-2 transition-colors duration-200 ease-brand hover:bg-foam aria-[current=page]:bg-teal-soft"
                     >
-                      <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[radial-gradient(circle_at_50%_40%,var(--color-white)_0%,var(--color-lagoon-wash)_100%)]">
-                        <Image src={serviceArt[service.slug]} alt="" sizes="36px" className="size-9 object-contain" />
-                      </span>
+                      <ServiceThumb service={service} className="size-10 shrink-0" art="size-9" sizes="40px" />
                       <span className="grid min-w-0">
                         <span className="text-base font-semibold text-abyss">{service.title}</span>
                         <span className="truncate text-[13px] text-slate">{service.summary}</span>

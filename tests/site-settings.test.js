@@ -28,6 +28,7 @@ test("isian kontak dibersihkan", () => {
     youtube: "",
     showUsd: true,
     hiddenServices: ["dive-courses", "snorkeling"],
+    serviceImages: {},
     googleVerification: "",
   });
   assert.deepEqual(validateSiteSettings({}), DEFAULT_SITE_SETTINGS);
@@ -97,4 +98,27 @@ test("website memakai isian admin, lalu nilai bawaan", () => {
   } finally {
     globalThis[SITE_STATE] = before;
   }
+});
+
+test("foto kartu layanan: hanya layanan dikenal dan id foto sah, bentuk gambar next/image", async () => {
+  const { cleanServiceImages, serviceImageOf } = await import("../src/lib/site-settings.js");
+  const id = "0123456789abcdef01234567";
+  const clean = cleanServiceImages({
+    "fun-dives": { id, width: 2400, height: "1600", blur: "data:image/webp;base64,AAAA" },
+    "dusk-dives": { id: "../../etc", width: 10 },
+    "island-trips": { id, width: -5, blur: "javascript:alert(1)" },
+    "bukan-layanan": { id },
+  });
+  assert.deepEqual(clean, {
+    "fun-dives": { id, width: 2400, height: 1600, blur: "data:image/webp;base64,AAAA" },
+    "island-trips": { id, width: null, height: null, blur: "" },
+  });
+  assert.deepEqual(cleanServiceImages(null), {});
+  assert.deepEqual(cleanServiceImages([1]), {});
+  assert.deepEqual(serviceImageOf(clean["fun-dives"]), { src: `/api/media/${id}`, width: 2400, height: 1600, blurDataURL: "data:image/webp;base64,AAAA" });
+  assert.deepEqual(serviceImageOf(clean["island-trips"]), { src: `/api/media/${id}`, width: 1600, height: 1067 });
+  assert.equal(serviceImageOf(undefined), null);
+  // Tersimpan bersama isian lain dan tidak hilang saat dinormalkan.
+  assert.deepEqual(normalizeSiteSettings({ serviceImages: { "fun-dives": { id, width: 100, height: 80 } } }).serviceImages["fun-dives"].id, id);
+  assert.deepEqual(DEFAULT_SITE_SETTINGS.serviceImages, {});
 });
