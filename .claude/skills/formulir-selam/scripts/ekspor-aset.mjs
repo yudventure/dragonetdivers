@@ -119,6 +119,10 @@ const ORIGINALS = [
   "app/api/admin/waiver/route.js",
   "src/admin/WaiverAgreementForm.jsx",
   "src/admin/PrintButton.jsx",
+  // Dokumen A4 bermerek untuk cetak atau PDF, nama file nomor_nama_negara.
+  "src/admin/WaiverDocument.jsx",
+  "src/lib/waiver-document.js",
+  "tests/waiver-document.test.js",
   "src/admin/CopyText.jsx",
   "database/migrations/008_waivers.sql",
   // Spreadsheet: Google Sheets otomatis lewat Apps Script dan unduh Excel.
