@@ -1,7 +1,7 @@
 // Teks perjanjian formulir selam (Assumption of Risk, Liability Release & Hold Harmless Agreement), dari form
 // waiver Turtle Dive Homestay milik pemilik (teks lengkap dikirim pemilik 2 November 2026) dengan nama tuan rumah
 // diganti Dragonet Divers Raja Ampat; isi lainnya kata demi kata. Dipakai formulir /waiver selama tim belum
-// menyimpan teks lain di /admin/formulir. Paragraf dipisah baris kosong; baris "1. Judul" tampil sebagai judul
+// menyimpan teks lain di /admin/formulir/pengaturan. Paragraf dipisah baris kosong; baris "1. Judul" tampil sebagai judul
 // (agreementBlocks di src/lib/waiver.js). Formulir menampilkan perjanjian dalam bahasa halaman (keputusan pemilik
 // 2 November 2026); halaman tanpa terjemahan memakai teks English ini.
 export const defaultAgreement = `Dragonet Divers Raja Ampat hosts Activities, including but not limited to snorkeling, freediving, breath-hold diving, scuba diving, technical diving, dive instruction, aquatic life interactions, land and underwater exploration, travel (in air, on land and over water), boating, fishing, lodging, food, beverages and all related activities (herein referred to as "Activities"). These Activities are inherently dangerous and may result in property loss, illness, injury, and death. In consideration of being allowed to participate in the Activities, I HEREBY AGREE TO BE LEGALLY BOUND BY THE TERMS AND CONDITIONS OF THIS ASSUMPTION OF RISK, LIABILITY RELEASE & HOLD HARMLESS AGREEMENT (herein referred to as "Agreement").
@@ -38,7 +38,7 @@ I HAVE FULLY READ, UNDERSTAND AND AGREE TO BE LEGALLY BOUND BY THIS AGREEMENT. I
 
 // Terjemahan Bahasa Indonesia (permintaan pemilik 2 November 2026: "tambahkan juga perjanjian untuk bahasa
 // indonesia"). Tampil di /id/waiver sebagai teks perjanjian (bahasa halaman). Dipakai
-// selama tim belum menyimpan teks sendiri di /admin/formulir (agreementTexts di src/lib/waiver.js).
+// selama tim belum menyimpan teks sendiri di /admin/formulir/pengaturan (agreementTexts di src/lib/waiver.js).
 export const defaultAgreementId = `Dragonet Divers Raja Ampat menyelenggarakan Kegiatan, termasuk namun tidak terbatas pada snorkeling, freediving, menyelam dengan menahan napas, scuba diving, technical diving, instruksi selam, interaksi dengan biota laut, penjelajahan darat dan bawah air, perjalanan (di udara, di darat, dan di atas air), berperahu, memancing, penginapan, makanan, minuman, serta semua kegiatan terkait (selanjutnya disebut "Kegiatan"). Kegiatan ini pada dasarnya berbahaya dan dapat mengakibatkan kehilangan harta benda, sakit, cedera, dan kematian. Sebagai imbalan atas izin untuk ikut serta dalam Kegiatan, SAYA DENGAN INI SETUJU UNTUK TERIKAT SECARA HUKUM OLEH SYARAT DAN KETENTUAN PERJANJIAN PENERIMAAN RISIKO, PELEPASAN TANGGUNG JAWAB, DAN PEMBEBASAN DARI TUNTUTAN INI (selanjutnya disebut "Perjanjian").
 
 1. Para Pihak dalam Perjanjian

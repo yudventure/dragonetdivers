@@ -13,7 +13,7 @@ const witTime = (iso) =>
     : "";
 
 /**
- * Spreadsheet formulir selam di /admin/formulir (permintaan pemilik 2 November 2026: "buatkan hasil form bisa
+ * Spreadsheet formulir selam di /admin/formulir/pengaturan (permintaan pemilik 2 November 2026: "buatkan hasil form bisa
  * langsung rapih di spreadsheet"): unduh Excel, dan Google Sheets yang terisi sendiri lewat Apps Script milik tim
  * (skrip dari appsScript di src/lib/waiver-sheet.js, API /api/admin/waiver-sheet). Selama formulir masih
  * dikirim di belakang layar, keadaannya ditanyakan ulang tiap 2,5 detik.

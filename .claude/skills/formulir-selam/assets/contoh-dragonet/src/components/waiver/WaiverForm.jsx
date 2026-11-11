@@ -5,6 +5,7 @@ import { addDays } from "@/lib/date-picker";
 import { format } from "@/lib/i18n";
 import { ageOn, boxItems, cleanWaiver, MEDICAL, medicalQuestions, needsClearance, WaiverError } from "@/lib/waiver";
 import { CheckIcon, ChatIcon } from "../icons";
+import PhoneField from "../booking/PhoneField";
 import DatePicker from "../DatePicker";
 import SignaturePad from "./SignaturePad";
 
@@ -20,7 +21,8 @@ const BLANK = {
   birthDate: "",
   address: "",
   nationality: "",
-  emergency: "",
+  emergencyName: "",
+  emergencyPhone: "",
   email: "",
   phone: "",
   room: "",
@@ -37,7 +39,7 @@ const BLANK = {
 
 function Field({ id, label, required, optional, hint, error, children }) {
   return (
-    <div className="grid content-start gap-1.5">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-1.5">
       <label htmlFor={id} className="text-sm font-semibold text-abyss">
         {label}
         {required && (
@@ -116,9 +118,11 @@ function Agreement({ blocks }) {
  * Formulir selam (/waiver): perjanjian, data diri, profil penyelam, kuesioner medis dengan kotak lanjutan, dan
  * tanda tangan. Diperiksa dulu di peramban dengan cleanWaiver yang sama dengan server (src/lib/waiver.js), lalu
  * dikirim ke /api/waiver. t = ui.waiver bahasa halaman; enMedical = teks medis English (selain di halaman
- * English) yang tampil kecil di bawah tiap pertanyaan.
+ * English) yang tampil kecil di bawah tiap pertanyaan; phoneText = teks pemilih kode negara (ui.checkout.phone).
+ * Semua isian wajib (permintaan pemilik 11 November 2026), WhatsApp dan email di kolom sendiri-sendiri, nomor
+ * WhatsApp peserta dan kontak darurat lewat pemilih kode negara yang sama dengan checkout (PhoneField).
  */
-export default function WaiverForm({ lang, t, dateText, enMedical, agreement, order, today, contact }) {
+export default function WaiverForm({ lang, t, dateText, phoneText, enMedical, agreement, order, today, contact }) {
   const [values, setValues] = useState(BLANK);
   const [date, setDate] = useState(order?.date || today);
   const [notCertified, setNotCertified] = useState(false);
@@ -302,9 +306,6 @@ export default function WaiverForm({ lang, t, dateText, enMedical, agreement, or
             </output>
           </Field>
         </div>
-        <Field id="waiver-address" label={t.fields.address} optional={t.optional} error={fieldError("address")}>
-          <input id="waiver-address" value={values.address} onChange={set("address")} maxLength={200} autoComplete="street-address" className={FIELD} {...invalid("address")} />
-        </Field>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field id="waiver-nationality" label={t.fields.nationality} required error={fieldError("nationality")}>
             <input id="waiver-nationality" value={values.nationality} onChange={set("nationality")} maxLength={80} autoComplete="country-name" className={FIELD} {...invalid("nationality")} />
@@ -325,20 +326,34 @@ export default function WaiverForm({ lang, t, dateText, enMedical, agreement, or
             />
           </Field>
         </div>
-        <Field id="waiver-emergency" label={t.fields.emergency} required error={fieldError("emergency")}>
-          <input id="waiver-emergency" value={values.emergency} onChange={set("emergency")} maxLength={160} className={FIELD} {...invalid("emergency")} />
+        <Field id="waiver-address" label={t.fields.address} required error={fieldError("address")}>
+          <input id="waiver-address" value={values.address} onChange={set("address")} maxLength={200} autoComplete="street-address" className={FIELD} {...invalid("address")} />
         </Field>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field id="waiver-email" label={t.fields.email} optional={t.optional} error={fieldError("email")}>
-            <input id="waiver-email" type="email" value={values.email} onChange={set("email")} maxLength={160} autoComplete="email" className={FIELD} {...invalid("email")} />
-          </Field>
-          <Field id="waiver-phone" label={t.fields.phone} optional={t.optional} error={fieldError("phone")}>
-            <input id="waiver-phone" type="tel" value={values.phone} onChange={set("phone")} maxLength={40} autoComplete="tel" className={FIELD} {...invalid("phone")} />
-          </Field>
-        </div>
-        <Field id="waiver-room" label={t.fields.room} optional={t.optional} error={fieldError("room")}>
+        <Field id="waiver-room" label={t.fields.room} required error={fieldError("room")}>
           <input id="waiver-room" value={values.room} onChange={set("room")} maxLength={80} className={FIELD} {...invalid("room")} />
         </Field>
+        {/* Nomor WhatsApp dan email selalu kolom terpisah (permintaan pemilik 11 November 2026). */}
+        <Field id="waiver-phone" label={t.fields.phone} required hint={t.fields.phoneHint} error={fieldError("phone")}>
+          <PhoneField id="waiver-phone" lang={lang} value={values.phone} onChange={(v) => setValue("phone", v)} t={phoneText} invalid={invalid("phone")} />
+        </Field>
+        <Field id="waiver-email" label={t.fields.email} required hint={t.fields.emailHint} error={fieldError("email")}>
+          <input id="waiver-email" type="email" value={values.email} onChange={set("email")} maxLength={160} autoComplete="email" className={FIELD} {...invalid("email")} />
+        </Field>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id="waiver-emergencyName" label={t.fields.emergencyName} required error={fieldError("emergencyName")}>
+            <input id="waiver-emergencyName" value={values.emergencyName} onChange={set("emergencyName")} maxLength={120} className={FIELD} {...invalid("emergencyName")} />
+          </Field>
+          <Field id="waiver-emergencyPhone" label={t.fields.emergencyPhone} required error={fieldError("emergencyPhone")}>
+            <PhoneField
+              id="waiver-emergencyPhone"
+              lang={lang}
+              value={values.emergencyPhone}
+              onChange={(v) => setValue("emergencyPhone", v)}
+              t={phoneText}
+              invalid={invalid("emergencyPhone")}
+            />
+          </Field>
+        </div>
         {minor && (
           <div className="grid gap-3 rounded-input bg-sunrise-wash p-4 ring-1 ring-sunrise">
             <p className="text-sm text-abyss">{t.fields.guardianNote}</p>
@@ -362,13 +377,13 @@ export default function WaiverForm({ lang, t, dateText, enMedical, agreement, or
             <Field id="waiver-certLevel" label={t.fields.certLevel} required hint={t.fields.certLevelHint} error={fieldError("certLevel")}>
               <input id="waiver-certLevel" value={values.certLevel} onChange={set("certLevel")} maxLength={80} className={FIELD} {...invalid("certLevel")} />
             </Field>
-            <Field id="waiver-certNumber" label={t.fields.certNumber} optional={t.optional} error={fieldError("certNumber")}>
+            <Field id="waiver-certNumber" label={t.fields.certNumber} required error={fieldError("certNumber")}>
               <input id="waiver-certNumber" value={values.certNumber} onChange={set("certNumber")} maxLength={60} className={FIELD} {...invalid("certNumber")} />
             </Field>
-            <Field id="waiver-loggedDives" label={t.fields.loggedDives} optional={t.optional} error={fieldError("loggedDives")}>
+            <Field id="waiver-loggedDives" label={t.fields.loggedDives} required error={fieldError("loggedDives")}>
               <input id="waiver-loggedDives" type="number" inputMode="numeric" min={0} max={99999} value={values.loggedDives} onChange={set("loggedDives")} className={FIELD} {...invalid("loggedDives")} />
             </Field>
-            <Field id="waiver-lastDive" label={t.fields.lastDive} optional={t.optional} error={fieldError("lastDive")}>
+            <Field id="waiver-lastDive" label={t.fields.lastDive} required error={fieldError("lastDive")}>
               <DatePicker
                 id="waiver-lastDive"
                 value={values.lastDive}
@@ -378,28 +393,40 @@ export default function WaiverForm({ lang, t, dateText, enMedical, agreement, or
                 today={today}
                 lang={lang}
                 t={dateText}
+                required
                 className={FIELD}
                 {...invalid("lastDive")}
               />
             </Field>
           </div>
         )}
-        <fieldset className="grid gap-2">
-          <legend className="mb-1.5 text-sm font-semibold text-abyss">{t.fields.insurance}</legend>
+        <fieldset id="waiver-insurance" tabIndex={-1} className="grid gap-2 outline-none" aria-describedby={fieldError("insurance") ? "waiver-insurance-error" : undefined}>
+          <legend className="mb-1.5 text-sm font-semibold text-abyss">
+            {t.fields.insurance}
+            <span className="text-danger" aria-hidden="true">
+              {" "}
+              *
+            </span>
+          </legend>
           <div className="flex flex-wrap gap-5">
             {[
               ["yes", t.yes],
               ["no", t.no],
             ].map(([value, label]) => (
               <label key={value} className="flex items-center gap-2 text-abyss">
-                <input type="radio" name="waiver-insurance" value={value} checked={values.insurance === value} onChange={set("insurance")} className="size-5 accent-teal" />
+                <input type="radio" name="waiver-insurance" value={value} checked={values.insurance === value} onChange={set("insurance")} required className="size-5 accent-teal" />
                 {label}
               </label>
             ))}
           </div>
+          {fieldError("insurance") && (
+            <p id="waiver-insurance-error" role="alert" className="text-sm font-semibold text-danger">
+              {fieldError("insurance")}
+            </p>
+          )}
         </fieldset>
         {values.insurance === "yes" && (
-          <Field id="waiver-insurer" label={t.fields.insurer} optional={t.optional} error={fieldError("insurer")}>
+          <Field id="waiver-insurer" label={t.fields.insurer} required error={fieldError("insurer")}>
             <input id="waiver-insurer" value={values.insurer} onChange={set("insurer")} maxLength={80} className={FIELD} {...invalid("insurer")} />
           </Field>
         )}

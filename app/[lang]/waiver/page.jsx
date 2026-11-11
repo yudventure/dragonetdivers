@@ -98,6 +98,7 @@ export default async function WaiverPage({ params, searchParams }) {
             lang={lang}
             t={t}
             dateText={all.datePicker}
+            phoneText={all.checkout.phone}
             enMedical={lang === "en" ? null : uiText("en").waiver.medical}
             agreement={{ blocks: agreementBlocks(shown.text), lang: shown.lang, fallback: shown.lang !== lang }}
             order={order}

@@ -14,7 +14,7 @@ const LANGS = [
 const EMPTY = { en: "", id: "", zh: "", ko: "" };
 
 /**
- * Teks perjanjian formulir selam (/admin/formulir), satu kolom per bahasa website. Tamu membaca dan
+ * Teks perjanjian formulir selam (/admin/formulir/pengaturan), satu kolom per bahasa website. Tamu membaca dan
  * menyetujui teks dalam bahasa halaman yang sedang aktif (keputusan pemilik 2 November 2026); bahasa yang
  * dikosongkan memakai teks English. Paragraf dipisah baris kosong, "1. Judul" menjadi judul. Teks yang sama
  * dengan bawaan disimpan kosong, jadi tetap mengikuti teks bawaan (src/content/waiver-agreement.js).

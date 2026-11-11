@@ -76,7 +76,7 @@ export async function POST(request) {
     }
   }
   state.throttle.fail(key); // setiap formulir dihitung
-  // Ke Google Sheets tim bila sudah disambungkan di /admin/formulir (src/server/waiver-sheet.js).
+  // Ke Google Sheets tim bila sudah disambungkan di /admin/formulir/pengaturan (src/server/waiver-sheet.js).
   later(() => syncWaiverSheet());
 
   const copy = Boolean(waiver.email) && mailConfigured();

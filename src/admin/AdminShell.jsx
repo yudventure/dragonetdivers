@@ -4,6 +4,7 @@ import {
   BanknoteIcon,
   CalendarIcon,
   ChevronIcon,
+  FormIcon,
   GlobeIcon,
   GridIcon,
   LifeBuoyIcon,
@@ -27,7 +28,15 @@ const MENU = [
   { key: "kalender", label: "Kalender reservasi", icon: CalendarIcon, href: "/admin/kalender" },
   { key: "tamu", label: "Tamu", icon: UserIcon, href: "/admin/tamu" },
   { key: "pesanan", label: "Pesanan", icon: ReceiptIcon, href: "/admin/pesanan" },
-  { key: "formulir", label: "Formulir selam", icon: LifeBuoyIcon, href: "/admin/formulir" },
+  // Meja peninjauan dan pengaturan formulir dipisah (permintaan pemilik 11 November 2026).
+  {
+    group: "Formulir selam",
+    icon: FormIcon,
+    items: [
+      { key: "formulir", label: "Meja peninjauan", icon: SearchIcon, href: "/admin/formulir" },
+      { key: "formulir-pengaturan", label: "Pengaturan formulir", icon: FormIcon, href: "/admin/formulir/pengaturan" },
+    ],
+  },
   {
     group: "Situs web",
     icon: GlobeIcon,

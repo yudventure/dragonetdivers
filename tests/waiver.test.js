@@ -27,14 +27,15 @@ const valid = (extra = {}) => ({
   address: "Jl. Mawar 1, Jakarta",
   nationality: "Indonesia",
   date: "2026-11-10",
-  emergency: "Budi +62 812 3456 789",
+  emergencyName: "Budi Santoso",
+  emergencyPhone: "+62 812 3456 7890",
   email: "Ana@Example.com",
-  phone: "+62 812 3456 789",
+  phone: "+62 813 2222 3333",
   room: "Turtle Dive Homestay",
   certified: true,
   certAgency: "SSI",
   certLevel: "Open Water Diver",
-  certNumber: "",
+  certNumber: "0012345",
   lastDive: "2026-08-01",
   loggedDives: "24",
   insurance: "yes",
@@ -61,6 +62,12 @@ test("formulir lengkap dibersihkan: nama dirapikan, umur dihitung, email huruf k
   assert.equal(w.clearance, false);
   assert.equal(w.agreement, true);
   assert.deepEqual(w.medical, allNo);
+  // WhatsApp peserta dan nomor kontak darurat disimpan lengkap dengan kode negara, terpisah dari email.
+  assert.equal(w.phone, "+6281322223333");
+  assert.equal(w.emergencyName, "Budi Santoso");
+  assert.equal(w.emergencyPhone, "+6281234567890");
+  assert.equal(w.emergency, "Budi Santoso +6281234567890");
+  assert.equal(w.certNumber, "0012345");
 });
 
 test("kolom wajib dan isian yang salah ditolak dengan nama kolomnya", () => {
@@ -69,9 +76,10 @@ test("kolom wajib dan isian yang salah ditolak dengan nama kolomnya", () => {
   failsOn(valid({ birthDate: "2020-01-01" }), "birthDate", { today: TODAY }); // di bawah 8 tahun
   failsOn(valid({ nationality: "" }), "nationality");
   failsOn(valid({ date: "2026-10-01" }), "date"); // sudah lewat
-  failsOn(valid({ emergency: "Budi" }), "emergency");
   failsOn(valid({ email: "bukan email" }), "email");
   failsOn(valid({ phone: "telepon saya" }), "phone");
+  failsOn(valid({ phone: "ana@example.com" }), "phone", { today: TODAY });
+  failsOn(valid({ emergencyPhone: "Budi" }), "emergencyPhone");
   failsOn(valid({ certAgency: "" }), "certAgency");
   failsOn(valid({ certLevel: "" }), "certLevel");
   failsOn(valid({ lastDive: "2027-01-01" }), "lastDive"); // masa depan
@@ -85,14 +93,24 @@ test("kolom wajib dan isian yang salah ditolak dengan nama kolomnya", () => {
   assert.throws(() => cleanWaiver(null, { today: TODAY }), (e) => e.field === "server");
 });
 
-test("belum bersertifikat (ikut kursus): agensi dan tingkat boleh kosong; kolom opsional boleh kosong", () => {
-  const w = cleanWaiver(valid({ certified: false, certAgency: "", certLevel: "", email: "", phone: "", lastDive: "", loggedDives: "", insurance: "", address: "" }), {
-    today: TODAY,
-  });
+test("semua isian wajib (permintaan pemilik 11 November 2026), termasuk email dan WhatsApp yang terpisah", () => {
+  for (const field of ["address", "email", "phone", "emergencyName", "emergencyPhone", "room", "certNumber", "loggedDives", "lastDive", "insurance"]) {
+    failsOn(valid({ [field]: "" }), field);
+  }
+  failsOn(valid({ insurance: "yes", insurer: "" }), "insurer");
+  // Tidak berasuransi: nama asuransi tidak diminta.
+  assert.equal(cleanWaiver(valid({ insurance: "no", insurer: "DAN" }), { today: TODAY }).insurer, "");
+});
+
+test("belum bersertifikat (ikut kursus): isian sertifikasi, jumlah selam, dan selam terakhir tidak diminta", () => {
+  const w = cleanWaiver(valid({ certified: false, certAgency: "", certLevel: "", certNumber: "", lastDive: "", loggedDives: "" }), { today: TODAY });
   assert.equal(w.certified, false);
   assert.equal(w.loggedDives, null);
-  assert.equal(w.insurance, "");
-  assert.equal(w.insurer, "");
+  assert.equal(w.lastDive, "");
+  assert.equal(w.certNumber, "");
+  // Isian yang tertinggal dari sebelum kotak "belum bersertifikat" dicentang tidak ikut tersimpan.
+  const left = cleanWaiver(valid({ certified: false }), { today: TODAY });
+  assert.deepEqual([left.certAgency, left.certLevel, left.certNumber, left.lastDive, left.loggedDives], ["", "", "", "", null]);
 });
 
 test("peserta di bawah 18 tahun: nama wali wajib dan wali yang mengetik nama konfirmasi", () => {

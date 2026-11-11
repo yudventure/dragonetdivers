@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import AdminGate from "@/admin/AdminGate";
 import AdminShell from "@/admin/AdminShell";
+import AutoPrint from "@/admin/AutoPrint";
 import PrintButton from "@/admin/PrintButton";
 import WaiverDocument from "@/admin/WaiverDocument";
 import { localeNamesId } from "@/lib/i18n";
@@ -41,9 +42,17 @@ export default async function WaiverDetailPage({ params }) {
     <AdminShell admin={admin} active="formulir">
       <div className="flex flex-wrap items-start justify-between gap-3 print:hidden">
         <Link href="/admin/formulir" className="text-sm font-bold text-teal hover:underline">
-          ← Semua formulir
+          ← Meja peninjauan
         </Link>
-        <PrintButton title={fileName} label="Unduh PDF atau cetak" />
+        <span className="flex flex-wrap gap-2">
+          <a
+            href={`/api/admin/export?type=formulir&kode=${w.code}`}
+            className="inline-flex h-10 items-center rounded-full bg-white px-4 text-sm font-bold text-teal ring-1 ring-mist transition-colors duration-200 ease-brand hover:ring-teal"
+          >
+            ⤓ Excel
+          </a>
+          <PrintButton title={fileName} label="⤓ Unduh PDF atau cetak" />
+        </span>
       </div>
       <div className="grid gap-1 print:hidden">
         <p className="font-mono text-sm text-slate">{w.code}</p>
@@ -72,6 +81,7 @@ export default async function WaiverDetailPage({ params }) {
         Dokumen di bawah ini yang tercetak atau tersimpan sebagai PDF. Klik Unduh PDF atau cetak, lalu pilih Simpan sebagai PDF (Save as PDF) di
         tujuan cetak. Nama filenya otomatis <span className="font-mono font-semibold text-abyss">{fileName}.pdf</span>.
       </p>
+      <AutoPrint title={fileName} />
       <div className="-mx-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0 print:m-0 print:overflow-visible print:p-0">
         <WaiverDocument w={w} contact={{ address: contact.address, email: contact.email, whatsapp: whatsappNumber() }} host={new URL(site.url).host} />
       </div>

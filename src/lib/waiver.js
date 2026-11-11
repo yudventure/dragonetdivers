@@ -1,11 +1,15 @@
 // Formulir selam untuk tamu yang menyelam (permintaan pemilik 2 November 2026, contoh: form waiver Turtle Dive
 // Homestay): data diri, profil penyelam dan asuransi, kuesioner medis penyelam (10 pertanyaan dengan kotak
 // lanjutan A sampai G, mengikuti Diver Medical Participant Questionnaire 2020), teks perjanjian (liability
-// release) dari tim di /admin/formulir, dan tanda tangan. Tiap penyelam mengisi formulirnya sendiri, idealnya
+// release) dari tim di /admin/formulir/pengaturan, dan tanda tangan. Tiap penyelam mengisi formulirnya sendiri, idealnya
 // sebelum datang (tautan di halaman pesanan dan email pesanan), atau di dive center lewat /waiver.
 // Fungsi murni, diuji di tests/waiver.test.js. Teks tampilan ada di src/content/ui.js (waiver).
+// Semua isian wajib (permintaan pemilik 11 November 2026: "di isian formulir publik semua wajib di isi"), kecuali
+// isian sertifikasi bagi yang belum bersertifikat (ikut kursus) dan nama asuransi bagi yang tidak berasuransi.
+// Email dan nomor WhatsApp selalu kolom terpisah ("ingat selalu pisahkan email dan nomor whatsapp"), kontak
+// darurat juga dipisah menjadi nama dan nomornya.
 
-import { isOrderCode } from "./checkout.js";
+import { cleanWhatsApp, isOrderCode } from "./checkout.js";
 
 /**
  * Sepuluh pertanyaan utama. box = kotak pertanyaan lanjutan bila dijawab Ya; doctor = jawaban Ya langsung
@@ -105,7 +109,7 @@ export function cleanWaiver(input, { today, agreement = false } = {}) {
   out.age = age;
 
   out.address = text(input.address, 200);
-  if (out.address.length > 200) fail("address");
+  if (out.address.length < 3 || out.address.length > 200) fail("address");
 
   out.nationality = text(input.nationality, 80);
   if (out.nationality.length < 2 || out.nationality.length > 80) fail("nationality");
@@ -113,17 +117,24 @@ export function cleanWaiver(input, { today, agreement = false } = {}) {
   out.date = input.date;
   if (!isDate(out.date) || out.date < addDays(today, -1) || out.date > addDays(today, 400)) fail("date");
 
-  out.emergency = text(input.emergency, 160);
-  if (out.emergency.length < 5 || out.emergency.length > 160) fail("emergency");
-
+  // Email dan WhatsApp peserta: dua kolom terpisah, keduanya wajib. Nomor disimpan lengkap dengan kode negara.
   out.email = text(input.email, 160).toLowerCase();
-  if (out.email && (out.email.length > 160 || !EMAIL.test(out.email))) fail("email");
+  if (!out.email || out.email.length > 160 || !EMAIL.test(out.email)) fail("email");
 
-  out.phone = text(input.phone, 40);
-  if (out.phone && (out.phone.length > 40 || !/^\+?[\d\s()-]{6,}$/.test(out.phone))) fail("phone");
+  const phone = cleanWhatsApp(input.phone);
+  if (!phone) fail("phone");
+  out.phone = `+${phone}`;
+
+  // Kontak darurat: nama dan nomornya terpisah; emergency = gabungan untuk dokumen, email, dan spreadsheet.
+  out.emergencyName = text(input.emergencyName, 120);
+  if (out.emergencyName.length < 2 || out.emergencyName.length > 120) fail("emergencyName");
+  const emergencyPhone = cleanWhatsApp(input.emergencyPhone);
+  if (!emergencyPhone) fail("emergencyPhone");
+  out.emergencyPhone = `+${emergencyPhone}`;
+  out.emergency = `${out.emergencyName} ${out.emergencyPhone}`;
 
   out.room = text(input.room, 80);
-  if (out.room.length > 80) fail("room");
+  if (out.room.length < 2 || out.room.length > 80) fail("room");
 
   // Penyelam bersertifikat mengisi agensi dan tingkatnya; yang belum (ikut kursus) boleh dikosongkan.
   out.certified = input.certified !== false;
@@ -133,19 +144,25 @@ export function cleanWaiver(input, { today, agreement = false } = {}) {
   if (out.certified) {
     if (out.certAgency.length < 2 || out.certAgency.length > 60) fail("certAgency");
     if (out.certLevel.length < 2 || out.certLevel.length > 80) fail("certLevel");
+    if (out.certNumber.length < 2 || out.certNumber.length > 60) fail("certNumber");
+  } else {
+    out.certAgency = "";
+    out.certLevel = "";
+    out.certNumber = "";
   }
-  if (out.certNumber.length > 60) fail("certNumber");
 
-  out.lastDive = input.lastDive || "";
-  if (out.lastDive && (!isDate(out.lastDive) || out.lastDive > today || out.lastDive < "1950-01-01")) fail("lastDive");
-
+  // Jumlah selam dan tanggal selam terakhir wajib bagi penyelam bersertifikat (yang ikut kursus belum punya).
   const dives = input.loggedDives;
-  out.loggedDives = dives === "" || dives === null || dives === undefined ? null : Number(dives);
-  if (out.loggedDives !== null && (!Number.isInteger(out.loggedDives) || out.loggedDives < 0 || out.loggedDives > 99_999)) fail("loggedDives");
+  out.loggedDives = !out.certified || dives === "" || dives === null || dives === undefined ? null : Number(dives);
+  if (out.certified && (!Number.isInteger(out.loggedDives) || out.loggedDives < 0 || out.loggedDives > 99_999)) fail("loggedDives");
+
+  out.lastDive = out.certified ? input.lastDive || "" : "";
+  if (out.certified && (!isDate(out.lastDive) || out.lastDive > today || out.lastDive < "1950-01-01")) fail("lastDive");
 
   out.insurance = input.insurance === "yes" || input.insurance === "no" ? input.insurance : "";
+  if (!out.insurance) fail("insurance");
   out.insurer = out.insurance === "yes" ? text(input.insurer, 80) : "";
-  if (out.insurer.length > 80) fail("insurer");
+  if (out.insurance === "yes" && (out.insurer.length < 2 || out.insurer.length > 80)) fail("insurer");
 
   // Di bawah 18 tahun: orang tua atau wali ikut menandatangani (namanya wajib).
   out.minor = age < 18;
@@ -176,7 +193,7 @@ export function cleanWaiver(input, { today, agreement = false } = {}) {
   return out;
 }
 
-// Teks perjanjian (bawaan src/content/waiver-agreement.js, atau dari /admin/formulir): paragraf dipisah baris kosong; paragraf satu baris yang diawali nomor
+// Teks perjanjian (bawaan src/content/waiver-agreement.js, atau dari /admin/formulir/pengaturan): paragraf dipisah baris kosong; paragraf satu baris yang diawali nomor
 // ("1. Agreement Parties") atau tanda pagar ("# Judul") tampil sebagai judul.
 export const AGREEMENT_MAX = 40_000;
 
@@ -226,6 +243,15 @@ export function cleanAgreement(input) {
   if (Object.values(out).some((text) => text.length > AGREEMENT_MAX)) throw new WaiverError("length");
   if (!out.en && AGREEMENT_LANGS.some((lang) => out[lang])) throw new WaiverError("english");
   return out;
+}
+
+/**
+ * Kontak darurat sebuah formulir tersimpan: { name, phone }. Formulir sejak 11 November 2026 menyimpan nama dan
+ * nomornya terpisah; formulir lama hanya punya satu isian gabungan (emergency), yang tampil sebagai nama.
+ */
+export function emergencyOf(data = {}) {
+  if (data.emergencyName) return { name: data.emergencyName, phone: data.emergencyPhone ?? "" };
+  return { name: data.emergency ?? "", phone: "" };
 }
 
 /** Layanan yang termasuk menyelam (pesanan yang tamunya perlu mengisi formulir). */

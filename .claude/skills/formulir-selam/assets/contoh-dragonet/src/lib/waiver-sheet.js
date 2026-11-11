@@ -25,7 +25,7 @@ export const SHEET_COLUMNS = [
   { header: "Nationality", type: "text", width: 120 },
   { header: "Dive Date", type: "date", width: 110 },
   { header: "Email", type: "text", width: 220 },
-  { header: "Phone", type: "text", width: 160 },
+  { header: "WhatsApp", type: "text", width: 160 },
   { header: "Emergency Contact", type: "text", width: 240 },
   { header: "Room / Homestay", type: "text", width: 160 },
   { header: "Date of Birth", type: "date", width: 110 },
@@ -154,7 +154,7 @@ export function excelRow(values) {
 export function appsScript(token) {
   return `/**
  * Dragonet Divers Raja Ampat · formulir selam ke Google Sheets.
- * Website mengirim tiap formulir yang masuk ke sini. Jangan ubah TOKEN. Bila perlu, salin ulang dari /admin/formulir.
+ * Website mengirim tiap formulir yang masuk ke sini. Jangan ubah TOKEN. Bila perlu, salin ulang dari /admin/formulir/pengaturan.
  */
 const TOKEN = ${JSON.stringify(token)};
 const SHEET_NAME = ${JSON.stringify(SHEET_NAME)};

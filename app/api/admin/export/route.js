@@ -2,14 +2,18 @@ import { reservation } from "@/lib/modules/calendar";
 import { categoryLabel, PAY_METHODS, yearReport } from "@/lib/modules/finance";
 import { ATTENDANCE, EMPLOYMENT } from "@/lib/modules/hr";
 import { METRICS, partner, post } from "@/lib/modules/pr";
+import { witToday } from "@/lib/checkout";
 import { isMonth, monthLabel, monthRange, optionLabel } from "@/lib/records";
 import { site } from "@/lib/site";
+import { isWaiverCode } from "@/lib/waiver";
+import { waiverFileName } from "@/lib/waiver-document";
+import { filterWaivers, isFiltered, reviewFilter } from "@/lib/waiver-review";
 import { excelRow, SHEET_COLUMNS, SHEET_NAME, sheetValues } from "@/lib/waiver-sheet";
 import { workbook } from "@/lib/xlsx";
 import { currentAdmin } from "@/server/admin-auth";
 import { attendanceMonth, calendarMonth, financeRows, financeSettings, guestList, payrollMonth, refOptions } from "@/server/admin-data";
 import { listRecords } from "@/server/records";
-import { listWaivers } from "@/server/waivers";
+import { listWaivers, listWaiversByCodes } from "@/server/waivers";
 
 export const dynamic = "force-dynamic";
 
@@ -18,34 +22,52 @@ const field = (schema, key) => schema.fields.find((f) => f.key === key);
 const label = (options, key) => options.find(([k]) => k === key)?.[1] ?? key ?? "";
 const yesNo = (v) => (v ? "Ya" : "Tidak");
 
+// Nama file boleh berhuruf non-ASCII (nama tamu), jadi dikirim juga sebagai filename* (RFC 5987).
 const file = (name, sheets) =>
   new Response(workbook(sheets), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="dragonet-${name}.xlsx"`,
+      "Content-Disposition": `attachment; filename="${name.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "")}.xlsx"; filename*=UTF-8''${encodeURIComponent(name)}.xlsx`,
       "Cache-Control": "no-store",
     },
   });
 
 const TYPES = {
   // Formulir selam, kolom sama dengan Google Sheets (src/lib/waiver-sheet.js), yang paling lama di atas.
-  async formulir() {
-    const waivers = (await listWaivers(5000)).reverse();
-    return [
-      {
-        name: SHEET_NAME,
-        brand: true,
-        filter: true,
-        freeze: { rows: 1, columns: 3 },
-        widths: SHEET_COLUMNS.map((c) => Math.round(c.width / 7)),
-        rows: [
-          SHEET_COLUMNS.map((c) => c.header),
-          ...waivers.map((w) =>
-            excelRow(sheetValues(w, { base: site.url })).map((cell, i) => (w.clearance && SHEET_COLUMNS[i].alert ? { value: cell, alert: true } : cell)),
-          ),
-        ],
-      },
-    ];
+  // ?kode=DW-… = satu formulir (tombol Excel di meja peninjauan, nama file nomor_nama_negara); selain itu rekap
+  // dengan filter meja peninjauan yang sama (?q=&negara=&sertifikat=&medis=&waktu=).
+  async formulir({ params }) {
+    const code = params.get("kode");
+    let waivers;
+    let fileName;
+    if (code !== null) {
+      if (!isWaiverCode(code)) throw Object.assign(new Error("kode"), { status: 400 });
+      waivers = await listWaiversByCodes([code]);
+      if (!waivers.length) throw Object.assign(new Error("kode"), { status: 404 });
+      fileName = waiverFileName(waivers[0]);
+    } else {
+      const filter = reviewFilter(params);
+      waivers = filterWaivers(await listWaivers(5000), filter, witToday()).reverse();
+      fileName = `dragonet-formulir${isFiltered(filter) ? "-filter" : ""}-${witToday()}`;
+    }
+    return {
+      fileName,
+      sheets: [
+        {
+          name: SHEET_NAME,
+          brand: true,
+          filter: true,
+          freeze: { rows: 1, columns: 3 },
+          widths: SHEET_COLUMNS.map((c) => Math.round(c.width / 7)),
+          rows: [
+            SHEET_COLUMNS.map((c) => c.header),
+            ...waivers.map((w) =>
+              excelRow(sheetValues(w, { base: site.url })).map((cell, i) => (w.clearance && SHEET_COLUMNS[i].alert ? { value: cell, alert: true } : cell)),
+            ),
+          ],
+        },
+      ],
+    };
   },
   async reservasi({ month }) {
     const { orders, reservations, partners } = await calendarMonth(month);
@@ -190,9 +212,11 @@ export async function GET(request) {
   if (["reservasi", "kas", "mutasi", "absensi", "gaji", "konten"].includes(type) && !isMonth(month)) return Response.json({ error: "Bulan tidak valid." }, { status: 400 });
   if (type === "laporan" && !/^20\d{2}$/.test(year)) return Response.json({ error: "Tahun tidak valid." }, { status: 400 });
   try {
-    const sheets = await TYPES[type]({ month, year });
-    return file(`${type}${month ? `-${month}` : year ? `-${year}` : ""}`, sheets);
+    const result = await TYPES[type]({ month, year, params });
+    const sheets = Array.isArray(result) ? result : result.sheets;
+    return file(result.fileName ?? `dragonet-${type}${month ? `-${month}` : year ? `-${year}` : ""}`, sheets);
   } catch (error) {
+    if (error.status) return Response.json({ error: error.status === 404 ? "Formulir tidak ditemukan." : "Nomor formulir tidak valid." }, { status: error.status });
     console.error(`[admin/export] ${type}: ${error.code ?? error.message}`);
     return Response.json({ error: "Database belum bisa diakses. Coba lagi sebentar." }, { status: 503 });
   }

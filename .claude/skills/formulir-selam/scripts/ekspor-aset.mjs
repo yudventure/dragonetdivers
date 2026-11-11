@@ -45,7 +45,7 @@ const neutral = (value) => {
 };
 
 // 1. Logika murni. Satu-satunya impor Dragonet (isOrderCode dari checkout.js) diganti setelan per situs.
-const IMPORT = 'import { isOrderCode } from "./checkout.js";';
+const IMPORT = 'import { cleanWhatsApp, isOrderCode } from "./checkout.js";';
 let logic = read("src/lib/waiver.js");
 if (!logic.includes(IMPORT)) throw new Error("Impor waiver.js berubah, perbarui ekspor-aset.mjs");
 logic = logic.replace(
@@ -55,6 +55,15 @@ logic = logic.replace(
     "// Situs tanpa pesanan online cukup membiarkannya, kolom order akan selalu kosong.",
     "const ORDER_CODE = /^DD-\\d{6}-[A-Z0-9]{5}$/;",
     "const isOrderCode = (value) => typeof value === \"string\" && ORDER_CODE.test(value);",
+    "// Nomor WhatsApp lengkap dengan kode negara (sama dengan cleanWhatsApp di src/lib/checkout.js Dragonet):",
+    "// \"+62 812 3456 7890\", \"0062…\", atau \"0812…\" (dianggap Indonesia) → \"6281234567890\", selain itu null.",
+    "export function cleanWhatsApp(value) {",
+    "  let digits = String(value ?? \"\").trim().replace(/[\\s().-]/g, \"\");",
+    "  if (digits.startsWith(\"+\")) digits = digits.slice(1);",
+    "  else if (digits.startsWith(\"00\")) digits = digits.slice(2);",
+    "  else if (digits.startsWith(\"0\")) digits = `62${digits.slice(1)}`;",
+    "  return /^[1-9]\\d{7,14}$/.test(digits) ? digits : null;",
+    "}",
   ].join("\n"),
 );
 write(
@@ -121,6 +130,12 @@ const ORIGINALS = [
   "src/admin/PrintButton.jsx",
   // Dokumen A4 bermerek untuk cetak atau PDF, nama file nomor_nama_negara.
   "src/admin/WaiverDocument.jsx",
+  // Meja peninjauan (cari dan filter, unduh PDF dan Excel per formulir) terpisah dari pengaturan formulir.
+  "app/admin/formulir/pengaturan/page.jsx",
+  "src/admin/WaiverFilters.jsx",
+  "src/admin/AutoPrint.jsx",
+  "src/lib/waiver-review.js",
+  "tests/waiver-review.test.js",
   "src/lib/waiver-document.js",
   "tests/waiver-document.test.js",
   "src/admin/CopyText.jsx",
