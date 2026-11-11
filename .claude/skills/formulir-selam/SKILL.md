@@ -114,6 +114,8 @@ lain sebaiknya dikembalikan ke Dragonet juga.
 - [ ] Di bawah 18 tahun meminta nama wali dan wali yang mengetik konfirmasi
 - [ ] Teks di semua bahasa situs bersih dari titik dua, titik koma, tanda pisah panjang
 - [ ] Ponsel 390 px tanpa gulir menyamping, tanda tangan bisa digambar dengan sentuhan
+- [ ] Semua isian formulir wajib (kecuali isian sertifikasi bagi yang ikut kursus dan nama asuransi bagi yang tidak berasuransi), nomor WhatsApp dan email kolom terpisah, kontak darurat nama dan nomor terpisah
+- [ ] Admin memisahkan meja peninjauan (cari nama, nomor formulir, email, WhatsApp; filter negara, sertifikat, medis, tanggal; unduh PDF dan Excel per formulir; rekap Excel sesuai filter) dari pengaturan formulir
 - [ ] Detail formulir di admin tercetak sebagai dokumen A4 dengan kop situs itu, tanpa tanggal dan alamat web dari peramban, dan nama file PDF berisi nomor surat, nama, dan negara (`assets/contoh-dragonet/src/admin/WaiverDocument.jsx`)
 - [ ] Bila spreadsheet dipasang, formulir baru masuk ke Google Sheets dengan telepon tetap teks, dan kirim ulang tidak membuat baris ganda
 - [ ] Katakan terus terang hanya Chromium Linux yang diuji, Windows, Mac, Android, dan iOS belum

@@ -3,7 +3,7 @@ import { query } from "./db";
 import { FALLBACK_BLUR, imageInfo } from "./media";
 import { getSetting, saveSetting } from "./settings";
 
-// Formulir selam di database (tabel waivers, migrasi 008) dan teks perjanjian dari /admin/formulir
+// Formulir selam di database (tabel waivers, migrasi 008) dan teks perjanjian dari /admin/formulir/pengaturan
 // (settings baris "waiver": { en, id, zh, ko, updatedAt }). Logika murni di src/lib/waiver.js.
 
 export const DEFAULT_AGREEMENT = { en: "", id: "", zh: "", ko: "", updatedAt: "" };
@@ -11,7 +11,7 @@ export const DEFAULT_AGREEMENT = { en: "", id: "", zh: "", ko: "", updatedAt: ""
 export const getAgreement = () => getSetting("waiver", DEFAULT_AGREEMENT);
 
 /**
- * Foto di panel kiri /waiver yang dipilih tim dari galeri di /admin/formulir (settings baris "waiver_photo",
+ * Foto di panel kiri /waiver yang dipilih tim dari galeri di /admin/formulir/pengaturan (settings baris "waiver_photo",
  * { mediaId }): gambar next/image, atau null (pakai foto bawaan) bila belum dipilih atau fotonya sudah dihapus.
  */
 export async function waiverPhoto() {
@@ -85,8 +85,8 @@ function fromRow(row, { full = false } = {}) {
   };
 }
 
-/** Daftar formulir terbaru (tanpa tanda tangan), untuk /admin/formulir. */
-export async function listWaivers(limit = 500) {
+/** Daftar formulir terbaru (tanpa tanda tangan), untuk meja peninjauan /admin/formulir. */
+export async function listWaivers(limit = 2000) {
   const rows = await query(
     `SELECT code, order_code, locale, full_name, birth_date, nationality, email, phone, dive_date, clearance, minor, data, created_at
      FROM waivers ORDER BY created_at DESC, id DESC LIMIT ?`,
@@ -104,6 +104,12 @@ export async function listWaiversByCodes(codes) {
     codes,
   );
   return rows.map((row) => fromRow(row));
+}
+
+/** Jumlah semua formulir. */
+export async function waiverTotal() {
+  const [row] = await query("SELECT COUNT(*) AS n FROM waivers");
+  return Number(row?.n ?? 0);
 }
 
 /** Satu formulir lengkap dengan tanda tangan dan teks perjanjiannya. */

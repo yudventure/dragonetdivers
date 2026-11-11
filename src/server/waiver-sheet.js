@@ -7,7 +7,7 @@ import { getSetting, saveSetting } from "./settings";
 import { listWaiversByCodes } from "./waivers";
 
 // Formulir selam ke Google Sheets tim (permintaan pemilik 2 November 2026: "buatkan hasil form bisa langsung
-// rapih di spreadsheet"). Tim menempel skrip dari /admin/formulir (appsScript di src/lib/waiver-sheet.js) di
+// rapih di spreadsheet"). Tim menempel skrip dari /admin/formulir/pengaturan (appsScript di src/lib/waiver-sheet.js) di
 // spreadsheetnya, memasangnya sebagai Web app, lalu menyimpan alamatnya. Setiap formulir baru dikirim setelah
 // tersimpan; yang gagal dikirim ulang oleh pengecekan berkala (startSheetSync, dimulai instrumentation.js) atau
 // tombol Kirim di admin. Yang sudah terkirim dicatat di tabel waiver_sheet_sync (migrasi 010); Apps Script

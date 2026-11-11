@@ -1,7 +1,7 @@
 import Image from "next/image";
 import logo from "../../brand/logo/dragonet-divers-logo.png";
 import { uiText } from "@/content/ui";
-import { agreementBlocks, boxItems, MEDICAL } from "@/lib/waiver";
+import { agreementBlocks, boxItems, emergencyOf, MEDICAL } from "@/lib/waiver";
 import { displayPhone, DOC_LANGUAGES, docDate, docTime } from "@/lib/waiver-document";
 
 // Cetak tanpa margin halaman, supaya peramban tidak menambahkan tanggal, judul, dan alamat web di atas dan
@@ -71,6 +71,7 @@ export default function WaiverDocument({ w, contact, host }) {
   const signedTime = docTime(w.createdAt);
   const language = DOC_LANGUAGES[w.lang] ?? w.lang;
   const certified = d.certified !== false;
+  const emergency = emergencyOf(d);
   const signer = w.minor ? d.guardian : w.name;
   const insurance = d.insurance === "yes" ? `Yes${d.insurer ? `, ${d.insurer}` : ""}` : d.insurance === "no" ? "No" : "Not answered";
 
@@ -152,10 +153,11 @@ export default function WaiverDocument({ w, contact, host }) {
                 <Section title="Contact and stay" className="keep">
                   <Rows
                     items={[
-                      ["Phone or WhatsApp", w.phone],
+                      ["WhatsApp", w.phone],
                       ["Email", w.email],
                       ["Home address", d.address],
-                      ["Emergency contact", d.emergency],
+                      ["Emergency contact", emergency.name],
+                      ...(emergency.phone ? [["Emergency phone", emergency.phone]] : []),
                       ["Staying at", d.room],
                       ...(w.order ? [["Booking", w.order]] : []),
                       ...(w.minor ? [["Parent or guardian", d.guardian]] : []),
@@ -255,7 +257,7 @@ export default function WaiverDocument({ w, contact, host }) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={w.signature} alt={`Signature of ${signer}`} className="h-[17mm] w-auto max-w-full object-contain" />
                   </Line>
-                  <Line label="Emergency contact and phone">{d.emergency}</Line>
+                  <Line label="Emergency contact and phone">{[emergency.name, emergency.phone].filter(Boolean).join(" · ")}</Line>
                 </div>
                 <div className="mt-[4mm] grid grid-cols-2 gap-x-[8mm]">
                   <Line label="Parent or guardian name (participant under 18)">{w.minor ? d.guardian : ""}</Line>

