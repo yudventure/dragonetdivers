@@ -150,6 +150,25 @@ export async function syncWaiverSheet() {
 
 export const sheetSyncRunning = () => Boolean(state.running);
 
+/** Kirim ulang satu formulir (status kedatangan atau sampah berubah) pada pengiriman berikutnya. */
+export async function resyncWaiver(code) {
+  await query("DELETE FROM waiver_sheet_sync WHERE code = ?", [code]);
+  syncWaiverSheet().catch((error) => console.error(`[formulir/sheet] ${error?.message}`));
+}
+
+/**
+ * Sebelum formulir dihapus permanen: barisnya di spreadsheet ditandai Deleted (baris tidak dihapus dari
+ * spreadsheet tim). Bila spreadsheet belum disambungkan atau gagal, penghapusan tetap jalan.
+ */
+export async function markSheetDeleted(w) {
+  const settings = await getSheetSettings().catch(() => null);
+  const url = cleanSheetUrl(settings?.url);
+  if (!url || !settings.token) return;
+  await post(url, settings.token, [sheetRow({ ...w, sheetStatus: "Deleted" }, { base: site.url })]).catch((error) =>
+    console.error(`[formulir/sheet] tanda Deleted tidak terkirim: ${error?.reason ?? ""} ${error?.message ?? ""}`.trim()),
+  );
+}
+
 /** Pengecekan berkala: formulir yang gagal terkirim dicoba lagi tiap 15 menit. */
 export function startSheetSync() {
   if (state.timer) return;

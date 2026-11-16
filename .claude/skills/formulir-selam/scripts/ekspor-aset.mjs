@@ -134,6 +134,10 @@ const ORIGINALS = [
   "app/admin/formulir/pengaturan/page.jsx",
   "src/admin/WaiverFilters.jsx",
   "src/admin/AutoPrint.jsx",
+  // Konfirmasi kedatangan dan sampah (uji coba atau tidak datang), pulihkan, hapus permanen.
+  "src/admin/WaiverActions.jsx",
+  "app/api/admin/waivers/[code]/route.js",
+  "database/migrations/011_waiver_status.sql",
   "src/lib/waiver-review.js",
   "tests/waiver-review.test.js",
   "src/lib/waiver-document.js",

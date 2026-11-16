@@ -80,49 +80,106 @@ function fromRow(row, { full = false } = {}) {
     clearance: Boolean(row.clearance),
     minor: Boolean(row.minor),
     createdAt: iso(row.created_at),
+    arrival: row.arrival ?? "",
+    arrivalAt: iso(row.arrival_at),
+    arrivalBy: row.arrival_by ?? "",
+    trashedAt: iso(row.trashed_at),
+    trashedBy: row.trashed_by ?? "",
     data,
     ...(full ? { agreement: row.agreement ?? "", signature: row.signature, ip: row.ip ?? "", userAgent: row.user_agent ?? "" } : {}),
   };
 }
 
-/** Daftar formulir terbaru (tanpa tanda tangan), untuk meja peninjauan /admin/formulir. */
-export async function listWaivers(limit = 2000) {
+// Kolom daftar (tanpa tanda tangan) beserta konfirmasi kedatangan dan sampah (tabel waiver_status, migrasi 011).
+const LIST_COLUMNS = `w.code, w.order_code, w.locale, w.full_name, w.birth_date, w.nationality, w.email, w.phone, w.dive_date, w.clearance,
+  w.minor, w.data, w.created_at, s.arrival, s.arrival_at, s.arrival_by, s.trashed_at, s.trashed_by`;
+const WITH_STATUS = "FROM waivers w LEFT JOIN waiver_status s ON s.code = w.code";
+
+/**
+ * Daftar formulir terbaru untuk meja peninjauan /admin/formulir. trashed = true: isi sampah (yang terakhir
+ * dipindahkan di atas); selain itu formulir di sampah tidak ikut.
+ */
+export async function listWaivers(limit = 2000, { trashed = false } = {}) {
   const rows = await query(
-    `SELECT code, order_code, locale, full_name, birth_date, nationality, email, phone, dive_date, clearance, minor, data, created_at
-     FROM waivers ORDER BY created_at DESC, id DESC LIMIT ?`,
+    `SELECT ${LIST_COLUMNS} ${WITH_STATUS}
+     WHERE s.trashed_at IS ${trashed ? "NOT NULL" : "NULL"}
+     ORDER BY ${trashed ? "s.trashed_at DESC," : ""} w.created_at DESC, w.id DESC LIMIT ?`,
     [limit],
   );
   return rows.map((row) => fromRow(row));
 }
 
-/** Formulir dengan kode tertentu (tanpa tanda tangan), urut dari yang paling lama, untuk spreadsheet. */
+/** Formulir dengan kode tertentu (termasuk yang di sampah), urut dari yang paling lama, untuk spreadsheet. */
 export async function listWaiversByCodes(codes) {
   if (!codes.length) return [];
   const rows = await query(
-    `SELECT code, order_code, locale, full_name, birth_date, nationality, email, phone, dive_date, clearance, minor, data, created_at
-     FROM waivers WHERE code IN (${codes.map(() => "?").join(", ")}) ORDER BY created_at, id`,
+    `SELECT ${LIST_COLUMNS} ${WITH_STATUS} WHERE w.code IN (${codes.map(() => "?").join(", ")}) ORDER BY w.created_at, w.id`,
     codes,
   );
   return rows.map((row) => fromRow(row));
 }
 
-/** Jumlah semua formulir. */
+/** Jumlah formulir di luar sampah, dan jumlah di sampah. */
 export async function waiverTotal() {
-  const [row] = await query("SELECT COUNT(*) AS n FROM waivers");
+  const [row] = await query(`SELECT COUNT(*) AS n ${WITH_STATUS} WHERE s.trashed_at IS NULL`);
   return Number(row?.n ?? 0);
+}
+
+export async function trashCount() {
+  const [row] = await query("SELECT COUNT(*) AS n FROM waiver_status WHERE trashed_at IS NOT NULL");
+  return Number(row?.n ?? 0);
+}
+
+/** Simpan konfirmasi kedatangan (arrival sudah diperiksa isArrival). by = email operator. */
+export async function setArrival(code, arrival, by) {
+  const result = await query(
+    `INSERT INTO waiver_status (code, arrival, arrival_at, arrival_by)
+     SELECT code, ?, ${arrival ? "UTC_TIMESTAMP()" : "NULL"}, ? FROM waivers WHERE code = ?
+     ON DUPLICATE KEY UPDATE arrival = VALUES(arrival), arrival_at = VALUES(arrival_at), arrival_by = VALUES(arrival_by)`,
+    [arrival, arrival ? by : null, code],
+  );
+  return result.affectedRows > 0;
+}
+
+/** Pindahkan ke sampah, hanya bila tamu tidak datang atau formulir uji coba (canTrash). */
+export async function trashWaiver(code, by) {
+  const result = await query(
+    "UPDATE waiver_status SET trashed_at = UTC_TIMESTAMP(), trashed_by = ? WHERE code = ? AND arrival IN ('tidak', 'uji') AND trashed_at IS NULL",
+    [by, code],
+  );
+  return result.affectedRows > 0;
+}
+
+export async function restoreWaiver(code) {
+  const result = await query("UPDATE waiver_status SET trashed_at = NULL, trashed_by = NULL WHERE code = ? AND trashed_at IS NOT NULL", [code]);
+  return result.affectedRows > 0;
+}
+
+/** Hapus permanen formulir yang sudah di sampah (beserta catatan status dan pengiriman spreadsheetnya). */
+export async function deleteWaiver(code) {
+  const [row] = await query("SELECT code FROM waiver_status WHERE code = ? AND trashed_at IS NOT NULL", [code]);
+  if (!row) return false;
+  await query("DELETE FROM waivers WHERE code = ?", [code]);
+  await query("DELETE FROM waiver_status WHERE code = ?", [code]);
+  await query("DELETE FROM waiver_sheet_sync WHERE code = ?", [code]);
+  return true;
 }
 
 /** Satu formulir lengkap dengan tanda tangan dan teks perjanjiannya. */
 export async function waiverByCode(code) {
-  const [row] = await query("SELECT * FROM waivers WHERE code = ?", [code]);
+  const [row] = await query(
+    `SELECT w.*, s.arrival, s.arrival_at, s.arrival_by, s.trashed_at, s.trashed_by ${WITH_STATUS} WHERE w.code = ?`,
+    [code],
+  );
   return row ? fromRow(row, { full: true }) : null;
 }
 
-/** Jumlah formulir per pesanan ({ kode: jumlah }). */
+/** Jumlah formulir per pesanan ({ kode: jumlah }), tanpa yang di sampah. */
 export async function waiverCounts(orderCodes) {
   if (!orderCodes.length) return {};
   const rows = await query(
-    `SELECT order_code, COUNT(*) AS n FROM waivers WHERE order_code IN (${orderCodes.map(() => "?").join(", ")}) GROUP BY order_code`,
+    `SELECT w.order_code, COUNT(*) AS n ${WITH_STATUS}
+     WHERE s.trashed_at IS NULL AND w.order_code IN (${orderCodes.map(() => "?").join(", ")}) GROUP BY w.order_code`,
     orderCodes,
   );
   return Object.fromEntries(rows.map((row) => [row.order_code, Number(row.n)]));
