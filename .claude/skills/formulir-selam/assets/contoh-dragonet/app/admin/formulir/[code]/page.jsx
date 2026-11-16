@@ -5,6 +5,7 @@ import AdminGate from "@/admin/AdminGate";
 import AdminShell from "@/admin/AdminShell";
 import AutoPrint from "@/admin/AutoPrint";
 import PrintButton from "@/admin/PrintButton";
+import { ArrivalSelect, TrashButton, TrashedActions } from "@/admin/WaiverActions";
 import WaiverDocument from "@/admin/WaiverDocument";
 import { localeNamesId } from "@/lib/i18n";
 import { contact, site, whatsappNumber } from "@/lib/site";
@@ -69,6 +70,21 @@ export default async function WaiverDetailPage({ params }) {
           )}
         </p>
       </div>
+      {w.trashedAt ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-danger/10 p-4 ring-1 ring-danger/30 print:hidden">
+          <p className="font-semibold text-abyss">Formulir ini ada di sampah, jadi tidak tampil di meja peninjauan dan rekap.</p>
+          <TrashedActions code={w.code} name={w.name} deletedHref="/admin/formulir?sampah=1" />
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3 rounded-card bg-white p-4 ring-1 ring-mist print:hidden">
+          <span className="text-sm font-semibold text-abyss">Kedatangan</span>
+          <ArrivalSelect code={w.code} arrival={w.arrival} name={w.name} />
+          {w.arrivalBy && <span className="text-xs text-slate">dikonfirmasi {w.arrivalBy}</span>}
+          <span className="ml-auto">
+            <TrashButton code={w.code} name={w.name} arrival={w.arrival} label />
+          </span>
+        </div>
+      )}
       {w.clearance ? (
         <p className="rounded-card bg-sunrise-wash p-4 font-semibold text-abyss ring-1 ring-sunrise print:hidden">
           Perlu persetujuan dokter sebelum menyelam karena ada jawaban Ya pada pertanyaan yang memerlukan evaluasi dokter. Minta surat evaluasi

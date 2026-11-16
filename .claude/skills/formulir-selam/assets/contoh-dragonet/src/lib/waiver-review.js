@@ -15,6 +15,17 @@ export const fold = (value) =>
 const MEDIS = ["dokter", "aman"];
 const WAKTU = ["akan", "lalu"];
 
+/**
+ * Konfirmasi kedatangan (permintaan pemilik 16 November 2026): diisi tim di meja peninjauan. Formulir uji coba
+ * atau tamu yang dipastikan tidak datang boleh dipindahkan ke sampah; formulir lain tetap tersimpan sebagai
+ * catatan resmi.
+ */
+export const ARRIVALS = { "": "Belum dikonfirmasi", datang: "Datang", tidak: "Tidak datang", uji: "Uji coba" };
+export const isArrival = (value) => typeof value === "string" && Object.hasOwn(ARRIVALS, value);
+export const canTrash = (w) => w?.arrival === "tidak" || w?.arrival === "uji";
+// Nilai filter kedatangan di alamat halaman ("belum" = belum dikonfirmasi).
+const KEDATANGAN = { belum: "", datang: "datang", tidak: "tidak", uji: "uji" };
+
 /** Filter dari parameter alamat (URLSearchParams atau objek). Nilai yang tidak dikenal diabaikan. */
 export function reviewFilter(params = {}) {
   const get = (key) => {
@@ -23,12 +34,14 @@ export function reviewFilter(params = {}) {
   };
   const medis = get("medis");
   const waktu = get("waktu");
+  const kedatangan = get("kedatangan");
   return {
     q: get("q"),
     negara: get("negara"),
     sertifikat: get("sertifikat"),
     medis: MEDIS.includes(medis) ? medis : "",
     waktu: WAKTU.includes(waktu) ? waktu : "",
+    kedatangan: Object.hasOwn(KEDATANGAN, kedatangan) ? kedatangan : "",
   };
 }
 
@@ -50,6 +63,7 @@ const certOf = (w) => (w.data?.certified === false ? "belum" : fold(w.data?.cert
  * jadi "0812" dan "+62 812" sama-sama ketemu), dan tingkat sertifikat. negara = kewarganegaraan persis (tanpa
  * beda huruf besar dan aksen). sertifikat = "ada", "belum", atau nama agensi. medis = "dokter" (perlu
  * persetujuan dokter) atau "aman". waktu = "akan" (tanggal selam hari ini atau nanti) atau "lalu".
+ * kedatangan = "belum", "datang", "tidak", atau "uji".
  */
 export function filterWaivers(list, filter, today) {
   const q = fold(filter.q);
@@ -71,6 +85,7 @@ export function filterWaivers(list, filter, today) {
     if (filter.medis === "aman" && w.clearance) return false;
     if (filter.waktu === "akan" && !(w.date >= today)) return false;
     if (filter.waktu === "lalu" && !(w.date < today)) return false;
+    if (filter.kedatangan && (w.arrival ?? "") !== KEDATANGAN[filter.kedatangan]) return false;
     return true;
   });
 }

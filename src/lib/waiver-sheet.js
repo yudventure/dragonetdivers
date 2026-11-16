@@ -73,6 +73,16 @@ export function medicalSummary(medical = {}) {
 }
 
 /**
+ * Kolom Status: konfirmasi kedatangan dari meja peninjauan (Arrived, No-show, Test), Trashed bila di sampah,
+ * selain itu Signed. w.sheetStatus menimpanya (mis. Deleted sebelum dihapus permanen).
+ */
+export function statusOf(w) {
+  if (w.sheetStatus) return w.sheetStatus;
+  if (w.trashedAt) return "Trashed";
+  return { datang: "Arrived", tidak: "No-show", uji: "Test" }[w.arrival] ?? "Signed";
+}
+
+/**
  * Satu formulir (bentuk listWaivers/waiverByCode di src/server/waivers.js) sebagai nilai kolom SHEET_COLUMNS.
  * base = alamat website untuk tautan ke halaman formulir di admin.
  */
@@ -107,7 +117,7 @@ export function sheetValues(w, { base = "" } = {}) {
     w.clearance ? "Needed" : "Not needed",
     LANGUAGES[w.lang] ?? w.lang ?? "",
     w.order || "",
-    "Signed",
+    statusOf(w),
     base ? `${base.replace(/\/$/, "")}/admin/formulir/${w.code}` : "",
   ];
 }

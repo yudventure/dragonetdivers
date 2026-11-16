@@ -9,7 +9,8 @@ const SELECT = `${INPUT} cursor-pointer pr-8`;
 /**
  * Cari dan filter di meja peninjauan formulir selam (/admin/formulir): nama, nomor formulir, email, atau WhatsApp,
  * lalu negara, sertifikat, medis, dan waktu selam. Formulir biasa (GET), jadi filternya ada di alamat halaman dan
- * ikut ke rekap Excel; pilihan yang diganti langsung dikirim, kolom cari dengan Enter atau tombol Cari.
+ * ikut ke rekap Excel; pilihan yang diganti langsung dikirim, kolom cari dengan Enter atau tombol Cari. Kedatangan
+ * (belum dikonfirmasi, datang, tidak datang, uji coba) sejak 16 November 2026.
  * filter = reviewFilter, options = reviewOptions (negara dan agensi yang ada).
  */
 export default function WaiverFilters({ filter, options }) {
@@ -38,7 +39,7 @@ export default function WaiverFilters({ filter, options }) {
           </button>
         </span>
       </label>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Select name="negara" label="Negara">
           <option value="">Semua negara</option>
           {options.countries.map((country) => (
@@ -70,6 +71,13 @@ export default function WaiverFilters({ filter, options }) {
           <option value="">Semua tanggal</option>
           <option value="akan">Hari ini dan nanti</option>
           <option value="lalu">Sudah lewat</option>
+        </Select>
+        <Select name="kedatangan" label="Kedatangan">
+          <option value="">Semua</option>
+          <option value="belum">Belum dikonfirmasi</option>
+          <option value="datang">Datang</option>
+          <option value="tidak">Tidak datang</option>
+          <option value="uji">Uji coba</option>
         </Select>
       </div>
     </form>

@@ -80,6 +80,9 @@ test("satu formulir menjadi satu baris rapi: waktu WIT, tanggal ISO, telepon tet
   assert.equal(get("Doctor Clearance"), "Not needed");
   assert.equal(get("Language"), "Indonesian");
   assert.equal(get("Status"), "Signed");
+  // Status mengikuti konfirmasi kedatangan dan sampah di meja peninjauan.
+  const status = (over) => sheetValues(waiver(over))[col("Status")];
+  assert.deepEqual([status({ arrival: "datang" }), status({ arrival: "tidak" }), status({ arrival: "uji" }), status({ arrival: "uji", trashedAt: "2026-11-16T01:00:00Z" }), status({ sheetStatus: "Deleted" })], ["Arrived", "No-show", "Test", "Trashed", "Deleted"]);
   assert.equal(get("Form"), "https://dragonetdiversrajaampat.com/admin/formulir/DW-261102-ABCDE");
   // Belum bersertifikat, tanpa asuransi dan jumlah selam, di bawah 18 dengan wali.
   const kid = sheetValues(
