@@ -1,7 +1,9 @@
 import "server-only";
+import { COURSES_SERVICE } from "@/lib/course-slugs";
 import { cleanHiddenServices, shownServicesIn } from "@/lib/services";
 import { SITE_STATE } from "@/lib/site";
 import { cleanServiceImages, DEFAULT_SITE_SETTINGS, normalizeSiteSettings, serviceImageOf } from "@/lib/site-settings";
+import { query } from "./db";
 import { isDatabaseConfigured } from "./db-config.js";
 import { getSetting, saveSetting } from "./settings";
 
@@ -98,4 +100,35 @@ export async function saveHiddenServices(hidden) {
   const value = { ...(await storedSiteSettings()), hiddenServices: cleanHiddenServices(hidden) };
   await saveSiteSettings(value);
   return value.hiddenServices;
+}
+
+const COURSES_MARK = "courses_shown_v1";
+const courses = (globalThis[`${SITE_STATE}:kursus`] ??= { run: null });
+
+/**
+ * Kursus selam tampil lagi (permintaan pemilik 16 November 2026, halaman kursus SSI): dilepas sekali dari daftar
+ * layanan yang disimpan di database. Penanda settings baris courses_shown_v1, jadi bila tim menyimpannya lagi di
+ * /admin/paket, kursus tidak muncul kembali. Dipanggil instrumentation.js dan /admin/paket.
+ */
+export function ensureCoursesShown() {
+  if (!isDatabaseConfigured() || process.env.NEXT_PHASE === "phase-production-build") return Promise.resolve(null);
+  courses.run ??= (async () => {
+    const claim = await query("INSERT IGNORE INTO settings (name, value) VALUES (?, ?)", [COURSES_MARK, JSON.stringify({ at: new Date().toISOString() })]);
+    if (claim.affectedRows === 0) return false; // sudah pernah (atau sedang di proses lain)
+    try {
+      const stored = await storedSiteSettings();
+      if (!stored.hiddenServices.includes(COURSES_SERVICE)) return false;
+      await saveSiteSettings({ ...stored, hiddenServices: stored.hiddenServices.filter((slug) => slug !== COURSES_SERVICE) });
+      console.log("[situs] kursus selam ditampilkan di website");
+      return true;
+    } catch (error) {
+      await query("DELETE FROM settings WHERE name = ?", [COURSES_MARK]).catch(() => {});
+      throw error;
+    }
+  })().catch((error) => {
+    courses.run = null;
+    console.error(`[situs] kursus selam belum bisa ditampilkan: ${error.code ?? error.message}`);
+    return null;
+  });
+  return courses.run;
 }

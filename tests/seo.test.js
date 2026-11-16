@@ -45,6 +45,16 @@ test("isian yang bukan kode tag HTML Google ditolak", () => {
 
 test("sitemap: beranda dan layanan yang tampil dalam empat bahasa, dengan pasangan bahasanya", () => {
   assert.deepEqual(sitemapPaths(["fun-dives", "dusk-dives"]), ["/", "/services/fun-dives", "/services/dusk-dives"]);
+  // Kursus selam yang tampil membawa lima halaman kursusnya.
+  assert.deepEqual(sitemapPaths(["dive-courses"]), [
+    "/",
+    "/services/dive-courses",
+    "/services/dive-courses/open-water-diver",
+    "/services/dive-courses/advanced-open-water-diver",
+    "/services/dive-courses/react-right",
+    "/services/dive-courses/diver-stress-and-rescue",
+    "/services/dive-courses/divemaster",
+  ]);
   const entries = sitemapEntries("https://dragonetdiversrajaampat.com", ["fun-dives"]);
   assert.deepEqual(
     entries.map((e) => e.url),

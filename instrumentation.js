@@ -13,8 +13,10 @@ export async function register() {
   }
   // Kontak dan media sosial dari /admin/kontak (src/server/site-settings.js), paling lama 1,5 detik.
   try {
-    const { getSiteSettings } = await import("./src/server/site-settings.js");
+    const { ensureCoursesShown, getSiteSettings } = await import("./src/server/site-settings.js");
     await getSiteSettings();
+    // Kursus selam tampil lagi sekali (halaman kursus SSI, 16 November 2026), tidak ditunggu.
+    ensureCoursesShown();
   } catch (error) {
     console.error(`[situs] pengaturan kontak tidak bisa dimuat: ${error?.message}`);
   }

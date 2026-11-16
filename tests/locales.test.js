@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { courses } from "../src/content/courses.js";
 import { faqs } from "../src/content/faq.js";
 import { maintenanceText } from "../src/content/maintenance.js";
 import { orderMailText } from "../src/content/order-mail.js";
@@ -47,6 +48,7 @@ const SOURCES = {
   orderMail: (lang) => [orderMailText.en, orderMailText[lang]],
   diveMap: (lang) => [mapText.en, mapText[lang]],
   services: (lang) => [Object.fromEntries(services.map((s) => [s.slug, s.en])), Object.fromEntries(services.map((s) => [s.slug, s[lang]]))],
+  courses: (lang) => [Object.fromEntries(courses.map((c) => [c.slug, c.en])), Object.fromEntries(courses.map((c) => [c.slug, c[lang]]))],
 };
 
 for (const lang of LANGS) {
@@ -65,7 +67,7 @@ for (const lang of LANGS) {
     assert.equal(maintenanceText[lang].language, "English", "tautan halaman perawatan ke English");
     const texts = [];
     const walk = (v) => (typeof v === "string" ? texts.push(v) : v && typeof v === "object" && Object.values(v).forEach(walk));
-    walk([ui[lang], faqs[lang], steps[lang], orderMailText[lang], mapText[lang], services.map((s) => s[lang])]);
+    walk([ui[lang], faqs[lang], steps[lang], orderMailText[lang], mapText[lang], services.map((s) => s[lang]), courses.map((c) => c[lang])]);
     const local = texts.filter((t) => /[぀-ヿ㐀-鿿가-힯]/.test(t)).length / texts.length;
     assert.ok(local > 0.8, `sebagian besar teks memakai aksara ${lang} (${Math.round(local * 100)}%)`);
     const bad = texts.filter((t) => /[；：]|——/.test(t));

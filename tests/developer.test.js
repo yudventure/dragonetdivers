@@ -73,6 +73,10 @@ test("alamat dipetakan ke kunci halaman", () => {
   assert.equal(pageForPath("/services/fun-dives/"), "fun-dives");
   assert.equal(pageForPath("/checkout/12"), "checkout");
   assert.equal(pageForPath("/services/tidak-ada"), null);
+  // Halaman kursus ikut kunci Kursus selam.
+  assert.equal(pageForPath("/services/dive-courses/open-water-diver"), "dive-courses");
+  assert.equal(pageForPath("/services/dive-courses/divemaster/"), "dive-courses");
+  assert.equal(pageForPath("/services/dive-courses/a/b"), null);
   assert.equal(pageForPath("/order/DD-ABC"), null);
   // Setiap halaman layanan bisa ditutup, dan sebaliknya.
   const servicePages = LOCKABLE_PAGES.filter(([, , path]) => path.startsWith("/services/")).map(([key]) => key);

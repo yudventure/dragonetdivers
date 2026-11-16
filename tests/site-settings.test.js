@@ -27,7 +27,7 @@ test("isian kontak dibersihkan", () => {
     facebook: "",
     youtube: "",
     showUsd: true,
-    hiddenServices: ["dive-courses", "snorkeling"],
+    hiddenServices: ["snorkeling"],
     serviceImages: {},
     googleVerification: "",
   });
@@ -53,13 +53,13 @@ test("kode verifikasi Google: tag HTML jadi kodenya, kode DNS dan isian asing di
   assert.equal(normalizeSiteSettings({ email: "info@contoh.id" }).email, "info@contoh.id");
 });
 
-test("layanan yang disimpan: bawaan snorkeling dan kursus selam, slug asing dibuang", () => {
-  assert.deepEqual(DEFAULT_SITE_SETTINGS.hiddenServices, ["dive-courses", "snorkeling"]);
+test("layanan yang disimpan: bawaan snorkeling (kursus selam tampil sejak 16 November 2026), slug asing dibuang", () => {
+  assert.deepEqual(DEFAULT_SITE_SETTINGS.hiddenServices, ["snorkeling"]);
   // Simpanan lama tanpa daftar memakai bawaan; daftar kosong berarti semua layanan tampil.
-  assert.deepEqual(normalizeSiteSettings({ email: "info@contoh.id" }).hiddenServices, ["dive-courses", "snorkeling"]);
+  assert.deepEqual(normalizeSiteSettings({ email: "info@contoh.id" }).hiddenServices, ["snorkeling"]);
   assert.deepEqual(normalizeSiteSettings({ hiddenServices: [] }).hiddenServices, []);
   assert.deepEqual(validateSiteSettings({ hiddenServices: ["snorkeling", "tidak-ada", "fun-dives", "snorkeling"] }).hiddenServices, ["fun-dives", "snorkeling"]);
-  assert.deepEqual(validateSiteSettings({ hiddenServices: "snorkeling" }).hiddenServices, ["dive-courses", "snorkeling"]);
+  assert.deepEqual(validateSiteSettings({ hiddenServices: "snorkeling" }).hiddenServices, ["snorkeling"]);
 });
 
 test("isian kontak yang salah ditolak dengan nama kolomnya", () => {
