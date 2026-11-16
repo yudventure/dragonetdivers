@@ -204,8 +204,10 @@ export function serviceBySlug(slug, lang = "en") {
 // Layanan yang disimpan: tidak tampil di website (menu, beranda, footer, halaman layanan 404, paketnya
 // tidak bisa dipesan) tetapi isi dan paketnya tetap ada. Tim menampilkannya lagi di /admin/paket
 // (settings baris "site", hiddenServices). Permintaan pemilik Oktober 2026: yang tampil dulu fun dive,
-// dusk dive, dan trip pulau, sedangkan snorkeling dan kursus selam disimpan.
-export const DEFAULT_HIDDEN_SERVICES = ["dive-courses", "snorkeling"];
+// dusk dive, dan trip pulau, sedangkan snorkeling dan kursus selam disimpan. Kursus selam tampil lagi sejak
+// 16 November 2026 (halaman kursus SSI dari pemilik, src/content/courses.js; ensureCoursesShown di
+// src/server/site-settings.js melepasnya sekali dari daftar yang sudah tersimpan).
+export const DEFAULT_HIDDEN_SERVICES = ["snorkeling"];
 
 /** Daftar slug layanan yang disimpan, hanya slug yang dikenal dan urut seperti services. Tanpa daftar = bawaan. */
 export function cleanHiddenServices(value) {

@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import CourseList from "@/components/courses/CourseList";
 import SeaConditions from "@/components/SeaConditions";
 import ServicePackages from "@/components/ServicePackages";
 import ServiceCard, { ServiceVisual } from "@/components/ServiceCard";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { ArrowIcon, CheckIcon, ChatIcon, Wave } from "@/components/icons";
+import { coursesIn } from "@/content/courses";
 import { uiText } from "@/content/ui";
 import { dateRange } from "@/lib/checkout";
+import { COURSES_SERVICE } from "@/lib/course-slugs";
 import { alternates, format, localeHref, locales } from "@/lib/i18n";
 import { poolOf } from "@/lib/modules/calendar";
 import { localizePackage } from "@/lib/packages";
@@ -23,6 +26,8 @@ import { isServiceShown, serviceWithImage, shownServices } from "@/server/site-s
 // Dirender per permintaan supaya paket dan harga dari /admin/paket langsung tampil (tidak tertahan cache
 // halaman atau CDN), begitu juga sisa tempat per tanggal di kalender pesan; kondisi laut tetap dari data
 // cache Next.js 15 menit. Layanan yang disimpan tim (/admin/paket) menjawab 404 sampai ditampilkan lagi.
+// Kursus selam (/services/dive-courses) juga menampilkan lima kursus SSI dengan halamannya sendiri
+// (src/content/courses.js, app/[lang]/services/[slug]/[course]).
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -53,6 +58,13 @@ export default async function ServicePage({ params }) {
   const others = (await shownServices(lang)).filter((other) => other.slug !== service.slug);
   const packages = (await activePackages(service.slug)).map((pkg) => ({ ...localizePackage(pkg, lang), names: { en: pkg.nameEn, id: pkg.nameId } }));
   const booking = packages.length ? await bookingData(service.slug) : null;
+  const courses = service.slug === COURSES_SERVICE ? coursesIn(lang) : [];
+  // Tombol utama: kursus, lalu paket, lalu tanya lewat WhatsApp; yang lain bergaris.
+  const primary = courses.length ? "courses" : packages.length ? "packages" : "ask";
+  const buttonClass = (kind) =>
+    `inline-flex h-12 items-center gap-2 rounded-full px-6 font-bold transition-colors duration-200 ease-brand ${
+      primary === kind ? "bg-teal text-white hover:bg-teal-dark" : "border-[1.5px] border-teal text-teal hover:bg-teal-soft"
+    }`;
 
   return (
     <>
@@ -93,27 +105,25 @@ export default async function ServicePage({ params }) {
                 ))}
               </ul>
               <div className="mt-2 flex flex-wrap gap-3">
+                {courses.length > 0 && (
+                  <a href="#courses" className={buttonClass("courses")}>
+                    {t.courses.see}
+                    <ArrowIcon className="size-[18px] rotate-90" />
+                  </a>
+                )}
                 {packages.length > 0 && (
-                  <a
-                    href="#packages"
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-teal px-6 font-bold text-white transition-colors duration-200 ease-brand hover:bg-teal-dark"
-                  >
+                  <a href="#packages" className={buttonClass("packages")}>
                     {t.packages.see}
                     <ArrowIcon className="size-[18px] rotate-90" />
                   </a>
                 )}
                 {ask ? (
-                  <a
-                    href={ask}
-                    className={`inline-flex h-12 items-center gap-2 rounded-full px-6 font-bold transition-colors duration-200 ease-brand ${
-                      packages.length > 0 ? "border-[1.5px] border-teal text-teal hover:bg-teal-soft" : "bg-teal text-white hover:bg-teal-dark"
-                    }`}
-                  >
+                  <a href={ask} className={buttonClass("ask")}>
                     <ChatIcon className="size-[18px]" />
                     {format(text.ask, { topic: service.title.toLowerCase() })}
                   </a>
                 ) : (
-                  packages.length === 0 && (
+                  primary === "ask" && (
                     <span className="inline-flex h-[26px] items-center rounded-full bg-teal-soft px-3 text-[11px] font-bold tracking-[0.08em] text-teal uppercase">
                       {text.bookingsSoon}
                     </span>
@@ -124,6 +134,8 @@ export default async function ServicePage({ params }) {
             <ServiceVisual service={service} className="aspect-[4/3] rounded-frame" sizes="(min-width: 1024px) 600px, 90vw" priority />
           </div>
         </section>
+
+        {courses.length > 0 && <CourseList courses={courses} lang={lang} text={t.courses} ask={ask} />}
 
         <ServicePackages lang={lang} service={service} packages={packages} booking={booking} />
 

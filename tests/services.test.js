@@ -24,11 +24,14 @@ test("setiap layanan punya slug unik, ilustrasi, dan isi halaman detail", () => 
 });
 
 // Permintaan pemilik Oktober 2026: fun dive, dusk dive, dan trip pulau tampil dulu, sisanya disimpan.
+// Kursus selam tampil lagi sejak 16 November 2026 (halaman kursus SSI), snorkeling tetap disimpan.
 test("layanan yang disimpan tidak tampil, isinya tetap ada", () => {
+  assert.deepEqual(DEFAULT_HIDDEN_SERVICES, ["snorkeling"]);
   assert.deepEqual(
     shownServicesIn("en").map((s) => s.slug),
-    ["fun-dives", "island-trips", "dusk-dives"],
+    services.map((s) => s.slug).filter((slug) => slug !== "snorkeling"),
   );
+  assert.ok(shownServicesIn("en").some((s) => s.slug === "dive-courses"));
   assert.deepEqual(
     shownServicesIn("id", []).map((s) => s.slug),
     services.map((s) => s.slug),

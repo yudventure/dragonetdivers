@@ -85,12 +85,15 @@ export const NO_LOCKS = visitorLocks(null);
 export const pageLocked = (locks, page) => Boolean(locks?.site || (page && locks?.pages?.[page]));
 export const sectionLocked = (locks, section) => Boolean(locks?.sections?.[section]);
 
-/** Kunci halaman untuk alamat tanpa awalan bahasa (/, /services/fun-dives, /checkout/3), atau null. */
+/**
+ * Kunci halaman untuk alamat tanpa awalan bahasa (/, /services/fun-dives, /checkout/3), atau null. Halaman kursus
+ * (/services/dive-courses/open-water-diver) ikut kunci layanannya.
+ */
 export function pageForPath(path) {
   const clean = String(path || "/").replace(/\/+$/, "") || "/";
   if (clean === "/") return "home";
   if (clean === "/checkout" || clean.startsWith("/checkout/")) return "checkout";
-  const match = clean.match(/^\/services\/([a-z-]+)$/);
+  const match = clean.match(/^\/services\/([a-z-]+)(?:\/[a-z-]+)?$/);
   return match && PAGE_KEYS.includes(match[1]) ? match[1] : null;
 }
 

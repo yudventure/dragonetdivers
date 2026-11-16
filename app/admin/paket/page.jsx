@@ -11,7 +11,7 @@ import { serviceImageOf } from "@/lib/site-settings";
 import { currentAdmin } from "@/server/admin-auth";
 import { databaseStatus } from "@/server/db";
 import { allPackages, ensurePriceList } from "@/server/packages";
-import { getSiteSettings } from "@/server/site-settings";
+import { ensureCoursesShown, getSiteSettings } from "@/server/site-settings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Paket & harga" };
@@ -21,7 +21,7 @@ export default async function PackagesPage() {
   const admin = await currentAdmin();
   if (!admin) return <AdminGate />;
   const database = await databaseStatus();
-  if (database.ok) await ensurePriceList();
+  if (database.ok) await Promise.all([ensurePriceList(), ensureCoursesShown()]);
   const packages = database.ok ? await allPackages().catch(() => []) : [];
   // Layanan yang disimpan (tidak tampil di website) tetap punya daftar paketnya di sini.
   const { hiddenServices, serviceImages } = await getSiteSettings({ fresh: database.ok });

@@ -2,6 +2,7 @@
 // verifikasi tag HTML yang ditempel tim di /admin/google (disimpan di settings baris "site", dipasang di
 // <head> lewat app/[lang]/layout.jsx), sitemap.xml (app/sitemap.js), dan robots.txt (app/robots.js).
 // Fungsi murni, diuji di tests/seo.test.js.
+import { COURSE_SLUGS, COURSES_SERVICE, coursePath } from "./course-slugs.js";
 import { defaultLocale, htmlLang, localeHref, locales } from "./i18n.js";
 
 const TOKEN = /^[A-Za-z0-9_-]{20,100}$/;
@@ -42,8 +43,11 @@ export function googleVerificationsOf(value) {
   return [...new Set(codes.filter(Boolean))];
 }
 
-/** Halaman publik yang didaftarkan ke Google: beranda dan halaman layanan yang tampil. */
-export const sitemapPaths = (serviceSlugs) => ["/", ...serviceSlugs.map((slug) => `/services/${slug}`)];
+/** Halaman publik yang didaftarkan ke Google: beranda, halaman layanan yang tampil, dan halaman kursus bila kursus selam tampil. */
+export const sitemapPaths = (serviceSlugs) => [
+  "/",
+  ...serviceSlugs.flatMap((slug) => [`/services/${slug}`, ...(slug === COURSES_SERVICE ? COURSE_SLUGS.map(coursePath) : [])]),
+];
 
 /**
  * Isi sitemap.xml: setiap halaman dalam setiap bahasa (English, Indonesia, Mandarin, Korea), dengan pasangan
